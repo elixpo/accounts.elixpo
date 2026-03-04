@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminSession } from '../../../../src/lib/admin-middleware';
 import { listAdminUsers, countUsers, setUserAdminStatus, setUserActiveStatus, logAdminAction } from '../../../../src/lib/db';
 import { getDatabase } from '../../../../src/lib/d1-client';
-import { generateUUID } from '../../../../src/lib/crypto';
+import { generateUUID } from '../../../../src/lib/webcrypto';
 
 export async function GET(request: NextRequest) {
   const session = await verifyAdminSession(request);
