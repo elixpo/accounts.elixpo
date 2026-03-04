@@ -227,19 +227,25 @@ export async function createOAuthClient(
     name,
     redirectUris,
     scopes,
+    ownerId,
+    description,
+    homepageUrl,
   }: {
     clientId: string;
     clientSecretHash: string;
     name: string;
     redirectUris: string; // JSON stringified array
     scopes: string; // JSON stringified array
+    ownerId: string;
+    description?: string;
+    homepageUrl?: string;
   }
 ) {
   const stmt = db.prepare(
-    `INSERT INTO oauth_clients (client_id, client_secret_hash, name, redirect_uris, scopes)
-     VALUES (?, ?, ?, ?, ?)`
+    `INSERT INTO oauth_clients (client_id, client_secret_hash, name, redirect_uris, scopes, owner_id, description, homepage_url)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
   );
-  return await stmt.bind(clientId, clientSecretHash, name, redirectUris, scopes).run();
+  return await stmt.bind(clientId, clientSecretHash, name, redirectUris, scopes, ownerId, description ?? null, homepageUrl ?? null).run();
 }
 
 export async function getOAuthClientById(db: D1Database, clientId: string) {
@@ -276,6 +282,9 @@ export async function updateOAuthClient(
     redirectUris?: string;
     scopes?: string;
     isActive?: boolean;
+    description?: string;
+    homepageUrl?: string;
+    logoUrl?: string;
   }
 ) {
   const setClauses: string[] = [];
@@ -296,6 +305,18 @@ export async function updateOAuthClient(
   if (updates.isActive !== undefined) {
     setClauses.push('is_active = ?');
     values.push(updates.isActive ? 1 : 0);
+  }
+  if (updates.description !== undefined) {
+    setClauses.push('description = ?');
+    values.push(updates.description);
+  }
+  if (updates.homepageUrl !== undefined) {
+    setClauses.push('homepage_url = ?');
+    values.push(updates.homepageUrl);
+  }
+  if (updates.logoUrl !== undefined) {
+    setClauses.push('logo_url = ?');
+    values.push(updates.logoUrl);
   }
 
   if (setClauses.length === 0) {
