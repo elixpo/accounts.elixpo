@@ -1,7 +1,9 @@
+export const runtime = 'edge';
+
 /**
  * Prometheus Metrics Endpoint
  * Exposes metrics for Prometheus scraping
- * 
+ *
  * Add to wrangler.toml or your router:
  * GET /metrics - Prometheus metrics in text format
  */
