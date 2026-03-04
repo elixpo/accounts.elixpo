@@ -6,10 +6,10 @@
  * GET /metrics - Prometheus metrics in text format
  */
 
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getMetricsText } from '../../../src/lib/prometheus-metrics';
 
-export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   try {
