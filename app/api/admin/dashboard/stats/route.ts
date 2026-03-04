@@ -2,7 +2,7 @@ export const runtime = 'edge';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminSession } from '../../../../../src/lib/admin-middleware';
-import { getAdminDashboardStats, getRequestTrend, getTopApps } from '../../../../../src/lib/db';
+import { getAdminDashboardStats, getRequestTrend, getTopApps, listAdminUsers, listOAuthClients } from '../../../../../src/lib/db';
 import { getDatabase } from '../../../../../src/lib/d1-client';
 import { cacheGetOrSet } from '../../../../../src/lib/kv-cache';
 
@@ -24,12 +24,20 @@ export async function GET(request: NextRequest) {
 
     const result = await cacheGetOrSet(`admin:stats:${timeRange}`, 300, async () => {
       const db = await getDatabase();
-      const [stats, requestTrend, topApps] = await Promise.all([
+      const [stats, requestTrend, topApps, recentUsersResult, recentAppsResult] = await Promise.all([
         getAdminDashboardStats(db, daysBack),
         getRequestTrend(db, daysBack > 30 ? 30 : daysBack),
         getTopApps(db, 5),
+        listAdminUsers(db, 5, 0),
+        listOAuthClients(db, 5, 0),
       ]);
-      return { ...stats, requestTrend, topApps };
+      return {
+        ...stats,
+        requestTrend,
+        topApps,
+        recentUsers: recentUsersResult.results || [],
+        recentApps: recentAppsResult.results || [],
+      };
     });
 
     return NextResponse.json({
