@@ -3,7 +3,7 @@
  * Handles generation, validation, and management of API keys
  */
 
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import { getDatabase } from './d1-client';
 
 export interface ApiKeyScopes {
