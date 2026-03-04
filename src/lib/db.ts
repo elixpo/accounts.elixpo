@@ -276,6 +276,9 @@ export async function updateOAuthClient(
     redirectUris?: string;
     scopes?: string;
     isActive?: boolean;
+    description?: string;
+    homepageUrl?: string;
+    logoUrl?: string;
   }
 ) {
   const setClauses: string[] = [];
@@ -296,6 +299,18 @@ export async function updateOAuthClient(
   if (updates.isActive !== undefined) {
     setClauses.push('is_active = ?');
     values.push(updates.isActive ? 1 : 0);
+  }
+  if (updates.description !== undefined) {
+    setClauses.push('description = ?');
+    values.push(updates.description);
+  }
+  if (updates.homepageUrl !== undefined) {
+    setClauses.push('homepage_url = ?');
+    values.push(updates.homepageUrl);
+  }
+  if (updates.logoUrl !== undefined) {
+    setClauses.push('logo_url = ?');
+    values.push(updates.logoUrl);
   }
 
   if (setClauses.length === 0) {

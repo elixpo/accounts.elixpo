@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import SettingsIcon from '@mui/icons-material/Settings';
+import Link from 'next/link';
 
 interface OAuthApp {
   client_id: string;
@@ -277,14 +279,25 @@ const OAuthAppsPage = () => {
                         {new Date(app.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell align="right">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDeleteApp(app.client_id)}
-                          sx={{ color: '#ef4444', '&:hover': { backgroundColor: 'rgba(239, 68, 68, 0.1)' } }}
-                          title="Delete Application"
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
+                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
+                          <IconButton
+                            size="small"
+                            component={Link}
+                            href={`/dashboard/oauth-apps/${app.client_id}`}
+                            sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#a3e635', backgroundColor: 'rgba(163,230,53,0.08)' } }}
+                            title="Settings"
+                          >
+                            <SettingsIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteApp(app.client_id)}
+                            sx={{ color: '#ef4444', '&:hover': { backgroundColor: 'rgba(239, 68, 68, 0.1)' } }}
+                            title="Delete Application"
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
                       </TableCell>
                     </TableRow>
                   ))}
