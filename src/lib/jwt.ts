@@ -12,41 +12,18 @@ export interface JWTPayload {
 
 
 export async function getSigningKey(): Promise<jose.KeyLike | Uint8Array> {
-  const isDev = process.env.NODE_ENV === 'development';
-
-  if (isDev) {
-    // Development: Use HS256 with JWT_SECRET
-    const secret = process.env.JWT_SECRET;
-    if (!secret || secret.length < 32) {
-      throw new Error('JWT_SECRET must be at least 32 characters for production');
-    }
-    return new TextEncoder().encode(secret);
-  }
-
   const privateKeyPEM = process.env.JWT_PRIVATE_KEY;
   if (!privateKeyPEM) {
     throw new Error('JWT_PRIVATE_KEY not found in environment');
   }
-
   return jose.importPKCS8(privateKeyPEM, 'EdDSA');
 }
 
 export async function getVerifyingKey(): Promise<jose.KeyLike | Uint8Array> {
-  const isDev = process.env.NODE_ENV === 'development';
-
-  if (isDev) {
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      throw new Error('JWT_SECRET not found in environment');
-    }
-    return new TextEncoder().encode(secret);
-  }
-
   const publicKeyPEM = process.env.JWT_PUBLIC_KEY;
   if (!publicKeyPEM) {
     throw new Error('JWT_PUBLIC_KEY not found in environment');
   }
-
   return jose.importSPKI(publicKeyPEM, 'EdDSA');
 }
 
@@ -66,10 +43,9 @@ export async function createAccessToken(
   };
 
   const key = await getSigningKey();
-  const isDev = process.env.NODE_ENV === 'development';
 
   const jwt = await new jose.SignJWT(payload)
-    .setProtectedHeader({ alg: isDev ? 'HS256' : 'EdDSA' })
+    .setProtectedHeader({ alg: 'EdDSA' })
     .setIssuedAt()
     .setExpirationTime(`${expiresInMinutes}m`)
     .sign(key);
@@ -91,10 +67,9 @@ export async function createRefreshToken(
   };
 
   const key = await getSigningKey();
-  const isDev = process.env.NODE_ENV === 'development';
 
   const jwt = await new jose.SignJWT(payload)
-    .setProtectedHeader({ alg: isDev ? 'HS256' : 'EdDSA' })
+    .setProtectedHeader({ alg: 'EdDSA' })
     .setIssuedAt()
     .setExpirationTime(`${expiresInDays}d`)
     .sign(key);
@@ -106,10 +81,9 @@ export async function createRefreshToken(
 export async function verifyJWT(token: string): Promise<JWTPayload | null> {
   try {
     const key = await getVerifyingKey();
-    const isDev = process.env.NODE_ENV === 'development';
 
     const verified = await jose.jwtVerify(token, key, {
-      algorithms: [isDev ? 'HS256' : 'EdDSA'],
+      algorithms: ['EdDSA'],
     });
 
     return verified.payload as unknown as JWTPayload;
