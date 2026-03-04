@@ -1,7 +1,7 @@
 export const runtime = 'edge';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { hashString, generateUUID } from '@/lib/crypto';
+import { hashString, generateUUID } from '@/lib/webcrypto';
 import { verifyJWT, createAccessToken, createRefreshToken } from '@/lib/jwt';
 import { getOAuthClientByIdWithSecret, validateOAuthClient, getRefreshTokenByHash, revokeRefreshToken, createRefreshToken as storeRefreshToken, getUserById } from '@/lib/db';
 import { getDatabase } from '@/lib/d1-client';
