@@ -2,6 +2,10 @@
   <img src="https://github.com/user-attachments/assets/a2057d99-fc2d-4e19-ab16-661a403bc0ec" alt="Elixpo Accounts Banner" width="600"/>
   <h1>🔐 Elixpo Accounts</h1>
   <p><em>The central identity and SSO gateway for the Elixpo ecosystem.</em></p>
+  
+  <a href="https://github.com/sponsors/Circuit-Overtime">
+    <img alt="GitHub Sponsors" src="https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#EA4AAA" />
+  </a>
 </div>
 
 ---
