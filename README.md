@@ -15,6 +15,24 @@ If you want to use our chat application, news feed, or any other platform we bui
 * **Universal Access:** One account to access all Elixpo projects.
 * **Flexible Login:** Sign in securely using your existing Google or GitHub accounts, or stick to a traditional Email login.
 * **Centralized Dashboard:** Manage your active sessions, connected services, and security settings all in one clean interface.
+* **OAuth 2.0 Integration:** Standardized OAuth 2.0 Authorization Code flow for third-party applications.
+
+## 🔗 Integration & Documentation
+
+**For developers integrating with Elixpo Accounts:**
+
+- **[API Documentation](./app/docs/README.md)** — Complete OAuth 2.0 integration guide
+- **[LLM Specification](./app/docs/LLM_SPEC.md)** — Plain-text spec optimized for LLM consumption
+- **[OpenAPI Spec](./app/docs/OPENAPI_SPEC.json)** — Machine-readable API specification (OpenAPI 3.0.0)
+- **[Interactive Docs](https://accounts.elixpo.com/docs)** — Live documentation with copy-to-clipboard functionality
+
+### Quick Integration
+
+```bash
+# 1. Register your OAuth app at https://accounts.elixpo.com/dashboard/oauth-apps
+# 2. Get your Client ID & Client Secret
+# 3. Follow the OAuth 2.0 Authorization Code flow in the docs above
+```
 
 ## 💻 Built With
 For developers looking to contribute, this project is built on a modern, fast, and scalable stack:

@@ -1,0 +1,303 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Elixpo Accounts OAuth 2.0 API",
+    "version": "1.0.0",
+    "description": "OAuth 2.0 Identity Provider for the Elixpo ecosystem",
+    "contact": {
+      "email": "accounts@elixpo.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://accounts.elixpo.com",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/oauth/authorize": {
+      "get": {
+        "summary": "Authorization endpoint",
+        "description": "Redirect users to this endpoint for OAuth authorization",
+        "operationId": "authorize",
+        "parameters": [
+          {
+            "name": "response_type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["code"]
+            },
+            "description": "Must be 'code'"
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Your registered OAuth app's Client ID"
+          },
+          {
+            "name": "redirect_uri",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Must exactly match a registered redirect URI"
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Random string for CSRF protection"
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "openid profile email"
+            },
+            "description": "Space-separated scopes"
+          },
+          {
+            "name": "nonce",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional nonce for replay protection"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to redirect_uri with authorization code or error"
+          }
+        }
+      }
+    },
+    "/api/auth/token": {
+      "post": {
+        "summary": "Token endpoint",
+        "description": "Exchange authorization code for tokens or refresh tokens",
+        "operationId": "token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "grant_type": {
+                        "type": "string",
+                        "enum": ["authorization_code"]
+                      },
+                      "code": {
+                        "type": "string"
+                      },
+                      "client_id": {
+                        "type": "string"
+                      },
+                      "client_secret": {
+                        "type": "string"
+                      },
+                      "redirect_uri": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["grant_type", "code", "client_id", "client_secret", "redirect_uri"]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "grant_type": {
+                        "type": "string",
+                        "enum": ["refresh_token"]
+                      },
+                      "refresh_token": {
+                        "type": "string"
+                      },
+                      "client_id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["grant_type", "refresh_token", "client_id"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful token response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "description": "JWT access token"
+                    },
+                    "token_type": {
+                      "type": "string",
+                      "enum": ["Bearer"]
+                    },
+                    "expires_in": {
+                      "type": "integer",
+                      "description": "Token expiration in seconds (900 seconds = 15 minutes)"
+                    },
+                    "refresh_token": {
+                      "type": "string",
+                      "description": "JWT refresh token"
+                    },
+                    "scope": {
+                      "type": "string",
+                      "description": "Space-separated scopes"
+                    }
+                  },
+                  "required": ["access_token", "token_type", "expires_in"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request or invalid grant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid client credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "summary": "Get current user profile",
+        "operationId": "getUserProfile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - invalid or missing token"
+          },
+          "403": {
+            "description": "Forbidden - token expired"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique user identifier"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Alias for id"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "User's display name (e.g., 'swift-falcon')"
+          },
+          "isAdmin": {
+            "type": "boolean"
+          },
+          "provider": {
+            "type": "string",
+            "enum": ["email"]
+          },
+          "avatar": {
+            "type": ["string", "null"],
+            "format": "uri"
+          },
+          "emailVerified": {
+            "type": "boolean"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Token expiration timestamp"
+          }
+        },
+        "required": ["id", "email", "displayName", "isAdmin", "provider", "emailVerified"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "enum": [
+              "invalid_request",
+              "invalid_client",
+              "invalid_grant",
+              "access_denied",
+              "unsupported_response_type",
+              "server_error"
+            ]
+          },
+          "error_description": {
+            "type": "string"
+          }
+        },
+        "required": ["error"]
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
