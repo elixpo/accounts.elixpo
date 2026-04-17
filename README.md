@@ -29,7 +29,7 @@ Think of it as your universal Elixpo passport.
 |---|---|
 | 🎫 **One account, everywhere** | Sign up once, use every Elixpo tool. No duplicate profiles. |
 | 🔑 **Login your way** | Email + password, Google, or GitHub. Your choice. |
-| 📊 **Your own dashboard** | See active sessions, connected apps, and your profile, all in one place. |
+| 📊 **Your own dashboard** | Manage your profile and connected apps all in one place. |
 | 🛡️ **Built for privacy** | We only store what's needed. No tracking, no selling data. |
 | ⚡ **Instant everywhere** | Runs on Cloudflare's edge network, so it's fast wherever you are. |
 | 🧑‍💻 **For developers too** | Build your own app on top of Elixpo's identity — full OAuth 2.0 support. |
@@ -90,7 +90,6 @@ We love pull requests. Whether it's fixing a typo, reporting a bug, or building 
 - Want to help out? Browse our [open issues](https://github.com/elixpo/accounts.elixpo/issues) and pick one that catches your eye
 - Have an idea? Tag it `FEATURE` and we'll chat
 
-> **Tip:** Add the `ELIXPO` label to an issue and our bot will jump in to help scope or even draft a PR for you.
 
 ---
 
