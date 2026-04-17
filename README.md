@@ -24,5 +24,10 @@ For developers looking to contribute, this project is built on a modern, fast, a
 * **Infrastructure:** Cloudflare Routing & Cloudflare D1 (Database)
 * **Containerization:** Docker
 
+## 💝 Support
+Love this project? Support our work and help us build even better tools:
+
+[![GitHub Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-sponsor?style=for-the-badge&logo=github&logoColor=white&color=ea4aaa)](https://github.com/sponsors/Circuit-Overtime)
+
 ---
 *Maintained by the Elixpo Open Source Team.*
