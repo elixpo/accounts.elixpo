@@ -15,28 +15,30 @@ concurrency:
   cancel-in-progress: false
 
 on:
-  issue_comment:
+  # PR-side only. Issue events (including @elixpoo mentions in issue bodies
+  # or comments) are owned by issue-auto-fix.yml + issue-triage.yml — this
+  # workflow must never fire on a plain issue, or we get dual-fire.
+  issue_comment:                # only PR comments, filtered by the if: block
     types: [created]
   pull_request_review_comment:
     types: [created]
-  issues:
-    types: [opened, assigned]
   pull_request_review:
     types: [submitted]
-  # When a whitelisted maintainer assigns @elixpoo as a reviewer from the
-  # review panel, that counts as "please review this PR" — same downstream flow.
-  pull_request:
+  pull_request:                 # review_requested = @elixpoo assigned as reviewer
     types: [review_requested]
 
 jobs:
   elixpo:
     # Skip if the triggering actor is elixpoo itself — loop prevention.
+    # PR-side work only. Issue comments go to issue-auto-fix.yml via the
+    # `!github.event.issue.pull_request` guard there; we use the inverse
+    # (`github.event.issue.pull_request` truthy) so the two workflows are
+    # disjoint and a single `@elixpoo` mention never fires both.
     if: |
       github.actor != 'elixpoo' && (
-        (github.event_name == 'issue_comment' && github.event.comment.user.login != 'elixpoo' && contains(github.event.comment.body, '@elixpoo')) ||
+        (github.event_name == 'issue_comment' && github.event.issue.pull_request && github.event.comment.user.login != 'elixpoo' && contains(github.event.comment.body, '@elixpoo')) ||
         (github.event_name == 'pull_request_review_comment' && github.event.comment.user.login != 'elixpoo' && contains(github.event.comment.body, '@elixpoo')) ||
         (github.event_name == 'pull_request_review' && github.event.review.user.login != 'elixpoo' && contains(github.event.review.body, '@elixpoo')) ||
-        (github.event_name == 'issues' && github.event.issue.user.login != 'elixpoo' && (contains(github.event.issue.body, '@elixpoo') || contains(github.event.issue.title, '@elixpoo'))) ||
         (github.event_name == 'pull_request' && github.event.requested_reviewer.login == 'elixpoo')
       )
     runs-on: ubuntu-latest
