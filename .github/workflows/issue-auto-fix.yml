@@ -119,7 +119,7 @@ jobs:
           cd config-src
           AGENT_MODEL=$(python3 -c "import sys; sys.path.insert(0,'.github'); from ci_config import LLM_MODEL_AGENT; print(LLM_MODEL_AGENT)")
           CODE_MODEL=$(python3 -c "import sys; sys.path.insert(0,'.github'); from ci_config import LLM_MODEL_CODE; print(LLM_MODEL_CODE)")
-          THINK_MODEL=$(python3 -c "import sys; sys.path.insert(0,'.github'); from ci_config import LLM_MODEL_rocket; print(LLM_MODEL_rocket)")
+          THINK_MODEL=$(python3 -c "import sys; sys.path.insert(0,'.github'); from ci_config import LLM_MODEL_THINKING; print(LLM_MODEL_THINKING)")
           SEARCH_MODEL=$(python3 -c "import sys; sys.path.insert(0,'.github'); from ci_config import LLM_MODEL_SEARCH; print(LLM_MODEL_SEARCH)")
           cd ..
 
