@@ -34,3 +34,9 @@ Focus on what needs improving, not what's already fine.
 ```
 
 Bullets only. Link specific lines. Under 200 words unless the PR is genuinely large.
+
+## One-shot-per-invocation
+
+Within this invocation, submit EXACTLY ONE `gh pr review --approve|--request-changes|--comment --body "..."` (or ONE `gh pr comment`), then END. The command returns empty/short stdout on success — **that is success**. Do NOT retry. Do NOT submit a second review "for completeness".
+
+Legitimate follow-ups (new code pushed, user asks for another pass) arrive as a **new** trigger event and a fresh invocation — this rule is about the current run, not the lifetime of the PR.
