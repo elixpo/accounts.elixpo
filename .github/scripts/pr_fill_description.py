@@ -26,7 +26,11 @@ from scripts._common import call_llm, github_rest  # noqa: E402
 
 REPO = os.environ["REPO"]
 PR_NUMBER = os.environ["PR_NUMBER"]
-TRIGGER_RE = re.compile(r"@elixpoo\s+fill", re.IGNORECASE)
+# Word-bounded @elixpoo (rejects @elixpooo). Accepts any phrasing after it
+# — "fill the PR description", "write me a description", "draft this", etc.
+# The LLM generates the body either way; we just detect the mention and
+# strip it from the final output so the workflow doesn't re-fire on our edit.
+TRIGGER_RE = re.compile(r"@elixpoo\b", re.IGNORECASE)
 MAX_DIFF_CHARS = 18000
 
 SYSTEM_PROMPT = """\

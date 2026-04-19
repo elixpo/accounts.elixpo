@@ -16,11 +16,13 @@ jobs:
     # Fire only if:
     #  - actor is a whitelisted org member (no external PRs),
     #  - actor is not elixpoo itself (loop prevention on our own edits),
-    #  - the PR body contains the `@elixpoo fill` trigger.
+    #  - the PR body mentions @elixpoo (any phrasing: "fill", "write",
+    #    "draft the description", etc.). The Python script does a word-bounded
+    #    recheck and strips the trigger line from the rewritten body.
     if: |
       github.event.pull_request.user.login != 'elixpoo' &&
       contains(fromJSON('["Circuit-Overtime","anwe-ch","elixpoo","ez-vivek"]'), github.event.pull_request.user.login) &&
-      contains(github.event.pull_request.body, '@elixpoo fill')
+      contains(github.event.pull_request.body, '@elixpoo')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
