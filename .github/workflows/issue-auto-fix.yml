@@ -104,34 +104,34 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Setup router + thinking reaction
+      - name: Setup router + rocket reaction
         if: steps.whitelist.outputs.authorized == 'true'
         id: setup
         run: |
-          # thinking reaction on the triggering comment (or the issue itself for label events)
+          # rocket reaction on the triggering comment (or the issue itself for label events)
           if [ "${{ github.event_name }}" = "issue_comment" ]; then
-            gh api repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions -f content=thinking || true
+            gh api repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions -f content=rocket || true
           else
-            gh api repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/reactions -f content=thinking || true
+            gh api repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/reactions -f content=rocket || true
           fi
 
           # Pull models from ci_config.py — single source of truth
           cd config-src
           AGENT_MODEL=$(python3 -c "import sys; sys.path.insert(0,'.github'); from ci_config import LLM_MODEL_AGENT; print(LLM_MODEL_AGENT)")
           CODE_MODEL=$(python3 -c "import sys; sys.path.insert(0,'.github'); from ci_config import LLM_MODEL_CODE; print(LLM_MODEL_CODE)")
-          THINK_MODEL=$(python3 -c "import sys; sys.path.insert(0,'.github'); from ci_config import LLM_MODEL_THINKING; print(LLM_MODEL_THINKING)")
+          THINK_MODEL=$(python3 -c "import sys; sys.path.insert(0,'.github'); from ci_config import LLM_MODEL_rocket; print(LLM_MODEL_rocket)")
           SEARCH_MODEL=$(python3 -c "import sys; sys.path.insert(0,'.github'); from ci_config import LLM_MODEL_SEARCH; print(LLM_MODEL_SEARCH)")
           cd ..
 
           # Router wiring (models come from ci_config.py, NOT hardcoded here):
           #   default    → AGENT_MODEL  — main agentic thread
           #   background → CODE_MODEL   — delegated code-heavy subagent work
-          #   thinking   → THINK_MODEL  — reasoning-heavy steps
+          #   rocket   → THINK_MODEL  — reasoning-heavy steps
           #   webSearch  → SEARCH_MODEL — when explicit web lookup is needed
-          echo "Router models: default=$AGENT_MODEL, background=$CODE_MODEL, thinking=$THINK_MODEL, webSearch=$SEARCH_MODEL"
+          echo "Router models: default=$AGENT_MODEL, background=$CODE_MODEL, rocket=$THINK_MODEL, webSearch=$SEARCH_MODEL"
 
           mkdir -p $HOME/.claude-code-router
-          # Copy custom CCR adapters (gemini thinking-disable, etc.) so the
+          # Copy custom CCR adapters (gemini rocket-disable, etc.) so the
           # router can load them by absolute path.
           cp config-src/.github/ccr-adapters/*.js $HOME/.claude-code-router/ 2>/dev/null || true
           GEMINI_ADAPTER="$HOME/.claude-code-router/gemini-adapter.js"
@@ -139,7 +139,7 @@ jobs:
           # Transformer order: gemini-adapter → openai → maxtoken.
           # gemini-adapter flattens prior tool_use/tool_result in history to
           # plain text (Vertex demands thought_signature on replayed tool_use;
-          # Pollinations exposes no knob to disable Gemini thinking).
+          # Pollinations exposes no knob to disable Gemini rocket).
           # Custom transformers MUST be registered at top-level "transformers"
           # — CCR resolves strings in "use" as registered names, not paths.
           cat > $HOME/.claude-code-router/config.json <<EOF
@@ -173,7 +173,7 @@ jobs:
             "Router": {
               "default": "pollinations-main,${AGENT_MODEL}",
               "background": "pollinations-coder,${CODE_MODEL}",
-              "thinking": "pollinations-main,${THINK_MODEL}",
+              "rocket": "pollinations-main,${THINK_MODEL}",
               "webSearch": "pollinations-main,${SEARCH_MODEL}"
             }
           }
