@@ -237,9 +237,17 @@ jobs:
             1. `gh issue view ${{ github.event.issue.number }} --comments` (once).
             2. Use Glob/Grep to locate files. Do NOT ls/tree.
             3. CHOOSE THE RIGHT TOOL per operation:
-               - **Bulk find/replace across many files** → ONE bash: `grep -rl 'OLD' app/ src/ | xargs sed -i 's/OLD/NEW/g'` (and repeat in a single turn for each string). NEVER do 20+ Read+Edit roundtrips for a mechanical rename — it takes 3+ minutes per 10 files through CCR.
-               - **1-3 file surgical edit** → Read then Edit.
-               - **Complex multi-step refactor** → delegate to a Task subagent with the full plan (routes to qwen-coder, which is code-tuned and faster).
+               - **Bulk / mechanical refactor (renames, theme swaps, string migrations, >3 files)** → `python .github/scripts/apply_refactor.py` with a JSON plan on stdin. ONE call, deterministic, no LLM roundtrip per file. Example:
+                 ```
+                 cat <<'PLAN' | python .github/scripts/apply_refactor.py
+                 {"replacements":[
+                   {"find":"#a3e635","replace":"#a78bfa"},
+                   {"find":"#86efac","replace":"#c4b5fd"}
+                 ],"scope":["app/","src/","theme.js"],"include":"*.{ts,tsx,js,jsx,css}"}
+                 PLAN
+                 ```
+               - **1-3 file surgical edit** → Read then Edit / MultiEdit.
+               - **Complex multi-step refactor needing judgement** → delegate to a Task subagent (routes to qwen-coder via CCR background).
             4. For code changes: branch `elixpo/issue-${{ github.event.issue.number }}-<hex>`, apply edits, `./biome.sh ci`, commit, push, `gh pr create --base main --title "[ELIXPO] <title>" --body "...Fixes #${{ github.event.issue.number }}"`.
             5. For a question / LGTM / discussion: one `gh issue comment ${{ github.event.issue.number }}` and stop.
 
