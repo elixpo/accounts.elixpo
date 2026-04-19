@@ -223,34 +223,10 @@ jobs:
         if: steps.whitelist.outputs.authorized == 'true'
         run: git fetch origin main --depth=50 || true
 
-      # ─────────────────────────────────────────────────────────────────
-      # Wire claudeops agents/hooks into .claude/ from the published npm
-      # package (@elixpo/claudeops). Faster than cloning the git repo and
-      # lets us bring in ONLY the agents we actually reference.
-      # The repo ships its own .claude/commands/ (committed) — those take
-      # priority and are not touched here.
-      # ─────────────────────────────────────────────────────────────────
-      - name: Wire claudeops agents + hooks into .claude/
-        if: steps.whitelist.outputs.authorized == 'true'
-        run: |
-          set -e
-          mkdir -p .claude/agents .claude/hooks
-          # Install only the claudeops package into a scratch prefix.
-          npm install --no-save --no-audit --no-fund --prefix /tmp/claudeops @elixpo/claudeops >/dev/null
-          SRC=/tmp/claudeops/node_modules/@elixpo/claudeops
-          # Copy only the agents we actually reference from the system prompt.
-          # Add to this list when the prompt references more.
-          for a in architect red-team refiner breaker wirer; do
-            if [ -f "$SRC/agents/$a.md" ]; then
-              cp "$SRC/agents/$a.md" ".claude/agents/$a.md"
-            fi
-          done
-          # Hooks are small — copy the lot.
-          cp -r "$SRC/hooks/." .claude/hooks/ 2>/dev/null || true
-          if [ -f "$SRC/config/hooks.json" ] && [ ! -f .claude/hooks.json ]; then
-            cp "$SRC/config/hooks.json" .claude/hooks.json
-          fi
-          echo "Wired $(ls .claude/agents | wc -l) agents + $(ls .claude/hooks 2>/dev/null | wc -l) hooks from @elixpo/claudeops"
+      # Polly-style: no claudeops agents wired in. Each subagent .md adds
+      # ~2KB to the Task tool schema per turn but we rarely invoke them
+      # (Task routes to qwen-coder via CCR anyway). Hooks were marginal.
+      # Keeps the flow lean and matches issue-auto-fix's shape.
 
       # ─────────────────────────────────────────────────────────────────
       # Pull the pre-built repo-context artifact (.elixpo-context/context.md)
