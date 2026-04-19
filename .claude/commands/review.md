@@ -34,3 +34,15 @@ Focus on what needs improving, not what's already fine.
 ```
 
 Bullets only. Link specific lines. Under 200 words unless the PR is genuinely large.
+
+## One-shot rule
+
+Submit EXACTLY ONE `gh pr review --approve|--request-changes|--comment --body "..."` or ONE `gh pr comment`. The command returns empty/short stdout on success — **that is success**. Do NOT retry. Do NOT submit a second review "for completeness".
+
+Before submitting, check if elixpoo already reviewed:
+
+```bash
+gh api "repos/{owner}/{repo}/pulls/<n>/reviews" --jq '[.[]|select(.user.login=="elixpoo")]|length'
+```
+
+If ≥1, someone was re-triggering us — STOP without adding another review.
