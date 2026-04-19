@@ -201,6 +201,12 @@ jobs:
           repository: ${{ github.repository }}
           token: ${{ secrets.CI_AGENT_TOKEN }}
 
+      # Ensure origin/main is a local ref so `git diff origin/main...HEAD` works
+      # on flows where the ref is checked out indirectly.
+      - name: Fetch main for diffs
+        if: steps.whitelist.outputs.authorized == 'true'
+        run: git fetch origin main --depth=50 || true
+
       # ─────────────────────────────────────────────────────────────────
       # Wire claudeops agents + hooks into .claude/ from the published npm
       # package (@elixpo/claudeops). Only pulls the agents we reference.
@@ -242,6 +248,31 @@ jobs:
           if_no_artifact_found: warn
           github_token: ${{ secrets.CI_AGENT_TOKEN }}
 
+      # Build a prompt with repo context injected inline — avoids the model
+      # running ls -R / tree to rediscover what's on disk.
+      - name: Build prompt body
+        if: steps.whitelist.outputs.authorized == 'true'
+        id: build_prompt
+        run: |
+          CTX="(context artifact missing)"
+          if [ -f .elixpo-context/context.md ]; then
+            CTX=$(head -c 6000 .elixpo-context/context.md)
+          fi
+          {
+            echo 'prompt<<PROMPT_EOF'
+            echo "Event: ${{ github.event_name }}"
+            echo "Actor: @${{ github.actor }}"
+            echo "Repo: ${{ github.repository }}"
+            echo "Issue: #${{ github.event.issue.number }}"
+            echo "Issue title: ${{ github.event.issue.title }}"
+            echo ""
+            echo "## Repo context (pre-built snapshot)"
+            echo "$CTX"
+            echo ""
+            echo "Proceed per .claude/commands/respond-to-issue.md. Act via tools, do not output plan/analysis as text."
+            echo 'PROMPT_EOF'
+          } >> "$GITHUB_OUTPUT"
+
       - uses: anthropics/claude-code-action@v1
         if: steps.whitelist.outputs.authorized == 'true'
         env:
@@ -252,15 +283,16 @@ jobs:
           GIT_COMMITTER_EMAIL: "269200728+elixpoo@users.noreply.github.com"
         with:
           anthropic_api_key: "ccr-pollinations"
-          show_full_output: true
+          show_full_output: false
           github_token: ${{ secrets.CI_AGENT_TOKEN }}
           branch_prefix: "elixpo/"
+          prompt: ${{ steps.build_prompt.outputs.prompt }}
           # claude-code-action injects its own restrictive ALLOWED_TOOLS list
           # for PR-creation flows. --permission-mode bypassPermissions is the
           # only reliable escape. Safe: ephemeral sandbox, branch-protected main.
           claude_args: |
             --permission-mode bypassPermissions
-            --system-prompt "You are elixpo, a developer on the Elixpo team. Never say 'Claude', 'Claude Code', 'AI', 'LLM', 'analyzing', 'analysis' — speak as a teammate. AGENTS.md is the operating manual. For THIS flow, follow .claude/commands/respond-to-issue.md exactly (it has the question-vs-implement-vs-existing-PR decision tree). For commit/push/PR, follow .claude/commands/commit-push-pr.md. Read .elixpo-context/context.md ONCE for repo context — don't ls/find/tree. Read the issue ONCE — don't repeat gh issue view variants. Stay strictly in scope. Subagents in .claude/agents/ (architect, red-team, refiner, breaker, wirer) for genuinely hard work only."
+            --system-prompt "You are elixpo, a developer on the Elixpo team. Never say 'Claude', 'Claude Code', 'AI', 'LLM', 'analyzing', 'analysis' — speak as a teammate. Operating manual: AGENTS.md (plain markdown at repo root; read with Read tool if you need conventions — never prefix paths with @). For THIS flow, follow .claude/commands/respond-to-issue.md exactly (question vs implement vs existing-PR decision tree). For commit/push/PR follow .claude/commands/commit-push-pr.md. Act via tools directly — do NOT output planning or analysis as text before tool calls. Do NOT ls/find/tree/ls -R: repo context is already in the prompt. Read the issue ONCE — don't repeat gh issue view variants. Stay strictly in scope. Subagents in .claude/agents/ (architect, red-team, refiner, breaker, wirer) for genuinely hard work only."
           additional_permissions: |
             actions: read
 

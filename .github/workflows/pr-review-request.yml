@@ -255,6 +255,30 @@ jobs:
           if_no_artifact_found: warn
           github_token: ${{ secrets.CI_AGENT_TOKEN }}
 
+      # Build a prompt that injects the pre-built repo context inline so
+      # the model doesn't need to go read it (which it ignores anyway).
+      - name: Build prompt body
+        if: steps.whitelist.outputs.authorized == 'true'
+        id: build_prompt
+        run: |
+          CTX="(context artifact missing)"
+          if [ -f .elixpo-context/context.md ]; then
+            CTX=$(head -c 6000 .elixpo-context/context.md)
+          fi
+          {
+            echo 'prompt<<PROMPT_EOF'
+            echo "Event: ${{ github.event_name }}"
+            echo "Actor: @${{ github.actor }}"
+            echo "Repo: ${{ github.repository }}"
+            echo "Issue/PR: ${{ github.event.issue.number || github.event.pull_request.number }}"
+            echo ""
+            echo "## Repo context (pre-built snapshot)"
+            echo "$CTX"
+            echo ""
+            echo "Proceed. Read the trigger once, act via tools, do not output plan/analysis as text."
+            echo 'PROMPT_EOF'
+          } >> "$GITHUB_OUTPUT"
+
       - uses: anthropics/claude-code-action@v1
         if: steps.whitelist.outputs.authorized == 'true'
         env:
@@ -265,13 +289,14 @@ jobs:
           GIT_COMMITTER_EMAIL: "269200728+elixpoo@users.noreply.github.com"
         with:
           anthropic_api_key: "ccr-pollinations"
-          show_full_output: true
+          show_full_output: false
           github_token: ${{ secrets.CI_AGENT_TOKEN }}
           trigger_phrase: "@elixpoo"
           branch_prefix: "elixpo/"
+          prompt: ${{ steps.build_prompt.outputs.prompt }}
           claude_args: |
             --permission-mode bypassPermissions
-            --system-prompt "You are elixpo, a developer on the Elixpo team. Never say 'Claude', 'Claude Code', 'AI', 'LLM', 'analyzing', 'analysis' — speak as a teammate. AGENTS.md is the operating manual; read it if you need conventions. For commit/push/PR follow .claude/commands/commit-push-pr.md. For review output follow .claude/commands/review.md. Read .elixpo-context/context.md ONCE for repo context — don't ls/find/tree or re-read README.md. Read the trigger ONCE — don't repeat gh pr view variants. Stay strictly in scope, no side quests. Subagents in .claude/agents/ (architect, red-team, refiner, breaker, wirer) are for genuinely hard work only — skip for LGTMs and small fixes."
+            --system-prompt "You are elixpo, a developer on the Elixpo team. Never say 'Claude', 'Claude Code', 'AI', 'LLM', 'analyzing', 'analysis' — speak as a teammate. The operating manual is AGENTS.md (plain markdown at repo root — read it with the Read tool if you need conventions; do not prefix the path with @). Runbooks: .claude/commands/commit-push-pr.md for commit/push/PR ceremony, .claude/commands/review.md for review output, .claude/commands/respond-to-issue.md for issue triage. Act via tools directly — do NOT output planning or analysis as visible text before tool calls. Do NOT ls/find/tree/ls -R: the repo context is injected into the prompt. Read the trigger ONCE via a single gh pr view / gh issue view. Stay strictly in scope, no side quests into other repos or URLs. Subagents in .claude/agents/ (architect, red-team, refiner, breaker, wirer) are for genuinely hard work only — skip for LGTMs and small fixes."
           additional_permissions: |
             actions: read
 
