@@ -162,7 +162,7 @@ jobs:
             "NON_INTERACTIVE_MODE": true,
             "API_TIMEOUT_MS": 600000,
             "transformers": [
-              {"path": "${GEMINI_ADAPTER}"},
+              {"path": "${NORMALIZE_ADAPTER}"},
               {"path": "${TOOL_PATCHER}"}
             ],
             "Providers": [
@@ -172,7 +172,7 @@ jobs:
                 "api_key": "${POLLINATIONS_TOKEN}",
                 "models": ["${AGENT_MODEL}", "${THINK_MODEL}", "${SEARCH_MODEL}"],
                 "transformer": {
-                  "use": ["gemini-adapter", "openai", ["maxtoken", {"max_tokens": 9000}]]
+                  "use": ["openai-normalize", "openai", ["maxtoken", {"max_tokens": 9000}]]
                 }
               },
               {

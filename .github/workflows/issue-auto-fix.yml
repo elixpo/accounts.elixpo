@@ -134,7 +134,7 @@ jobs:
           # Copy custom CCR adapters (gemini rocket-disable, etc.) so the
           # router can load them by absolute path.
           cp config-src/.github/ccr-adapters/*.js $HOME/.claude-code-router/ 2>/dev/null || true
-          GEMINI_ADAPTER="$HOME/.claude-code-router/gemini-adapter.js"
+          NORMALIZE_ADAPTER="$HOME/.claude-code-router/openai-normalize.js"
           # Two providers — main (cheap key) + coder (separate key for qwen-coder).
           # Transformer order: gemini-adapter → openai → maxtoken.
           # gemini-adapter flattens prior tool_use/tool_result in history to
@@ -148,7 +148,7 @@ jobs:
             "NON_INTERACTIVE_MODE": true,
             "API_TIMEOUT_MS": 600000,
             "transformers": [
-              {"path": "${GEMINI_ADAPTER}"}
+              {"path": "${NORMALIZE_ADAPTER}"}
             ],
             "Providers": [
               {
@@ -157,7 +157,7 @@ jobs:
                 "api_key": "${POLLINATIONS_TOKEN}",
                 "models": ["${AGENT_MODEL}", "${THINK_MODEL}", "${SEARCH_MODEL}"],
                 "transformer": {
-                  "use": ["gemini-adapter", "openai", ["maxtoken", {"max_tokens": 9000}]]
+                  "use": ["openai-normalize", "openai", ["maxtoken", {"max_tokens": 9000}]]
                 }
               },
               {
