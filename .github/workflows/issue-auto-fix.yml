@@ -203,52 +203,12 @@ jobs:
           repository: ${{ github.repository }}
           token: ${{ secrets.CI_AGENT_TOKEN }}
 
-      # Ensure origin/main is a local ref so `git diff origin/main...HEAD` works
-      # on flows where the ref is checked out indirectly.
-      - name: Fetch main for diffs
-        if: steps.whitelist.outputs.authorized == 'true'
-        run: git fetch origin main --depth=50 || true
-
-      # ─────────────────────────────────────────────────────────────────
-      # Wire claudeops agents + hooks into .claude/ from the published npm
-      # package (@elixpo/claudeops). Only pulls the agents we reference.
-      # Commands in .claude/commands/ are committed in this repo and take
-      # priority — not touched by this step.
-      # ─────────────────────────────────────────────────────────────────
-      - name: Wire claudeops agents + hooks into .claude/
-        if: steps.whitelist.outputs.authorized == 'true'
-        run: |
-          set -e
-          mkdir -p .claude/agents .claude/hooks
-          npm install --no-save --no-audit --no-fund --prefix /tmp/claudeops @elixpo/claudeops >/dev/null
-          SRC=/tmp/claudeops/node_modules/@elixpo/claudeops
-          for a in architect red-team refiner breaker wirer; do
-            if [ -f "$SRC/agents/$a.md" ]; then
-              cp "$SRC/agents/$a.md" ".claude/agents/$a.md"
-            fi
-          done
-          cp -r "$SRC/hooks/." .claude/hooks/ 2>/dev/null || true
-          if [ -f "$SRC/config/hooks.json" ] && [ ! -f .claude/hooks.json ]; then
-            cp "$SRC/config/hooks.json" .claude/hooks.json
-          fi
-          echo "Wired $(ls .claude/agents | wc -l) agents + $(ls .claude/hooks 2>/dev/null | wc -l) hooks from @elixpo/claudeops"
-
-      # ─────────────────────────────────────────────────────────────────
-      # Pull the pre-built repo-context artifact (.elixpo-context/context.md)
-      # produced by artifact-update.yml on every push to main. The model
-      # reads this FIRST so it doesn't burn turns on `ls` / `tree` / re-reading
-      # README.md to reconstruct context we already have on disk.
-      # ─────────────────────────────────────────────────────────────────
-      - name: Download repo-context artifact
-        if: steps.whitelist.outputs.authorized == 'true'
-        continue-on-error: true
-        uses: dawidd6/action-download-artifact@v6
-        with:
-          name: repo-context
-          workflow: artifact-update.yml
-          path: .elixpo-context
-          if_no_artifact_found: warn
-          github_token: ${{ secrets.CI_AGENT_TOKEN }}
+      # Polly-style: no claudeops agents wired in (every extra agent file
+      # adds ~2KB of tool-definition tokens to every turn) and no pre-built
+      # context artifact. The committed CLAUDE.md + AGENTS.md at repo root
+      # are auto-loaded by claude-code; the model uses its native Glob /
+      # Grep / Read skills to find files directly — same flow as polly's
+      # issue-polly-auto-fix.
 
       - uses: anthropics/claude-code-action@v1
         if: steps.whitelist.outputs.authorized == 'true'
