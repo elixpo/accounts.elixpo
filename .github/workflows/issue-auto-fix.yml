@@ -223,21 +223,27 @@ jobs:
           show_full_output: true
           github_token: ${{ secrets.CI_AGENT_TOKEN }}
           branch_prefix: "elixpo/"
-          # Cap the tool surface — each extra tool schema adds ~300B to every
-          # turn. Only expose what issue-fix needs. (No WebFetch/WebSearch.)
-          allowed_tools: "Read,Edit,Write,Glob,Grep,Bash,TodoWrite"
+          # No allowed_tools cap — every Claude Code tool is available
+          # (Read / Edit / Write / MultiEdit / Glob / Grep / Bash / BashOutput /
+          # TodoWrite / Task / WebFetch / WebSearch / NotebookEdit / Skill / ...).
+          # Task routes to CCR 'background' = qwen-coder, so code-heavy
+          # multi-file work can be delegated to the coder-tuned model.
           prompt: |
             Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}
 
             Fast path — do NOT read CLAUDE.md, AGENTS.md, or .claude/commands/*.
-            They are autoloaded or irrelevant. Trust the issue body.
+            Trust the issue body.
 
             1. `gh issue view ${{ github.event.issue.number }} --comments` (once).
-            2. Use Glob/Grep to find the exact file(s) to change. Do NOT ls/tree.
-            3. For code changes: branch `elixpo/issue-${{ github.event.issue.number }}-<hex>`, Edit the file(s), `./biome.sh ci` (must exit 0), commit, push, `gh pr create --base main --title "[ELIXPO] <title>" --body "...Fixes #${{ github.event.issue.number }}"`.
-            4. For a question / LGTM / discussion: one `gh issue comment ${{ github.event.issue.number }}` and stop.
+            2. Use Glob/Grep to locate files. Do NOT ls/tree.
+            3. CHOOSE THE RIGHT TOOL per operation:
+               - **Bulk find/replace across many files** → ONE bash: `grep -rl 'OLD' app/ src/ | xargs sed -i 's/OLD/NEW/g'` (and repeat in a single turn for each string). NEVER do 20+ Read+Edit roundtrips for a mechanical rename — it takes 3+ minutes per 10 files through CCR.
+               - **1-3 file surgical edit** → Read then Edit.
+               - **Complex multi-step refactor** → delegate to a Task subagent with the full plan (routes to qwen-coder, which is code-tuned and faster).
+            4. For code changes: branch `elixpo/issue-${{ github.event.issue.number }}-<hex>`, apply edits, `./biome.sh ci`, commit, push, `gh pr create --base main --title "[ELIXPO] <title>" --body "...Fixes #${{ github.event.issue.number }}"`.
+            5. For a question / LGTM / discussion: one `gh issue comment ${{ github.event.issue.number }}` and stop.
 
-            Never commit to main. Never read large files you don't need.
+            Never commit to main.
           additional_permissions: |
             actions: read
 
