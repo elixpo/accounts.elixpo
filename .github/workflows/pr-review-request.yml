@@ -267,30 +267,6 @@ jobs:
           if_no_artifact_found: warn
           github_token: ${{ secrets.CI_AGENT_TOKEN }}
 
-      # Build a prompt that injects the pre-built repo context inline so
-      # the model doesn't need to go read it (which it ignores anyway).
-      - name: Build prompt body
-        if: steps.whitelist.outputs.authorized == 'true'
-        id: build_prompt
-        run: |
-          CTX="(context artifact missing)"
-          if [ -f .elixpo-context/context.md ]; then
-            CTX=$(head -c 6000 .elixpo-context/context.md)
-          fi
-          {
-            echo 'prompt<<PROMPT_EOF'
-            echo "Event: ${{ github.event_name }}"
-            echo "Actor: @${{ github.actor }}"
-            echo "Repo: ${{ github.repository }}"
-            echo "Issue/PR: ${{ github.event.issue.number || github.event.pull_request.number }}"
-            echo ""
-            echo "## Repo context (pre-built snapshot)"
-            echo "$CTX"
-            echo ""
-            echo "Proceed. Read the trigger once, act via tools, do not output plan/analysis as text."
-            echo 'PROMPT_EOF'
-          } >> "$GITHUB_OUTPUT"
-
       - uses: anthropics/claude-code-action@v1
         if: steps.whitelist.outputs.authorized == 'true'
         env:
@@ -301,17 +277,12 @@ jobs:
           GIT_COMMITTER_EMAIL: "269200728+elixpoo@users.noreply.github.com"
         with:
           anthropic_api_key: "ccr-pollinations"
-          # Keep full output ON — without it the action's tracking comment
-          # and final summary aren't posted, so the bot looks silent even
-          # when it ran 13 turns successfully. Post-guard strips branding.
           show_full_output: true
           github_token: ${{ secrets.CI_AGENT_TOKEN }}
           trigger_phrase: "@elixpoo"
           branch_prefix: "elixpo/"
-          prompt: ${{ steps.build_prompt.outputs.prompt }}
           claude_args: |
-            --permission-mode bypassPermissions
-            --system-prompt "You are elixpo, a developer on the Elixpo team. Never say 'Claude', 'Claude Code', 'AI', 'LLM', 'analyzing', 'analysis' — speak as a teammate. Operating manual: AGENTS.md (Read tool; never prefix paths with @). Runbooks: .claude/commands/commit-push-pr.md, .claude/commands/review.md, .claude/commands/respond-to-issue.md. ONE-SHOT-PER-INVOCATION (CRITICAL): this invocation must submit AT MOST ONE review OR ONE comment OR ONE commit, then END. 'gh pr review --approve' and 'gh pr comment' return empty stdout on success — THAT IS SUCCESS. Do NOT retry, do NOT post a follow-up 'to be thorough'. Multiple invocations across different user triggers are fine — each trigger gets its own single response; we just don't spam within one run. Use TodoWrite at the start to plan 2-4 concrete steps so progress shows in the tracking comment as checkboxes. Skip prose chatter before tool calls. Do NOT ls/find/tree: repo context is in the prompt. Read the trigger ONCE. Stay strictly in scope. Subagents (architect, red-team, refiner, breaker, wirer) for genuinely hard work only — never for LGTMs."
+            --system-prompt "You are elixpoo, a helpful developer on the Elixpo team. Never mention Claude, Claude Code, AI, or LLMs — you are just a team member. Be casual, concise, and human. Use bullet points. No verbose explanations. When commenting on issues or reviewing PRs, write like a friendly dev — short, direct, helpful. For PR reviews, end the body with 'Merge-readiness: READY' or 'Merge-readiness: NEEDS CHANGES'."
           additional_permissions: |
             actions: read
 

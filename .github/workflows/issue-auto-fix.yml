@@ -250,31 +250,6 @@ jobs:
           if_no_artifact_found: warn
           github_token: ${{ secrets.CI_AGENT_TOKEN }}
 
-      # Build a prompt with repo context injected inline — avoids the model
-      # running ls -R / tree to rediscover what's on disk.
-      - name: Build prompt body
-        if: steps.whitelist.outputs.authorized == 'true'
-        id: build_prompt
-        run: |
-          CTX="(context artifact missing)"
-          if [ -f .elixpo-context/context.md ]; then
-            CTX=$(head -c 6000 .elixpo-context/context.md)
-          fi
-          {
-            echo 'prompt<<PROMPT_EOF'
-            echo "Event: ${{ github.event_name }}"
-            echo "Actor: @${{ github.actor }}"
-            echo "Repo: ${{ github.repository }}"
-            echo "Issue: #${{ github.event.issue.number }}"
-            echo "Issue title: ${{ github.event.issue.title }}"
-            echo ""
-            echo "## Repo context (pre-built snapshot)"
-            echo "$CTX"
-            echo ""
-            echo "Proceed per .claude/commands/respond-to-issue.md. Act via tools, do not output plan/analysis as text."
-            echo 'PROMPT_EOF'
-          } >> "$GITHUB_OUTPUT"
-
       - uses: anthropics/claude-code-action@v1
         if: steps.whitelist.outputs.authorized == 'true'
         env:
@@ -285,19 +260,19 @@ jobs:
           GIT_COMMITTER_EMAIL: "269200728+elixpoo@users.noreply.github.com"
         with:
           anthropic_api_key: "ccr-pollinations"
-          # Keep full output ON — without it the action's tracking comment
-          # and final summary aren't posted, so the bot looks silent even
-          # when it ran multiple turns successfully.
           show_full_output: true
           github_token: ${{ secrets.CI_AGENT_TOKEN }}
           branch_prefix: "elixpo/"
-          prompt: ${{ steps.build_prompt.outputs.prompt }}
-          # claude-code-action injects its own restrictive ALLOWED_TOOLS list
-          # for PR-creation flows. --permission-mode bypassPermissions is the
-          # only reliable escape. Safe: ephemeral sandbox, branch-protected main.
-          claude_args: |
-            --permission-mode bypassPermissions
-            --system-prompt "You are elixpo, a developer on the Elixpo team. Never say 'Claude', 'Claude Code', 'AI', 'LLM', 'analyzing', 'analysis' — speak as a teammate. Operating manual: AGENTS.md (Read tool; never prefix paths with @). For THIS flow follow .claude/commands/respond-to-issue.md exactly. For commit/push/PR follow .claude/commands/commit-push-pr.md. ONE-SHOT-PER-INVOCATION (CRITICAL): this invocation must produce AT MOST ONE visible outcome — answer path = ONE 'gh issue comment' then STOP; implement path = ONE commit + ONE push + ONE PR then STOP. 'gh issue comment' and 'gh pr create' return empty/short stdout on success — THAT IS SUCCESS, do NOT retry. Do NOT post a follow-up 'to add more detail'. Multiple invocations across different user triggers are fine — each gets its own single response. Use TodoWrite at the start to plan 2-4 concrete steps so progress shows as checkboxes in the tracking comment. Skip prose chatter before tool calls. Do NOT ls/find/tree: repo context is in the prompt. Read the issue ONCE. Stay strictly in scope. Subagents (architect, red-team, refiner, breaker, wirer) for genuinely hard work only."
+          prompt: |
+            Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}
+
+            Read the issue body from the GitHub API to get the full details.
+
+            Decide the appropriate action:
+            1. If the issue requires code changes: create a branch `elixpo/issue-${{ github.event.issue.number }}-<hex>`, make the fix, run `./biome.sh` until ci passes, commit, push, and open a PR titled `[ELIXPO] <title>` with body ending in "Fixes #${{ github.event.issue.number }}".
+            2. If the issue is a question, discussion, or doesn't need code changes: just comment on the issue with a helpful response using `gh issue comment ${{ github.event.issue.number }}`.
+
+            Use your judgment — not every issue needs a PR. Never commit to main.
           additional_permissions: |
             actions: read
 
