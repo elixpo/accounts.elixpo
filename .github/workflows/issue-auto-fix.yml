@@ -136,10 +136,12 @@ jobs:
           cp config-src/.github/ccr-adapters/*.js $HOME/.claude-code-router/ 2>/dev/null || true
           NORMALIZE_ADAPTER="$HOME/.claude-code-router/openai-normalize.js"
           # Two providers — main (cheap key) + coder (separate key for qwen-coder).
-          # Transformer order: gemini-adapter → openai → maxtoken.
-          # gemini-adapter flattens prior tool_use/tool_result in history to
-          # plain text (Vertex demands thought_signature on replayed tool_use;
-          # Pollinations exposes no knob to disable Gemini rocket).
+          # Transformer order: openai-normalize → openai → maxtoken.
+          # openai-normalize flattens Anthropic-style structured content
+          # (multi-block text arrays, cache_control, tool_use/tool_result) to
+          # the plain OpenAI shape that Pollinations' non-Anthropic models
+          # (kimi, qwen-coder, perplexity-*, gemini, glm) require. Anthropic-
+          # native models pass through unchanged.
           # Custom transformers MUST be registered at top-level "transformers"
           # — CCR resolves strings in "use" as registered names, not paths.
           cat > $HOME/.claude-code-router/config.json <<EOF
