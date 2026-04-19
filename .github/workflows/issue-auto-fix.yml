@@ -202,43 +202,28 @@ jobs:
           token: ${{ secrets.CI_AGENT_TOKEN }}
 
       # ─────────────────────────────────────────────────────────────────
-      # Pull shared Claude assets (agents + hooks + config) from
-      # elixpo/claudeOps.elixpo so every repo's bot has the same skills.
-      # Update once there → applies to all 15 repos on next run.
+      # Wire claudeops agents + hooks into .claude/ from the published npm
+      # package (@elixpo/claudeops). Only pulls the agents we reference.
+      # Commands in .claude/commands/ are committed in this repo and take
+      # priority — not touched by this step.
       # ─────────────────────────────────────────────────────────────────
-      - name: Pull claudeops skills
-        if: steps.whitelist.outputs.authorized == 'true'
-        uses: actions/checkout@v4
-        with:
-          repository: elixpo/claudeOps.elixpo
-          ref: main
-          token: ${{ secrets.CI_AGENT_TOKEN }}
-          path: .claudeops-src
-          sparse-checkout: |
-            agents
-            hooks
-            config
-          sparse-checkout-cone-mode: false
-
-      - name: Wire claudeops skills into .claude/
+      - name: Wire claudeops agents + hooks into .claude/
         if: steps.whitelist.outputs.authorized == 'true'
         run: |
-          mkdir -p .claude
-          # agents → .claude/agents (subagent markdown files)
-          if [ -d .claudeops-src/agents ]; then
-            cp -r .claudeops-src/agents .claude/agents
-            echo "Wired $(ls .claude/agents | wc -l) agents from claudeops"
+          set -e
+          mkdir -p .claude/agents .claude/hooks
+          npm install --no-save --no-audit --no-fund --prefix /tmp/claudeops @elixpo/claudeops >/dev/null
+          SRC=/tmp/claudeops/node_modules/@elixpo/claudeops
+          for a in architect red-team refiner breaker wirer; do
+            if [ -f "$SRC/agents/$a.md" ]; then
+              cp "$SRC/agents/$a.md" ".claude/agents/$a.md"
+            fi
+          done
+          cp -r "$SRC/hooks/." .claude/hooks/ 2>/dev/null || true
+          if [ -f "$SRC/config/hooks.json" ] && [ ! -f .claude/hooks.json ]; then
+            cp "$SRC/config/hooks.json" .claude/hooks.json
           fi
-          # hooks → .claude/hooks (guards: bash, glob, grep)
-          if [ -d .claudeops-src/hooks ]; then
-            cp -r .claudeops-src/hooks .claude/hooks
-            echo "Wired $(ls .claude/hooks | wc -l) hooks from claudeops"
-          fi
-          # hooks.json config (if present and this repo doesn't already have one)
-          if [ -f .claudeops-src/config/hooks.json ] && [ ! -f .claude/hooks.json ]; then
-            cp .claudeops-src/config/hooks.json .claude/hooks.json
-            echo "Wired hooks.json from claudeops"
-          fi
+          echo "Wired $(ls .claude/agents | wc -l) agents + $(ls .claude/hooks 2>/dev/null | wc -l) hooks from @elixpo/claudeops"
 
       # ─────────────────────────────────────────────────────────────────
       # Pull the pre-built repo-context artifact (.elixpo-context/context.md)

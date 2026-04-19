@@ -203,39 +203,33 @@ jobs:
           token: ${{ secrets.CI_AGENT_TOKEN }}
 
       # ─────────────────────────────────────────────────────────────────
-      # Pull shared Claude assets (agents + hooks + config) from
-      # elixpo/claudeOps.elixpo so every repo's bot has the same skills.
+      # Wire claudeops agents/hooks into .claude/ from the published npm
+      # package (@elixpo/claudeops). Faster than cloning the git repo and
+      # lets us bring in ONLY the agents we actually reference.
+      # The repo ships its own .claude/commands/ (committed) — those take
+      # priority and are not touched here.
       # ─────────────────────────────────────────────────────────────────
-      - name: Pull claudeops skills
-        if: steps.whitelist.outputs.authorized == 'true'
-        uses: actions/checkout@v4
-        with:
-          repository: elixpo/claudeOps.elixpo
-          ref: main
-          token: ${{ secrets.CI_AGENT_TOKEN }}
-          path: .claudeops-src
-          sparse-checkout: |
-            agents
-            hooks
-            config
-          sparse-checkout-cone-mode: false
-
-      - name: Wire claudeops skills into .claude/
+      - name: Wire claudeops agents + hooks into .claude/
         if: steps.whitelist.outputs.authorized == 'true'
         run: |
-          mkdir -p .claude
-          if [ -d .claudeops-src/agents ]; then
-            cp -r .claudeops-src/agents .claude/agents
-            echo "Wired $(ls .claude/agents | wc -l) agents from claudeops"
+          set -e
+          mkdir -p .claude/agents .claude/hooks
+          # Install only the claudeops package into a scratch prefix.
+          npm install --no-save --no-audit --no-fund --prefix /tmp/claudeops @elixpo/claudeops >/dev/null
+          SRC=/tmp/claudeops/node_modules/@elixpo/claudeops
+          # Copy only the agents we actually reference from the system prompt.
+          # Add to this list when the prompt references more.
+          for a in architect red-team refiner breaker wirer; do
+            if [ -f "$SRC/agents/$a.md" ]; then
+              cp "$SRC/agents/$a.md" ".claude/agents/$a.md"
+            fi
+          done
+          # Hooks are small — copy the lot.
+          cp -r "$SRC/hooks/." .claude/hooks/ 2>/dev/null || true
+          if [ -f "$SRC/config/hooks.json" ] && [ ! -f .claude/hooks.json ]; then
+            cp "$SRC/config/hooks.json" .claude/hooks.json
           fi
-          if [ -d .claudeops-src/hooks ]; then
-            cp -r .claudeops-src/hooks .claude/hooks
-            echo "Wired $(ls .claude/hooks | wc -l) hooks from claudeops"
-          fi
-          if [ -f .claudeops-src/config/hooks.json ] && [ ! -f .claude/hooks.json ]; then
-            cp .claudeops-src/config/hooks.json .claude/hooks.json
-            echo "Wired hooks.json from claudeops"
-          fi
+          echo "Wired $(ls .claude/agents | wc -l) agents + $(ls .claude/hooks 2>/dev/null | wc -l) hooks from @elixpo/claudeops"
 
       # ─────────────────────────────────────────────────────────────────
       # Pull the pre-built repo-context artifact (.elixpo-context/context.md)
@@ -270,7 +264,7 @@ jobs:
           branch_prefix: "elixpo/"
           claude_args: |
             --permission-mode bypassPermissions
-            --system-prompt "You are elixpo, a developer on the Elixpo team. Never say 'Claude', 'Claude Code', 'AI', 'LLM', 'analyzing', 'analysis' — speak as a teammate ('looking into this', 'pushed a fix', 'opened #N'). Be casual, concise, human. Read .elixpo-context/context.md ONCE at the start for repo context — don't ls/find/tree or re-read README/CLAUDE.md. Read the trigger comment/PR/issue ONCE — don't repeat gh pr view variants. Stay strictly in scope, no side quests into other repos. For code changes: never commit to main; if on an issue, create branch elixpo/issue-<n>-<hex>; run ./biome.sh until ci passes before commit; push and open a ready PR with title '[ELIXPO] <title>' and body fixing #<n>. Specialized subagents live in .claude/agents/ — use them only for genuinely hard work (red-team, architect, refiner), skip for LGTMs and small fixes."
+            --system-prompt "You are elixpo, a developer on the Elixpo team. Never say 'Claude', 'Claude Code', 'AI', 'LLM', 'analyzing', 'analysis' — speak as a teammate. AGENTS.md is the operating manual; read it if you need conventions. For commit/push/PR follow .claude/commands/commit-push-pr.md. For review output follow .claude/commands/review.md. Read .elixpo-context/context.md ONCE for repo context — don't ls/find/tree or re-read README.md. Read the trigger ONCE — don't repeat gh pr view variants. Stay strictly in scope, no side quests. Subagents in .claude/agents/ (architect, red-team, refiner, breaker, wirer) are for genuinely hard work only — skip for LGTMs and small fixes."
           additional_permissions: |
             actions: read
 
