@@ -52,35 +52,45 @@ def load_context():
 
 
 def fallback_body(title, author="reporter"):
-    """Basic template used when the LLM response is malformed."""
+    """Basic template used when the LLM response is malformed.
+
+    New format per product direction:
+      - Description + Tasks + Checklist come first (self-contained issue body).
+      - Questions, if any, appear LAST as a small `### Questions from @elixpoo`
+        subsection with a short note tagging **@elixpoo** (the bot) — never
+        tagging the reporter — asking them to answer or label `ELIXPO`.
+    """
     return (
         "## Problem Statement\n"
         f"{title}\n\n"
-        f"## Questions for @{author}\n"
-        "- What is the exact scope of this change?\n"
-        "- Which files or components should be affected?\n"
-        "- What is the expected behavior after the change?\n\n"
-        f"> @{author} — please reply in this issue and tag **&#64;elixpoo** in your response so I can pick it up.\n\n"
-        "## Todo's\n"
-        f"- Scope to be defined once @{author} answers questions above.\n\n"
+        "## Tasks\n"
+        "- Scope to be defined once the questions below are answered.\n\n"
         "## Checklist\n"
-        f"- [ ] @{author}'s questions answered\n"
         "- [ ] Implementation complete\n"
         "- [ ] Tests pass\n"
         "- [ ] Documentation updated if behavior changes\n\n"
-        "---\n"
-        "> If you want elixpoo to handle this issue, attach the **`ELIXPO`** label to the issue.\n"
+        "---\n\n"
+        "### Questions from @elixpoo\n"
+        "- What is the exact scope of this change?\n"
+        "- Which files or components should be affected?\n"
+        "- What is the expected behavior after the change?\n\n"
+        "Answering these will make the description richer — tag **@elixpoo** "
+        "and ask me to update the issue description, or label the issue with "
+        "**`ELIXPO`** to let me solve it.\n"
     )
 
 
 def looks_valid(body):
-    """Check that the generated body contains the expected section headers."""
+    """Check that the generated body has the new structure.
+
+    Required: Problem Statement + Tasks + Checklist. Questions section is
+    optional (the model may write 'None — title is clear.' and omit the block).
+    """
     if not body:
         return False
     required = [
         "## Problem Statement",
-        "## Questions for",  # allows "Questions for @username"
-        "## Todo's",
+        "## Tasks",
         "## Checklist",
     ]
     return all(marker in body for marker in required)
