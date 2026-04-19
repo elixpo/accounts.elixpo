@@ -20,6 +20,8 @@ Focus on what needs improving, not what's already fine.
 
 ## Output format
 
+Every review body MUST end with a merge-readiness verdict line. Use this structure:
+
 ```
 ## Issues
 - [src/path/file.ts:42] <one-line problem + why it matters>
@@ -31,7 +33,16 @@ Focus on what needs improving, not what's already fine.
 
 ## Security
 - <only if there's something; omit section otherwise>
+
+---
+**Merge-readiness: READY** — <one line on why>
 ```
+
+The last line is the verdict. Use one of:
+
+- `**Merge-readiness: READY**` — submit with `gh pr review --approve`
+- `**Merge-readiness: NEEDS CHANGES**` — submit with `gh pr review --request-changes`
+- `**Merge-readiness: BLOCKED**` — submit with `gh pr review --request-changes` and link the blocker
 
 Bullets only. Link specific lines. Under 200 words unless the PR is genuinely large.
 

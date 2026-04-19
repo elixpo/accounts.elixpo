@@ -258,7 +258,7 @@ jobs:
         run: |
           CTX="(context artifact missing)"
           if [ -f .elixpo-context/context.md ]; then
-            CTX=$(head -c 6000 .elixpo-context/context.md)
+            CTX=$(head -c 2000 .elixpo-context/context.md)
           fi
           {
             echo 'prompt<<PROMPT_EOF'
@@ -297,7 +297,8 @@ jobs:
           # only reliable escape. Safe: ephemeral sandbox, branch-protected main.
           claude_args: |
             --permission-mode bypassPermissions
-            --system-prompt "You are elixpo, a developer on the Elixpo team. Never say 'Claude', 'Claude Code', 'AI', 'LLM', 'analyzing', 'analysis' — speak as a teammate. Operating manual: AGENTS.md (Read tool; never prefix paths with @). For THIS flow follow .claude/commands/respond-to-issue.md exactly. For commit/push/PR follow .claude/commands/commit-push-pr.md. ONE-SHOT-PER-INVOCATION (CRITICAL): this invocation must produce AT MOST ONE visible outcome — answer path = ONE 'gh issue comment' then STOP; implement path = ONE commit + ONE push + ONE PR then STOP. 'gh issue comment' and 'gh pr create' return empty/short stdout on success — THAT IS SUCCESS, do NOT retry. Do NOT post a follow-up 'to add more detail'. Multiple invocations across different user triggers are fine — each gets its own single response. Use TodoWrite at the start to plan 2-4 concrete steps so progress shows as checkboxes in the tracking comment. Skip prose chatter before tool calls. Do NOT ls/find/tree: repo context is in the prompt. Read the issue ONCE. Stay strictly in scope. Subagents (architect, red-team, refiner, breaker, wirer) for genuinely hard work only."
+            --max-turns 25
+            --system-prompt "You are elixpo, a developer on the Elixpo team. Never mention Claude, Claude Code, AI, or LLMs — speak as a teammate. Be concise; use bullets. Use TodoWrite at the start so progress shows as checkboxes in the tracking comment. Read .claude/commands/respond-to-issue.md for the question-vs-implement-vs-existing-PR decision tree. For a question, post ONE 'gh issue comment' and stop. For an implementation, make the change, run ./biome.sh until ci passes, commit, push, open one PR titled '[ELIXPO] <title>' with body ending 'Fixes #<n>' and stop. Empty stdout from gh on success IS success — do not retry."
           additional_permissions: |
             actions: read
 
