@@ -146,7 +146,7 @@ jobs:
 
           mkdir -p $HOME/.claude-code-router
           cp config-src/.github/ccr-adapters/*.js $HOME/.claude-code-router/ 2>/dev/null || true
-          GEMINI_ADAPTER="$HOME/.claude-code-router/gemini-adapter.js"
+          NORMALIZE_ADAPTER="$HOME/.claude-code-router/openai-normalize.js"
           TOOL_PATCHER="$HOME/.claude-code-router/tool-schema-patcher.js"
           # Two providers — main (cheap key, gemini) + coder (separate key for
           # qwen-coder). Background subagent work (code-heavy) goes to coder
