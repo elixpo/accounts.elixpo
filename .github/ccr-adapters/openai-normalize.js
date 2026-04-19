@@ -218,7 +218,10 @@ class OpenAINormalizeAdapter {
         if (!Array.isArray(body.messages)) return request;
         // Only pass through unchanged for real Claude models; everything else
         // (kimi, qwen, perplexity, glm, gemini, ...) gets flattened.
-        if (typeof body.model === "string" && ANTHROPIC_NATIVE_RE.test(body.model)) {
+        if (
+            typeof body.model === "string" &&
+            ANTHROPIC_NATIVE_RE.test(body.model)
+        ) {
             return request;
         }
 
