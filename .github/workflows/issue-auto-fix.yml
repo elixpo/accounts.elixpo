@@ -203,12 +203,64 @@ jobs:
           repository: ${{ github.repository }}
           token: ${{ secrets.CI_AGENT_TOKEN }}
 
-      # Polly-style: no claudeops agents wired in (every extra agent file
-      # adds ~2KB of tool-definition tokens to every turn) and no pre-built
-      # context artifact. The committed CLAUDE.md + AGENTS.md at repo root
-      # are auto-loaded by claude-code; the model uses its native Glob /
-      # Grep / Read skills to find files directly — same flow as polly's
-      # issue-polly-auto-fix.
+      # ─────────────────────────────────────────────────────────────────
+      # Pull the pre-built repo-context artifact (.elixpo-context/context.md)
+      # produced by artifact-update.yml on every push to main. Injected
+      # inline into the agent's prompt below so the model never has to
+      # ls/tree/Glob-to-discover — it already has the cold repo context
+      # the way a human using ccr in their terminal does.
+      - name: Download repo-context artifact
+        if: steps.whitelist.outputs.authorized == 'true'
+        continue-on-error: true
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          name: repo-context
+          workflow: artifact-update.yml
+          path: .elixpo-context
+          if_no_artifact_found: warn
+          github_token: ${{ secrets.CI_AGENT_TOKEN }}
+
+      # Build the prompt by inlining the repo context snapshot.
+      - name: Build prompt body
+        if: steps.whitelist.outputs.authorized == 'true'
+        id: build_prompt
+        run: |
+          CTX="(context artifact missing — fall back to Glob/Grep discovery)"
+          if [ -f .elixpo-context/context.md ]; then
+            CTX=$(cat .elixpo-context/context.md)
+          fi
+          {
+            echo 'prompt<<PROMPT_EOF'
+            echo "Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}"
+            echo ""
+            echo "## Cold repo context (pre-built snapshot)"
+            echo "$CTX"
+            echo ""
+            echo "## Your task"
+            echo ""
+            echo "Fetch the full issue body + comments once:"
+            echo "  gh issue view ${{ github.event.issue.number }} --comments"
+            echo ""
+            echo "Then pick ONE of four paths:"
+            echo ""
+            echo "1. **IMPLEMENT (simple → medium)** — up to ~15 files, mechanical or surgical, no ambiguous design choices."
+            echo "   - Bulk find/replace / renames / theme swaps → python .github/scripts/apply_refactor.py with a JSON plan on stdin (one call, deterministic)."
+            echo "   - 1-3 file surgical edits → Read + Edit/MultiEdit."
+            echo "   - Branch: elixpo/issue-${{ github.event.issue.number }}-<hex>. Commit, push, open PR '[ELIXPO] <title>' with body ending 'Fixes #${{ github.event.issue.number }}'."
+            echo "   - Do NOT run ./biome.sh — the CI biome workflow checks the PR separately. Skipping that step saves 2-3 turns."
+            echo ""
+            echo "2. **DECLINE (too big / needs human judgement)** — new features spanning many modules, security-sensitive changes, DB-migration-heavy work, anything needing architectural decisions."
+            echo "   - Post ONE 'gh issue comment ${{ github.event.issue.number }}' politely saying the scope needs manual implementation, with a 1-2 sentence reason, and stop."
+            echo ""
+            echo "3. **ANSWER (question / LGTM / discussion)** — no code changes."
+            echo "   - Post ONE 'gh issue comment ${{ github.event.issue.number }}' and stop."
+            echo ""
+            echo "4. **CLARIFY (ambiguous)** — you cannot tell what the user wants."
+            echo "   - Post ONE 'gh issue comment' with the specific questions needed to proceed, and stop."
+            echo ""
+            echo "Never commit to main. Never lie about test results. The repo context above is cold but current."
+            echo 'PROMPT_EOF'
+          } >> "$GITHUB_OUTPUT"
 
       - uses: anthropics/claude-code-action@v1
         if: steps.whitelist.outputs.authorized == 'true'
@@ -228,30 +280,7 @@ jobs:
           # TodoWrite / Task / WebFetch / WebSearch / NotebookEdit / Skill / ...).
           # Task routes to CCR 'background' = qwen-coder, so code-heavy
           # multi-file work can be delegated to the coder-tuned model.
-          prompt: |
-            Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}
-
-            Fast path — do NOT read CLAUDE.md, AGENTS.md, or .claude/commands/*.
-            Trust the issue body.
-
-            1. `gh issue view ${{ github.event.issue.number }} --comments` (once).
-            2. Use Glob/Grep to locate files. Do NOT ls/tree.
-            3. CHOOSE THE RIGHT TOOL per operation:
-               - **Bulk / mechanical refactor (renames, theme swaps, string migrations, >3 files)** → `python .github/scripts/apply_refactor.py` with a JSON plan on stdin. ONE call, deterministic, no LLM roundtrip per file. Example:
-                 ```
-                 cat <<'PLAN' | python .github/scripts/apply_refactor.py
-                 {"replacements":[
-                   {"find":"#a3e635","replace":"#a78bfa"},
-                   {"find":"#86efac","replace":"#c4b5fd"}
-                 ],"scope":["app/","src/","theme.js"],"include":"*.{ts,tsx,js,jsx,css}"}
-                 PLAN
-                 ```
-               - **1-3 file surgical edit** → Read then Edit / MultiEdit.
-               - **Complex multi-step refactor needing judgement** → delegate to a Task subagent (routes to qwen-coder via CCR background).
-            4. For code changes: branch `elixpo/issue-${{ github.event.issue.number }}-<hex>`, apply edits, `./biome.sh ci`, commit, push, `gh pr create --base main --title "[ELIXPO] <title>" --body "...Fixes #${{ github.event.issue.number }}"`.
-            5. For a question / LGTM / discussion: one `gh issue comment ${{ github.event.issue.number }}` and stop.
-
-            Never commit to main.
+          prompt: ${{ steps.build_prompt.outputs.prompt }}
           additional_permissions: |
             actions: read
 
