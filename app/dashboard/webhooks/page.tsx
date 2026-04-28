@@ -30,7 +30,7 @@ import {
     Typography,
 } from "@mui/material";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const AVAILABLE_EVENTS = [
     { value: "user.created", label: "User Created" },
@@ -100,11 +100,7 @@ export default function WebhooksPage() {
         secret: "",
     });
 
-    useEffect(() => {
-        fetchWebhooks();
-    }, [fetchWebhooks]);
-
-    const fetchWebhooks = async () => {
+    const fetchWebhooks = useCallback(async () => {
         try {
             setLoading(true);
             const res = await fetch("/api/auth/webhooks", {
@@ -118,7 +114,11 @@ export default function WebhooksPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchWebhooks();
+    }, [fetchWebhooks]);
 
     const showSnack = (message: string, severity: "success" | "error") => {
         setSnack({ open: true, message, severity });

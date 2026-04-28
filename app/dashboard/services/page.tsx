@@ -3,7 +3,7 @@
 import LinkOffIcon from "@mui/icons-material/LinkOff";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { Box, Button, Chip, CircularProgress, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { generatePixelAvatar } from "@/lib/pixel-avatar";
 
 interface ConnectedService {
@@ -74,11 +74,7 @@ const ServicesPage = () => {
     const [loading, setLoading] = useState(true);
     const [revoking, setRevoking] = useState<string | null>(null);
 
-    useEffect(() => {
-        fetchServices();
-    }, [fetchServices]);
-
-    const fetchServices = async () => {
+    const fetchServices = useCallback(async () => {
         try {
             setLoading(true);
             const res = await fetch("/api/auth/connected-services", {
@@ -93,7 +89,11 @@ const ServicesPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchServices();
+    }, [fetchServices]);
 
     const revokeService = async (clientId: string) => {
         if (

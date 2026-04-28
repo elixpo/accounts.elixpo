@@ -27,7 +27,7 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { generatePixelAvatar } from "@/lib/pixel-avatar";
 
 interface UserProfile {
@@ -223,13 +223,7 @@ const ProfilePage = () => {
         }
     }, [verifyCooldown]);
 
-    useEffect(() => {
-        fetchProfile();
-        fetchNotifPrefs();
-        fetchConnectedServices();
-    }, [fetchProfile, fetchNotifPrefs, fetchConnectedServices]);
-
-    const fetchProfile = async () => {
+    const fetchProfile = useCallback(async () => {
         try {
             setProfileLoading(true);
             const res = await fetch("/api/auth/me", { credentials: "include" });
@@ -249,9 +243,9 @@ const ProfilePage = () => {
         } finally {
             setProfileLoading(false);
         }
-    };
+    }, []);
 
-    const fetchConnectedServices = async () => {
+    const fetchConnectedServices = useCallback(async () => {
         try {
             setServicesLoading(true);
             const res = await fetch("/api/auth/connected-services", {
@@ -271,9 +265,9 @@ const ProfilePage = () => {
         } finally {
             setServicesLoading(false);
         }
-    };
+    }, []);
 
-    const fetchNotifPrefs = async () => {
+    const fetchNotifPrefs = useCallback(async () => {
         try {
             setNotifLoading(true);
             const res = await fetch("/api/auth/notification-preferences", {
@@ -292,7 +286,13 @@ const ProfilePage = () => {
         } finally {
             setNotifLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchProfile();
+        fetchNotifPrefs();
+        fetchConnectedServices();
+    }, [fetchProfile, fetchNotifPrefs, fetchConnectedServices]);
 
     const handleUpdateProfile = async () => {
         setUpdateError("");

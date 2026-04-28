@@ -32,7 +32,7 @@ import {
     Tooltip,
     Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface ApiKey {
     id: string;
@@ -91,12 +91,7 @@ export default function ApiKeysPage() {
         setFormData((prev) => ({ ...prev, scopes: defaultScopes }));
     }, []);
 
-    // Fetch API keys
-    useEffect(() => {
-        fetchApiKeys();
-    }, [fetchApiKeys]);
-
-    const fetchApiKeys = async () => {
+    const fetchApiKeys = useCallback(async () => {
         try {
             setLoading(true);
             const token = localStorage.getItem("jwt_token");
@@ -114,7 +109,12 @@ export default function ApiKeysPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    // Fetch API keys
+    useEffect(() => {
+        fetchApiKeys();
+    }, [fetchApiKeys]);
 
     const handleCreateApiKey = async () => {
         if (!formData.name.trim()) {
