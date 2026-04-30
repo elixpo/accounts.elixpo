@@ -9,7 +9,7 @@ import {
     Typography,
 } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 
 const textFieldSx = {
     "& .MuiOutlinedInput-root": {
@@ -38,11 +38,7 @@ const SetupNameContent = () => {
         severity: "success" | "error";
     }>({ open: false, message: "", severity: "success" });
 
-    useEffect(() => {
-        fetchCurrentName();
-    }, [fetchCurrentName]);
-
-    const fetchCurrentName = async () => {
+    const fetchCurrentName = useCallback(async () => {
         try {
             const res = await fetch("/api/auth/me", { credentials: "include" });
             if (!res.ok) {
@@ -58,7 +54,11 @@ const SetupNameContent = () => {
         } finally {
             setPageLoading(false);
         }
-    };
+    }, [next, router]);
+
+    useEffect(() => {
+        fetchCurrentName();
+    }, [fetchCurrentName]);
 
     const handleSave = async () => {
         const trimmed = displayName.trim();

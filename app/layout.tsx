@@ -68,6 +68,12 @@ export const metadata: Metadata = {
         icon: "/LOGO/logo.png",
         apple: "/LOGO/logo.png",
     },
+    manifest: "/manifest.json",
+    appleWebApp: {
+        title: "Elixpo Accounts",
+        statusBarStyle: "black-translucent",
+        capable: true,
+    },
     robots: {
         index: true,
         follow: true,
@@ -76,6 +82,10 @@ export const metadata: Metadata = {
             follow: true,
         },
     },
+};
+
+export const viewport = {
+    themeColor: "#000000",
 };
 
 export default function RootLayout({

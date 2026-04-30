@@ -28,7 +28,7 @@ import {
     Typography,
 } from "@mui/material";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { generatePixelAvatar } from "@/lib/pixel-avatar";
 
 interface OAuthApp {
@@ -159,12 +159,7 @@ const OAuthAppsPage = () => {
         redirect_uris: [""],
     });
 
-    useEffect(() => {
-        fetchApps();
-        fetchVerificationStatus();
-    }, [fetchVerificationStatus, fetchApps]);
-
-    const fetchVerificationStatus = async () => {
+    const fetchVerificationStatus = useCallback(async () => {
         try {
             const res = await fetch("/api/auth/me", { credentials: "include" });
             if (res.ok) {
@@ -174,16 +169,9 @@ const OAuthAppsPage = () => {
         } catch {
             // fail silently
         }
-    };
+    }, []);
 
-    const showToast = (
-        message: string,
-        severity: "success" | "error" | "warning",
-    ) => {
-        setToast({ open: true, message, severity });
-    };
-
-    const fetchApps = async () => {
+    const fetchApps = useCallback(async () => {
         try {
             setAppLoading(true);
             const response = await fetch("/api/auth/oauth-apps", {
@@ -201,6 +189,18 @@ const OAuthAppsPage = () => {
         } finally {
             setAppLoading(false);
         }
+    }, []);
+
+    useEffect(() => {
+        fetchApps();
+        fetchVerificationStatus();
+    }, [fetchVerificationStatus, fetchApps]);
+
+    const showToast = (
+        message: string,
+        severity: "success" | "error" | "warning",
+    ) => {
+        setToast({ open: true, message, severity });
     };
 
     const handleCreateApp = async () => {
