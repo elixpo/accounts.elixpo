@@ -22,6 +22,7 @@ import {
     Typography,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { colors } from "@elixpo/theme";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
@@ -30,6 +31,17 @@ import { useEffect, useState } from "react";
 const darkTheme = createTheme({
     palette: {
         mode: "dark",
+        primary: {
+            main: colors.lime.main,
+        },
+        background: {
+            default: colors.dark.bg.deep,
+            paper: colors.dark.bg.card,
+        },
+        text: {
+            primary: colors.dark.text.primary,
+            secondary: colors.dark.text.secondary,
+        },
     },
 });
 
@@ -104,15 +116,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
     return (
         <ThemeProvider theme={darkTheme}>
-            <Box sx={{ minHeight: "100vh", bgcolor: "#141a16" }}>
+            <Box sx={{ minHeight: "100vh", bgcolor: colors.dark.bg.deep }}>
                 {/* Top Navbar */}
                 <AppBar
                     position="sticky"
                     elevation={0}
                     sx={{
-                        bgcolor: "rgba(20, 26, 22, 0.9)",
+                        bgcolor: colors.dark.bg.overlay,
                         backdropFilter: "blur(16px)",
-                        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                        borderBottom: `1px solid ${colors.dark.border.light}`,
                     }}
                 >
                     <Toolbar
@@ -150,7 +162,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                 sx={{
                                     fontWeight: 700,
                                     fontSize: "1.1rem",
-                                    color: "#f5f5f4",
+                                    color: colors.dark.text.primary,
                                     display: { xs: "none", sm: "block" },
                                     letterSpacing: "-0.01em",
                                 }}
@@ -179,10 +191,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     title={item.label}
                                     sx={{
                                         color: isActive(item.href)
-                                            ? "#a3e635"
-                                            : "rgba(255, 255, 255, 0.45)",
+                                            ? colors.lime.main
+                                            : colors.dark.text.disabled,
                                         bgcolor: isActive(item.href)
-                                            ? "rgba(163, 230, 53, 0.1)"
+                                            ? colors.lime.dim
                                             : "transparent",
                                         borderRadius: "8px",
                                         width: 38,
@@ -191,10 +203,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         "&:hover": {
                                             bgcolor: isActive(item.href)
                                                 ? "rgba(163, 230, 53, 0.15)"
-                                                : "rgba(255, 255, 255, 0.06)",
+                                                : colors.dark.bg.cardGlassHover,
                                             color: isActive(item.href)
-                                                ? "#a3e635"
-                                                : "rgba(255, 255, 255, 0.8)",
+                                                ? colors.lime.main
+                                                : colors.dark.text.secondary,
                                         },
                                     }}
                                 >
@@ -216,8 +228,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                 height: 38,
                                 borderRadius: "8px",
                                 "&:hover": {
-                                    color: "#fff",
-                                    bgcolor: "rgba(255,255,255,0.06)",
+                                    color: colors.dark.text.primary,
+                                    bgcolor: colors.dark.bg.cardGlassHover,
                                 },
                             }}
                         >
@@ -238,7 +250,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         width: 34,
                                         height: 34,
                                         borderRadius: "50%",
-                                        border: "2px solid rgba(163, 230, 53, 0.3)",
+                                        border: `2px solid ${colors.lime.border}`,
                                     }}
                                 />
                             ) : (
