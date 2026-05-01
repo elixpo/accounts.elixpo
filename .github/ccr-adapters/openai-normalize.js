@@ -181,6 +181,11 @@ class OpenAINormalizeAdapter {
         }
 
         body.messages = flattenMessages(body.messages);
+        // Force SSE streaming so claude-code-action's tracking comment can
+        // update as tool calls and text deltas arrive. Pollinations only
+        // streams when stream=true is explicit; CCR's openai transformer
+        // doesn't always preserve it across the Anthropic→OpenAI conversion.
+        body.stream = true;
         return request;
     }
 }
