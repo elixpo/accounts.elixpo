@@ -80,27 +80,14 @@ Biome is the single linter/formatter (eslint-config-next is vestigial). The wrap
 
 ## Testing
 
-- Tests are run using Vitest.
-- Default command: `npm test` (Node environment).
-- Watch mode: `npm run test:watch`.
-
-- A workers-compatible test config is included (`vitest.workers.config.ts`) using Miniflare.
-  This prepares the repo for future Cloudflare bindings (e.g., D1), but is not required for current tests.
-
-- Current test coverage focuses on pure logic modules (`src/lib/webcrypto.ts`).
-- Future tests should expand to `jwt.ts`, `rate-limit.ts`, and eventually `db.ts` (with bindings).
-
-- For API changes, the verification loop is:
-  1. `npm run dev`
-  2. `curl -X POST http://localhost:3000/api/...`
-  3. Check DB via `wrangler d1 execute elixpo_auth --local --command "SELECT ..."`
-
-- For edge-runtime-specific code (Web Crypto / cf bindings), run:
-  `npm run pages:build` to catch edge incompatibilities.
-
-- Never add tests that depend on Node-only packages — they must remain compatible with edge/runtime constraints.
-
-- `@cloudflare/vitest-pool-workers` is installed for future Workers runtime integration.
+- Vitest is the test runner. `npm test` runs once; `npm run test:watch` for watch mode. CI runs `npm test` on every PR via `.github/workflows/vitest.yml`.
+- Test files live in `src/**/__tests__/*.test.ts`. Current coverage is pure-logic only (`webcrypto.ts`). Tests run under Node (vitest default) — Web Crypto is available on Node 20+, which is what CI uses.
+- For tests that need Cloudflare bindings (D1, KV) later, switch to `@cloudflare/vitest-pool-workers` (already installed) and add a `wrangler.toml` + pool config. Don't introduce that until a test actually needs it.
+- For API/edge changes not covered by tests, the manual loop is still:
+  1. `npm run dev`, then `curl -X POST http://localhost:3000/api/...`
+  2. Check DB state via `wrangler d1 execute elixpo_auth --local --command "SELECT ..."`
+  3. `npm run pages:build` to catch edge-runtime incompatibilities (Web Crypto / cf bindings).
+- Never add tests that import Node-only packages — they must remain compatible with edge runtime.
 
 ## Git & PR Workflow
 
