@@ -80,13 +80,27 @@ Biome is the single linter/formatter (eslint-config-next is vestigial). The wrap
 
 ## Testing
 
-- **No test runner is wired yet.** Verification is manual: `npm run dev` + curl or browser. When adding tests, use `vitest` + `@cloudflare/vitest-pool-workers` (matches the Workers pool pattern in pollinations/enter).
+- Tests are run using Vitest.
+- Default command: `npm test` (Node environment).
+- Watch mode: `npm run test:watch`.
+
+- A workers-compatible test config is included (`vitest.workers.config.ts`) using Miniflare.
+  This prepares the repo for future Cloudflare bindings (e.g., D1), but is not required for current tests.
+
+- Current test coverage focuses on pure logic modules (`src/lib/webcrypto.ts`).
+- Future tests should expand to `jwt.ts`, `rate-limit.ts`, and eventually `db.ts` (with bindings).
+
 - For API changes, the verification loop is:
-  1. `npm run dev` (runs Next in dev mode, not on CF pages)
-  2. `curl -X POST http://localhost:3000/api/...` with a seeded test user
-  3. Check `wrangler d1 execute elixpo_auth --local --command "SELECT ..."` for DB state
-- For edge-runtime-specific code (anything using Web Crypto / cf bindings), run `npm run pages:build` — this is the only way to catch edge incompat before prod.
-- Never add a test that depends on `node-*` packages (they won't run under the Workers pool).
+  1. `npm run dev`
+  2. `curl -X POST http://localhost:3000/api/...`
+  3. Check DB via `wrangler d1 execute elixpo_auth --local --command "SELECT ..."`
+
+- For edge-runtime-specific code (Web Crypto / cf bindings), run:
+  `npm run pages:build` to catch edge incompatibilities.
+
+- Never add tests that depend on Node-only packages — they must remain compatible with edge/runtime constraints.
+
+- `@cloudflare/vitest-pool-workers` is installed for future Workers runtime integration.
 
 ## Git & PR Workflow
 
