@@ -22,10 +22,10 @@ describe("generateUUID", () => {
 });
 
 describe("generateRandomString", () => {
-  it("returns a hex string of the requested length", () => {
+  it("returns a hex string of 2*length chars (one byte = two hex chars)", () => {
     for (const len of [8, 16, 32, 64]) {
       const s = generateRandomString(len);
-      expect(s).toHaveLength(len);
+      expect(s).toHaveLength(len * 2);
       expect(s).toMatch(/^[0-9a-f]+$/);
     }
   });
@@ -34,18 +34,18 @@ describe("generateRandomString", () => {
     expect(generateRandomString(32)).not.toBe(generateRandomString(32));
   });
 
-  it("defaults to length 32", () => {
-    expect(generateRandomString()).toHaveLength(32);
+  it("defaults to 32 bytes (64 hex chars)", () => {
+    expect(generateRandomString()).toHaveLength(64);
   });
 });
 
 describe("generateState / generateNonce", () => {
-  it("state is 32 hex chars", () => {
-    expect(generateState()).toMatch(/^[0-9a-f]{32}$/);
+  it("state is 64 hex chars (32 bytes)", () => {
+    expect(generateState()).toMatch(/^[0-9a-f]{64}$/);
   });
 
-  it("nonce is 16 hex chars", () => {
-    expect(generateNonce()).toMatch(/^[0-9a-f]{16}$/);
+  it("nonce is 32 hex chars (16 bytes)", () => {
+    expect(generateNonce()).toMatch(/^[0-9a-f]{32}$/);
   });
 });
 
