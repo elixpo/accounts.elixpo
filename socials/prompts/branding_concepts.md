@@ -10,7 +10,7 @@ Based on the project's `theme.js`, the branding is deeply rooted in a modern, cy
 * **Visual Style:** **Glassmorphism & Cyber-Sec**. Frosted glass effects (translucent dark cards with blurred backgrounds), subtle radial glows, and crisp geometric typography (Space Grotesk).
 
 ## 2. Mascot Ideas (The "Accounts Panda")
-Since this is an OAuth 2.0 Identity Provider, the core mascot (a panda) must embody security, trust, and access. Here are four stylistic approaches:
+Since this is an OAuth 2.0 Identity Provider, the core mascot (a panda) must embody security, trust, and access. Here are four stylistic approaches
 
 **Demo Mascot Design Link:** [https://canva.link/6pawcnhm53phb88](https://canva.link/6pawcnhm53phb88)
 
