@@ -74,9 +74,10 @@ const ServicesPage = () => {
     const [loading, setLoading] = useState(true);
     const [revoking, setRevoking] = useState<string | null>(null);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchServices();
-    }, [fetchServices]);
+    }, []);
 
     const fetchServices = async () => {
         try {
