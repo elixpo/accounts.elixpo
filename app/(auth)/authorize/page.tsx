@@ -9,6 +9,7 @@ interface AuthorizationRequest {
     clientName: string;
     clientDescription?: string;
     homepageUrl?: string;
+    logoUrl?: string;
     redirectUri: string;
     scopes: string[];
     state: string;
@@ -25,45 +26,54 @@ const SCOPE_LABELS: Record<string, { label: string; desc: string }> = {
 function ClientIcon({
     name,
     homepageUrl,
+    logoUrl,
     clientId,
     size = 44,
 }: {
     name: string;
     homepageUrl?: string;
+    logoUrl?: string;
     clientId: string;
     size?: number;
 }) {
-    const [failed, setFailed] = useState(false);
-    const hostname = homepageUrl
-        ? (() => {
-              try {
-                  return new URL(homepageUrl).hostname;
-              } catch {
-                  return "";
-              }
-          })()
-        : "";
+    const [srcIndex, setSrcIndex] = useState(0);
 
-    if (homepageUrl && hostname && !failed) {
+    const sources = [
+        logoUrl,
+        homepageUrl
+            ? (() => {
+                  try {
+                      return `https://www.google.com/s2/favicons?domain=${new URL(homepageUrl).hostname}&sz=64`;
+                  } catch {
+                      return "";
+                  }
+              })()
+            : "",
+        generatePixelAvatar(clientId + name, size),
+    ].filter(Boolean);
+
+    const src = sources[Math.min(srcIndex, sources.length - 1)];
+
+    if (srcIndex >= sources.length - 1 || !src) {
         return (
             <img
-                src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`}
+                src={generatePixelAvatar(clientId + name, size)}
                 alt=""
                 width={size}
                 height={size}
                 style={{ borderRadius: 10, flexShrink: 0 }}
-                onError={() => setFailed(true)}
             />
         );
     }
 
     return (
         <img
-            src={generatePixelAvatar(clientId + name, size)}
+            src={src}
             alt=""
             width={size}
             height={size}
             style={{ borderRadius: 10, flexShrink: 0 }}
+            onError={() => setSrcIndex((i) => i + 1)}
         />
     );
 }
@@ -141,6 +151,7 @@ function AuthorizeContent() {
                     clientName: client.name || "Unknown App",
                     clientDescription: client.description || null,
                     homepageUrl: client.homepage_url || null,
+                    logoUrl: client.logo_url || null,
                     redirectUri,
                     scopes: scopes.length > 0 ? scopes : client.scopes || [],
                     state,
@@ -434,6 +445,7 @@ function AuthorizeContent() {
                             <ClientIcon
                                 name={authRequest.clientName}
                                 homepageUrl={authRequest.homepageUrl}
+                                logoUrl={authRequest.logoUrl}
                                 clientId={authRequest.clientId}
                                 size={44}
                             />

@@ -300,6 +300,7 @@ export async function createOAuthClient(
         ownerId,
         description,
         homepageUrl,
+        logoUrl,
     }: {
         clientId: string;
         clientSecretHash: string;
@@ -309,11 +310,12 @@ export async function createOAuthClient(
         ownerId: string;
         description?: string;
         homepageUrl?: string;
+        logoUrl?: string;
     },
 ) {
     const stmt = db.prepare(
-        `INSERT INTO oauth_clients (client_id, client_secret_hash, name, redirect_uris, scopes, owner_id, description, homepage_url)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO oauth_clients (client_id, client_secret_hash, name, redirect_uris, scopes, owner_id, description, homepage_url, logo_url)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     );
     return await stmt
         .bind(
@@ -325,13 +327,14 @@ export async function createOAuthClient(
             ownerId,
             description ?? null,
             homepageUrl ?? null,
+            logoUrl ?? null,
         )
         .run();
 }
 
 export async function getOAuthClientById(db: D1Database, clientId: string) {
     const stmt = db.prepare(
-        "SELECT client_id, name, redirect_uris, scopes, description, homepage_url, created_at, is_active FROM oauth_clients WHERE client_id = ?",
+        "SELECT client_id, name, redirect_uris, scopes, description, homepage_url, logo_url, created_at, is_active FROM oauth_clients WHERE client_id = ?",
     );
     return await stmt.bind(clientId).first();
 }

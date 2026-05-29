@@ -23,48 +23,54 @@ function ServiceIcon({
     svc: ConnectedService;
     size?: number;
 }) {
-    const [faviconFailed, setFaviconFailed] = useState(false);
-    const hostname = svc.homepage_url
-        ? (() => {
-              try {
-                  return new URL(svc.homepage_url).hostname;
-              } catch {
-                  return "";
-              }
-          })()
-        : "";
+    const [srcIndex, setSrcIndex] = useState(0);
 
-    if (svc.homepage_url && hostname && !faviconFailed) {
+    const sources = [
+        svc.logo_url,
+        svc.homepage_url
+            ? (() => {
+                  try {
+                      return `https://www.google.com/s2/favicons?domain=${new URL(svc.homepage_url).hostname}&sz=64`;
+                  } catch {
+                      return "";
+                  }
+              })()
+            : "",
+        generatePixelAvatar(svc.client_id + svc.name, size),
+    ].filter(Boolean);
+
+    const src = sources[Math.min(srcIndex, sources.length - 1)];
+
+    if (srcIndex >= sources.length - 1 || !src) {
         return (
             <Box
                 component="img"
-                src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`}
+                src={generatePixelAvatar(svc.client_id + svc.name, size)}
                 alt=""
                 sx={{
                     width: size,
                     height: size,
                     borderRadius: "10px",
                     flexShrink: 0,
-                    bgcolor: "rgba(255,255,255,0.05)",
-                    p: 0.5,
                 }}
-                onError={() => setFaviconFailed(true)}
             />
         );
     }
 
-    // Pixel avatar fallback
     return (
         <Box
             component="img"
-            src={generatePixelAvatar(svc.client_id + svc.name, size)}
+            src={src}
             alt=""
             sx={{
                 width: size,
                 height: size,
                 borderRadius: "10px",
                 flexShrink: 0,
+                bgcolor: "rgba(255,255,255,0.05)",
+                p: 0.5,
             }}
+            onError={() => setSrcIndex((i) => i + 1)}
         />
     );
 }

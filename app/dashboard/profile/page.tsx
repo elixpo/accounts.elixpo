@@ -52,6 +52,7 @@ interface ConnectedService {
     name: string;
     description?: string;
     homepage_url?: string;
+    logo_url?: string;
     first_authorized: string;
     last_authorized: string;
 }
@@ -110,30 +111,31 @@ const _dividerSx = {
 };
 
 function ServiceIconSmall({ svc }: { svc: ConnectedService }) {
-    const [failed, setFailed] = useState(false);
-    const hostname = svc.homepage_url
-        ? (() => {
-              try {
-                  return new URL(svc.homepage_url).hostname;
-              } catch {
-                  return "";
-              }
-          })()
-        : "";
+    const [srcIndex, setSrcIndex] = useState(0);
 
-    if (svc.homepage_url && hostname && !failed) {
+    const sources = [
+        svc.logo_url,
+        svc.homepage_url
+            ? (() => {
+                  try {
+                      return `https://www.google.com/s2/favicons?domain=${new URL(svc.homepage_url).hostname}&sz=32`;
+                  } catch {
+                      return "";
+                  }
+              })()
+            : "",
+        generatePixelAvatar(svc.client_id + svc.name, 24),
+    ].filter(Boolean);
+
+    const src = sources[Math.min(srcIndex, sources.length - 1)];
+
+    if (srcIndex >= sources.length - 1 || !src) {
         return (
             <Box
                 component="img"
-                src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=32`}
+                src={generatePixelAvatar(svc.client_id + svc.name, 24)}
                 alt=""
-                sx={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: "4px",
-                    flexShrink: 0,
-                }}
-                onError={() => setFailed(true)}
+                sx={{ width: 24, height: 24, borderRadius: "4px", flexShrink: 0 }}
             />
         );
     }
@@ -141,9 +143,15 @@ function ServiceIconSmall({ svc }: { svc: ConnectedService }) {
     return (
         <Box
             component="img"
-            src={generatePixelAvatar(svc.client_id + svc.name, 24)}
+            src={src}
             alt=""
-            sx={{ width: 24, height: 24, borderRadius: "4px", flexShrink: 0 }}
+            sx={{
+                width: 24,
+                height: 24,
+                borderRadius: "4px",
+                flexShrink: 0,
+            }}
+            onError={() => setSrcIndex((i) => i + 1)}
         />
     );
 }

@@ -74,6 +74,7 @@ export default function OAuthAppSettingsPage() {
         name: "",
         description: "",
         homepage_url: "",
+        logo_url: "",
         redirect_uris: [""] as string[],
     });
 
@@ -95,6 +96,7 @@ export default function OAuthAppSettingsPage() {
                     name: data.name || "",
                     description: data.description || "",
                     homepage_url: data.homepage_url || "",
+                    logo_url: data.logo_url || "",
                     redirect_uris: uris.length > 0 ? uris : [""],
                 });
             } catch {
@@ -127,6 +129,7 @@ export default function OAuthAppSettingsPage() {
                     name: form.name,
                     description: form.description,
                     homepage_url: form.homepage_url,
+                    logo_url: form.logo_url || undefined,
                     redirect_uris: redirectUris,
                 }),
             });
@@ -197,15 +200,16 @@ export default function OAuthAppSettingsPage() {
         }
     };
 
-    const faviconUrl = form.homepage_url
-        ? (() => {
-              try {
-                  return `https://www.google.com/s2/favicons?domain=${new URL(form.homepage_url).hostname}&sz=64`;
-              } catch {
-                  return null;
-              }
-          })()
-        : null;
+    const faviconUrl = form.logo_url
+        || (form.homepage_url
+            ? (() => {
+                  try {
+                      return `https://www.google.com/s2/favicons?domain=${new URL(form.homepage_url).hostname}&sz=64`;
+                  } catch {
+                      return null;
+                  }
+              })()
+            : null);
 
     if (loading) {
         return (
@@ -536,6 +540,20 @@ export default function OAuthAppSettingsPage() {
                                     homepage_url: e.target.value,
                                 })
                             }
+                            sx={textFieldSx}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Logo URL"
+                            placeholder="https://example.com/logo.png"
+                            value={form.logo_url}
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    logo_url: e.target.value,
+                                })
+                            }
+                            helperText="Used as the app icon in the dashboard and consent screen"
                             sx={textFieldSx}
                         />
                         <Box sx={{ gridColumn: { md: "1 / -1" } }}>

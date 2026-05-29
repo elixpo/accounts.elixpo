@@ -35,6 +35,7 @@ interface OAuthApp {
     client_id: string;
     name: string;
     homepage_url?: string;
+    logo_url?: string;
     description?: string;
     created_at: string;
     is_active: boolean;
@@ -83,22 +84,29 @@ const tableBodySx = {
 };
 
 function AppIcon({ app, size = 28 }: { app: OAuthApp; size?: number }) {
-    const [failed, setFailed] = useState(false);
-    const hostname = app.homepage_url
-        ? (() => {
-              try {
-                  return new URL(app.homepage_url).hostname;
-              } catch {
-                  return "";
-              }
-          })()
-        : "";
+    const [srcIndex, setSrcIndex] = useState(0);
 
-    if (app.homepage_url && hostname && !failed) {
+    const sources = [
+        app.logo_url,
+        app.homepage_url
+            ? (() => {
+                  try {
+                      return `https://www.google.com/s2/favicons?domain=${new URL(app.homepage_url).hostname}&sz=64`;
+                  } catch {
+                      return "";
+                  }
+              })()
+            : "",
+        generatePixelAvatar(app.client_id + app.name, size),
+    ].filter(Boolean);
+
+    const src = sources[Math.min(srcIndex, sources.length - 1)];
+
+    if (srcIndex >= sources.length - 1 || !src) {
         return (
             <Box
                 component="img"
-                src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`}
+                src={generatePixelAvatar(app.client_id + app.name, size)}
                 alt=""
                 sx={{
                     width: size,
@@ -106,7 +114,6 @@ function AppIcon({ app, size = 28 }: { app: OAuthApp; size?: number }) {
                     borderRadius: "6px",
                     flexShrink: 0,
                 }}
-                onError={() => setFailed(true)}
             />
         );
     }
@@ -114,7 +121,7 @@ function AppIcon({ app, size = 28 }: { app: OAuthApp; size?: number }) {
     return (
         <Box
             component="img"
-            src={generatePixelAvatar(app.client_id + app.name, size)}
+            src={src}
             alt=""
             sx={{
                 width: size,
@@ -122,6 +129,7 @@ function AppIcon({ app, size = 28 }: { app: OAuthApp; size?: number }) {
                 borderRadius: "6px",
                 flexShrink: 0,
             }}
+            onError={() => setSrcIndex((i) => i + 1)}
         />
     );
 }

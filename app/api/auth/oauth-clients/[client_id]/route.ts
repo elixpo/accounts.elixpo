@@ -133,6 +133,7 @@ export async function PUT(
             name: updated?.name,
             description: updated?.description,
             homepage_url: updated?.homepage_url,
+            logo_url: updated?.logo_url || null,
             redirect_uris: JSON.parse(updated?.redirect_uris || "[]"),
             scopes: JSON.parse(updated?.scopes || "[]"),
             is_active: Boolean(updated?.is_active),

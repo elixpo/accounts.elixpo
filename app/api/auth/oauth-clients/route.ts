@@ -154,6 +154,7 @@ export async function POST(request: NextRequest) {
                 ownerId: auth.sub,
                 description,
                 homepageUrl: homepage_url,
+                logoUrl: logo_uri,
             });
             console.log(`[OAuth Client] Registered: ${name} (${clientId})`);
 
@@ -244,6 +245,7 @@ export async function GET(request: NextRequest) {
             name: (client as any).name,
             description: (client as any).description || null,
             homepage_url: (client as any).homepage_url || null,
+            logo_url: (client as any).logo_url || null,
             redirect_uris: JSON.parse((client as any).redirect_uris || "[]"),
             scopes: JSON.parse((client as any).scopes || "[]"),
             created_at: (client as any).created_at,
