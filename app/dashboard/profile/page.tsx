@@ -2209,6 +2209,101 @@ const ProfilePage = () => {
                 </Box>
             </Box>
 
+            {/* Username Change (destructive) Dialog */}
+            <Dialog
+                open={usernameDialogOpen}
+                onClose={() => !usernameLoading && setUsernameDialogOpen(false)}
+                PaperProps={{
+                    sx: {
+                        background: "#1a1d29",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: "14px",
+                        width: "100%",
+                        maxWidth: 420,
+                    },
+                }}
+            >
+                <DialogTitle sx={{ color: "#f4f4f6", fontWeight: 700 }}>
+                    Change username
+                </DialogTitle>
+                <DialogContent>
+                    <Alert
+                        severity="warning"
+                        sx={{ mb: 2, bgcolor: "rgba(245,158,11,0.1)", color: "#f59e0b" }}
+                    >
+                        This is destructive. Any link pointing to
+                        {" "}@{profile.username} on other Elixpo services
+                        (profiles, shared blogs) will break. Your account and
+                        data stay the same.
+                    </Alert>
+                    <TextField
+                        fullWidth
+                        autoFocus
+                        label="New username"
+                        value={newUsername}
+                        onChange={(e) =>
+                            setNewUsername(
+                                e.target.value
+                                    .toLowerCase()
+                                    .replace(/[^a-z0-9_-]/g, ""),
+                            )
+                        }
+                        inputProps={{ maxLength: 32 }}
+                        disabled={usernameLoading}
+                        helperText={
+                            usernameCheck.state === "checking"
+                                ? "Checking availability…"
+                                : usernameCheck.state === "available"
+                                  ? "✓ Available"
+                                  : usernameCheck.state === "taken"
+                                    ? `✗ ${usernameCheck.reason || "Taken"}`
+                                    : "3–32 chars. Lowercase letters, numbers, - and _."
+                        }
+                        FormHelperTextProps={{
+                            sx: {
+                                color:
+                                    usernameCheck.state === "available"
+                                        ? "#4ade80"
+                                        : usernameCheck.state === "taken"
+                                          ? "#f87171"
+                                          : "rgba(255,255,255,0.4)",
+                            },
+                        }}
+                        sx={textFieldSx}
+                    />
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
+                    <Button
+                        onClick={() => setUsernameDialogOpen(false)}
+                        disabled={usernameLoading}
+                        sx={{ color: "rgba(255,255,255,0.6)", textTransform: "none" }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleUpdateUsername}
+                        disabled={
+                            usernameLoading ||
+                            usernameCheck.state !== "available"
+                        }
+                        variant="contained"
+                        sx={{
+                            background: "#9b7bf7",
+                            color: "#fff",
+                            textTransform: "none",
+                            fontWeight: 600,
+                            "&:hover": { background: "#b69aff" },
+                            "&:disabled": {
+                                background: "rgba(255,255,255,0.08)",
+                                color: "rgba(255,255,255,0.3)",
+                            },
+                        }}
+                    >
+                        {usernameLoading ? "Changing…" : "Change username"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             {/* Delete Account Confirmation Dialog */}
             <Dialog
                 open={deleteDialogOpen}
