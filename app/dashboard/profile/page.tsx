@@ -297,11 +297,12 @@ const ProfilePage = () => {
         }
     }, [verifyCooldown]);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchProfile();
         fetchNotifPrefs();
         fetchConnectedServices();
-    }, [fetchProfile, fetchNotifPrefs, fetchConnectedServices]);
+    }, []);
 
     const fetchProfile = async () => {
         try {
@@ -2232,7 +2233,7 @@ const ProfilePage = () => {
                         sx={{ mb: 2, bgcolor: "rgba(245,158,11,0.1)", color: "#f59e0b" }}
                     >
                         This is destructive. Any link pointing to
-                        {" "}@{profile.username} on other Elixpo services
+                        {" "}@{profile?.username} on other Elixpo services
                         (profiles, shared blogs) will break. Your account and
                         data stay the same.
                     </Alert>

@@ -159,10 +159,11 @@ const OAuthAppsPage = () => {
         redirect_uris: [""],
     });
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchApps();
         fetchVerificationStatus();
-    }, [fetchVerificationStatus, fetchApps]);
+    }, []);
 
     const fetchVerificationStatus = async () => {
         try {
