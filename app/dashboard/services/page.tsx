@@ -140,7 +140,7 @@ const ServicesPage = () => {
 
             {loading ? (
                 <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-                    <CircularProgress sx={{ color: "#a3e635" }} />
+                    <CircularProgress sx={{ color: "#9b7bf7" }} />
                 </Box>
             ) : services.length === 0 ? (
                 <Box
@@ -240,7 +240,7 @@ const ServicesPage = () => {
                                                     alignItems: "center",
                                                     gap: 0.5,
                                                     "&:hover": {
-                                                        color: "#a3e635",
+                                                        color: "#9b7bf7",
                                                     },
                                                 }}
                                             >

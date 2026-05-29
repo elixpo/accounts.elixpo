@@ -72,10 +72,10 @@ const textFieldSx = {
         color: "#f5f5f4",
         "& fieldset": { borderColor: "rgba(255, 255, 255, 0.1)" },
         "&:hover fieldset": { borderColor: "rgba(255, 255, 255, 0.2)" },
-        "&.Mui-focused fieldset": { borderColor: "#a3e635" },
+        "&.Mui-focused fieldset": { borderColor: "#9b7bf7" },
     },
     "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.7)" },
-    "& .MuiInputLabel-root.Mui-focused": { color: "#a3e635" },
+    "& .MuiInputLabel-root.Mui-focused": { color: "#9b7bf7" },
     "& .MuiFormHelperText-root": { color: "rgba(255,255,255,0.5)" },
 };
 
@@ -248,12 +248,12 @@ export default function WebhooksPage() {
                         startIcon={<AddIcon />}
                         onClick={() => setOpenDialog(true)}
                         sx={{
-                            background: "rgba(163,230,53,0.15)",
-                            color: "#a3e635",
-                            border: "1px solid rgba(163,230,53,0.3)",
+                            background: "rgba(155, 123, 247,0.15)",
+                            color: "#9b7bf7",
+                            border: "1px solid rgba(155, 123, 247,0.3)",
                             fontWeight: 600,
                             textTransform: "none",
-                            "&:hover": { background: "rgba(163,230,53,0.25)" },
+                            "&:hover": { background: "rgba(155, 123, 247,0.25)" },
                         }}
                     >
                         Add Webhook
@@ -264,7 +264,7 @@ export default function WebhooksPage() {
                 <Box sx={cardSx}>
                     {loading ? (
                         <Box sx={{ p: 4, textAlign: "center" }}>
-                            <CircularProgress sx={{ color: "#a3e635" }} />
+                            <CircularProgress sx={{ color: "#9b7bf7" }} />
                         </Box>
                     ) : webhooks.length === 0 ? (
                         <Box
@@ -290,12 +290,12 @@ export default function WebhooksPage() {
                                     <TableRow
                                         sx={{
                                             "& .MuiTableCell-head": {
-                                                color: "#a3e635",
+                                                color: "#9b7bf7",
                                                 fontWeight: 600,
                                                 bgcolor:
-                                                    "rgba(163,230,53,0.05)",
+                                                    "rgba(155, 123, 247,0.05)",
                                                 borderColor:
-                                                    "rgba(163,230,53,0.2)",
+                                                    "rgba(155, 123, 247,0.2)",
                                             },
                                         }}
                                     >
@@ -352,8 +352,8 @@ export default function WebhooksPage() {
                                                                 size="small"
                                                                 sx={{
                                                                     bgcolor:
-                                                                        "rgba(163,230,53,0.1)",
-                                                                    color: "#a3e635",
+                                                                        "rgba(155, 123, 247,0.1)",
+                                                                    color: "#9b7bf7",
                                                                     fontSize:
                                                                         "0.7rem",
                                                                     height: 20,
@@ -375,7 +375,7 @@ export default function WebhooksPage() {
                                                     sx={{
                                                         "& .MuiSwitch-switchBase.Mui-checked":
                                                             {
-                                                                color: "#a3e635",
+                                                                color: "#9b7bf7",
                                                             },
                                                         "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
                                                             {
@@ -415,10 +415,10 @@ export default function WebhooksPage() {
                                                             )
                                                         }
                                                         sx={{
-                                                            color: "#a3e635",
+                                                            color: "#9b7bf7",
                                                             "&:hover": {
                                                                 bgcolor:
-                                                                    "rgba(163,230,53,0.1)",
+                                                                    "rgba(155, 123, 247,0.1)",
                                                             },
                                                         }}
                                                     >
@@ -542,7 +542,7 @@ export default function WebhooksPage() {
                                         sx={{
                                             color: "rgba(255,255,255,0.3)",
                                             "&.Mui-checked": {
-                                                color: "#a3e635",
+                                                color: "#9b7bf7",
                                             },
                                         }}
                                     />
@@ -557,7 +557,7 @@ export default function WebhooksPage() {
                                         <span
                                             style={{
                                                 fontFamily: "monospace",
-                                                color: "#a3e635",
+                                                color: "#9b7bf7",
                                                 marginRight: 8,
                                             }}
                                         >
@@ -585,10 +585,10 @@ export default function WebhooksPage() {
                         variant="contained"
                         disabled={creating}
                         sx={{
-                            background: "rgba(163,230,53,0.15)",
-                            color: "#a3e635",
-                            border: "1px solid rgba(163,230,53,0.3)",
-                            "&:hover": { background: "rgba(163,230,53,0.25)" },
+                            background: "rgba(155, 123, 247,0.15)",
+                            color: "#9b7bf7",
+                            border: "1px solid rgba(155, 123, 247,0.3)",
+                            "&:hover": { background: "rgba(155, 123, 247,0.25)" },
                         }}
                     >
                         {creating ? "Creating..." : "Add Webhook"}
@@ -608,13 +608,13 @@ export default function WebhooksPage() {
                     sx={{
                         bgcolor:
                             snack.severity === "success"
-                                ? "rgba(163,230,53,0.15)"
+                                ? "rgba(155, 123, 247,0.15)"
                                 : "rgba(239,68,68,0.15)",
                         color:
                             snack.severity === "success"
-                                ? "#a3e635"
+                                ? "#9b7bf7"
                                 : "#ef4444",
-                        border: `1px solid ${snack.severity === "success" ? "rgba(163,230,53,0.3)" : "rgba(239,68,68,0.3)"}`,
+                        border: `1px solid ${snack.severity === "success" ? "rgba(155, 123, 247,0.3)" : "rgba(239,68,68,0.3)"}`,
                     }}
                 >
                     {snack.message}
