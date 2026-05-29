@@ -37,6 +37,7 @@ interface UserProfile {
     provider: string;
     avatar?: string | null;
     emailVerified?: boolean;
+    username?: string | null;
     displayName?: string | null;
     bio?: string | null;
     country?: string | null;
@@ -191,6 +192,79 @@ const ProfilePage = () => {
         text: string;
         type: "success" | "error";
     } | null>(null);
+
+    // Username (handle) change state — changing a handle is destructive.
+    const [usernameDialogOpen, setUsernameDialogOpen] = useState(false);
+    const [newUsername, setNewUsername] = useState("");
+    const [usernameLoading, setUsernameLoading] = useState(false);
+    const [usernameMsg, setUsernameMsg] = useState<{
+        text: string;
+        type: "success" | "error";
+    } | null>(null);
+    const [usernameCheck, setUsernameCheck] = useState<{
+        state: "idle" | "checking" | "available" | "taken";
+        reason?: string;
+    }>({ state: "idle" });
+
+    // Debounced availability check while the change dialog is open.
+    useEffect(() => {
+        if (!usernameDialogOpen) return;
+        const u = newUsername.trim().toLowerCase();
+        if (!u || u === profile?.username) {
+            setUsernameCheck({ state: "idle" });
+            return;
+        }
+        setUsernameCheck({ state: "checking" });
+        const t = setTimeout(async () => {
+            try {
+                const res = await fetch(
+                    `/api/auth/username/check?u=${encodeURIComponent(u)}`,
+                );
+                const data: any = await res.json();
+                setUsernameCheck(
+                    data.available
+                        ? { state: "available" }
+                        : { state: "taken", reason: data.reason },
+                );
+            } catch {
+                setUsernameCheck({ state: "idle" });
+            }
+        }, 350);
+        return () => clearTimeout(t);
+    }, [newUsername, usernameDialogOpen, profile?.username]);
+
+    const handleUpdateUsername = async () => {
+        const handle = newUsername.trim().toLowerCase();
+        if (usernameCheck.state !== "available") {
+            setUsernameMsg({
+                text: usernameCheck.reason || "Pick an available username.",
+                type: "error",
+            });
+            return;
+        }
+        setUsernameLoading(true);
+        setUsernameMsg(null);
+        try {
+            const res = await fetch("/api/auth/me", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ username: handle, confirm: true }),
+            });
+            if (!res.ok) {
+                const data: any = await res.json();
+                throw new Error(data.error || "Failed to update username");
+            }
+            setUsernameMsg({ text: "Username updated!", type: "success" });
+            setUsernameDialogOpen(false);
+            setNewUsername("");
+            fetchProfile();
+        } catch (err: any) {
+            setUsernameMsg({ text: err.message, type: "error" });
+        } finally {
+            setUsernameLoading(false);
+        }
+    };
 
     // Connected services state
     const [connectedServices, setConnectedServices] = useState<
@@ -672,6 +746,73 @@ const ProfilePage = () => {
                                             />
                                         )}
                                     </Box>
+                                </Box>
+                            </Box>
+
+                            {/* Username (handle) */}
+                            <Box sx={{ mb: 3 }}>
+                                <Typography
+                                    sx={{
+                                        color: "rgba(255,255,255,0.55)",
+                                        fontSize: "0.8rem",
+                                        mb: 0.8,
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.05em",
+                                    }}
+                                >
+                                    Username
+                                </Typography>
+                                {usernameMsg && (
+                                    <Alert
+                                        severity={usernameMsg.type}
+                                        sx={{ mb: 1.5, py: 0 }}
+                                    >
+                                        {usernameMsg.text}
+                                    </Alert>
+                                )}
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1.5,
+                                        p: 1.5,
+                                        background: "rgba(255,255,255,0.04)",
+                                        border: "1px solid rgba(255,255,255,0.08)",
+                                        borderRadius: "10px",
+                                    }}
+                                >
+                                    <Typography
+                                        sx={{
+                                            color: "#f4f4f6",
+                                            fontWeight: 500,
+                                            flex: 1,
+                                        }}
+                                    >
+                                        @{profile.username || "—"}
+                                    </Typography>
+                                    <Button
+                                        size="small"
+                                        onClick={() => {
+                                            setNewUsername(profile.username || "");
+                                            setUsernameCheck({ state: "idle" });
+                                            setUsernameMsg(null);
+                                            setUsernameDialogOpen(true);
+                                        }}
+                                        startIcon={
+                                            <EditIcon sx={{ fontSize: "0.9rem" }} />
+                                        }
+                                        sx={{
+                                            color: "#9b7bf7",
+                                            textTransform: "none",
+                                            fontSize: "0.8rem",
+                                            "&:hover": {
+                                                backgroundColor:
+                                                    "rgba(155, 123, 247,0.08)",
+                                            },
+                                        }}
+                                    >
+                                        Change
+                                    </Button>
                                 </Box>
                             </Box>
 
