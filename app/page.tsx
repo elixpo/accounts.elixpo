@@ -8,6 +8,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Box, Button, Chip, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import BackgroundAurora from "./components/background-aurora";
+import Footer from "./components/footer";
 import Navbar from "./components/navbar";
 
 const ACCENT = "#9b7bf7";
@@ -330,25 +331,7 @@ export default function LandingPage() {
                 </Box>
             </Box>
 
-            <Box
-                component="footer"
-                sx={{
-                    borderTop: "1px solid rgba(255,255,255,0.06)",
-                    py: 3,
-                    px: { xs: 2.5, md: 4 },
-                    color: "rgba(255,255,255,0.45)",
-                    fontSize: "0.85rem",
-                    textAlign: "center",
-                    position: "relative",
-                    zIndex: 1,
-                }}
-            >
-                © {new Date().getFullYear()} Elixpo · Built on Cloudflare's edge
-                ·{" "}
-                <Link href="/about" style={{ color: "rgba(255,255,255,0.7)" }}>
-                    About
-                </Link>
-            </Box>
+            <Footer />
         </Box>
     );
 }

@@ -70,7 +70,7 @@ function ServiceIcon({
 }
 
 // Only allow post-revoke redirects back to first-party elixpo.com hosts.
-function isSafeReturn(url: string): boolean {
+function _isSafeReturn(url: string): boolean {
     try {
         const u = new URL(url);
         return (
