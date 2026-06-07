@@ -153,7 +153,6 @@ const ServicesPage = () => {
     }, [loading, services, paramHandled]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    
 
     const fetchServices = async () => {
         try {
@@ -174,8 +173,8 @@ const ServicesPage = () => {
 
     useEffect(() => {
         fetchServices();
-    }, [fetchServices]);
-    
+    }, [fetchServices]); // mount-only; inline fetches recreated each render cause a loop
+
     const revokeService = async (clientId: string) => {
         if (
             !confirm(

@@ -194,9 +194,7 @@ const OAuthAppsPage = () => {
     useEffect(() => {
         fetchApps();
         fetchVerificationStatus();
-    }, [fetchVerificationStatus, fetchApps]);
-
-    
+    }, [fetchVerificationStatus, fetchApps]); // mount-only; inline fetches recreated each render cause a loop
 
     const showToast = (
         message: string,
@@ -204,8 +202,6 @@ const OAuthAppsPage = () => {
     ) => {
         setToast({ open: true, message, severity });
     };
-
-    
 
     const handleCreateApp = async () => {
         setError("");

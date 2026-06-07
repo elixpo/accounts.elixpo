@@ -298,7 +298,7 @@ const ProfilePage = () => {
     }, [verifyCooldown]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    
+
     const fetchProfile = async () => {
         try {
             setProfileLoading(true);
@@ -368,8 +368,7 @@ const ProfilePage = () => {
         fetchProfile();
         fetchNotifPrefs();
         fetchConnectedServices();
-    }, [fetchProfile, fetchNotifPrefs, fetchConnectedServices]);
-
+    }, [fetchProfile, fetchNotifPrefs, fetchConnectedServices]); // mount-only; inline fetches recreated each render cause a loop
 
     const handleUpdateProfile = async () => {
         setUpdateError("");

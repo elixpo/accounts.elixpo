@@ -81,7 +81,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         // loop because useRouter returns a new ref on every render under
         // Next 15.2 + React 19.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [router.replace, router.push]);
 
     const handleLogout = async () => {
         setAnchorEl(null);

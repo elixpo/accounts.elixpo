@@ -101,7 +101,6 @@ export default function WebhooksPage() {
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    
 
     const fetchWebhooks = async () => {
         try {
@@ -121,8 +120,8 @@ export default function WebhooksPage() {
 
     useEffect(() => {
         fetchWebhooks();
-    }, [fetchWebhooks]);
-    
+    }, [fetchWebhooks]); // mount-only; inline fetches recreated each render cause a loop
+
     const showSnack = (message: string, severity: "success" | "error") => {
         setSnack({ open: true, message, severity });
     };
