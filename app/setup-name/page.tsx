@@ -53,6 +53,9 @@ const SetupNameContent = () => {
         severity: "success" | "error";
     }>({ open: false, message: "", severity: "success" });
 
+    // Uses window.location for the catch branch so router isn't referenced
+    // inside the effect — prevents eslint-react-hooks from autofixing it
+    // back into deps (which would loop the /me fetch).
     useEffect(() => {
         (async () => {
             try {
@@ -66,7 +69,6 @@ const SetupNameContent = () => {
                     return;
                 }
                 const data: any = await res.json();
-                // Already has a handle → setup complete, move on.
                 if (data.username) {
                     window.location.href = next || "/dashboard/oauth-apps";
                     return;
@@ -75,15 +77,12 @@ const SetupNameContent = () => {
                 setDisplayName(dn);
                 setUsername(slugifyHandle(dn));
             } catch {
-                router.push("/login");
+                window.location.href = "/login";
             } finally {
                 setPageLoading(false);
             }
         })();
-        // Mount-only — router is unstable across renders under Next 15.2 +
-        // React 19 and using it as a dep loops the /me fetch.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [next, router.push]);
+    }, [next]);
 
     // Debounced availability check.
     useEffect(() => {
