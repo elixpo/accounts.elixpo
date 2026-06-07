@@ -103,7 +103,7 @@ export default function WebhooksPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchWebhooks();
-    }, []);
+    }, [fetchWebhooks]);
 
     const fetchWebhooks = async () => {
         try {
@@ -254,7 +254,9 @@ export default function WebhooksPage() {
                             border: "1px solid rgba(155, 123, 247,0.3)",
                             fontWeight: 600,
                             textTransform: "none",
-                            "&:hover": { background: "rgba(155, 123, 247,0.25)" },
+                            "&:hover": {
+                                background: "rgba(155, 123, 247,0.25)",
+                            },
                         }}
                     >
                         Add Webhook
@@ -589,7 +591,9 @@ export default function WebhooksPage() {
                             background: "rgba(155, 123, 247,0.15)",
                             color: "#9b7bf7",
                             border: "1px solid rgba(155, 123, 247,0.3)",
-                            "&:hover": { background: "rgba(155, 123, 247,0.25)" },
+                            "&:hover": {
+                                background: "rgba(155, 123, 247,0.25)",
+                            },
                         }}
                     >
                         {creating ? "Creating..." : "Add Webhook"}

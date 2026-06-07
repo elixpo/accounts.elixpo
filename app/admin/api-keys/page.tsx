@@ -95,7 +95,7 @@ export default function ApiKeysPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchApiKeys();
-    }, []);
+    }, [fetchApiKeys]);
 
     const fetchApiKeys = async () => {
         try {
@@ -116,8 +116,6 @@ export default function ApiKeysPage() {
             setLoading(false);
         }
     };
-
-    
 
     const handleCreateApiKey = async () => {
         if (!formData.name.trim()) {
