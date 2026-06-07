@@ -794,13 +794,17 @@ const ProfilePage = () => {
                                     <Button
                                         size="small"
                                         onClick={() => {
-                                            setNewUsername(profile.username || "");
+                                            setNewUsername(
+                                                profile.username || "",
+                                            );
                                             setUsernameCheck({ state: "idle" });
                                             setUsernameMsg(null);
                                             setUsernameDialogOpen(true);
                                         }}
                                         startIcon={
-                                            <EditIcon sx={{ fontSize: "0.9rem" }} />
+                                            <EditIcon
+                                                sx={{ fontSize: "0.9rem" }}
+                                            />
                                         }
                                         sx={{
                                             color: "#9b7bf7",
@@ -2230,12 +2234,16 @@ const ProfilePage = () => {
                 <DialogContent>
                     <Alert
                         severity="warning"
-                        sx={{ mb: 2, bgcolor: "rgba(245,158,11,0.1)", color: "#f59e0b" }}
+                        sx={{
+                            mb: 2,
+                            bgcolor: "rgba(245,158,11,0.1)",
+                            color: "#f59e0b",
+                        }}
                     >
-                        This is destructive. Any link pointing to
-                        {" "}@{profile?.username} on other Elixpo services
-                        (profiles, shared blogs) will break. Your account and
-                        data stay the same.
+                        This is destructive. Any link pointing to @
+                        {profile?.username} on other Elixpo services (profiles,
+                        shared blogs) will break. Your account and data stay the
+                        same.
                     </Alert>
                     <TextField
                         fullWidth
@@ -2277,7 +2285,10 @@ const ProfilePage = () => {
                     <Button
                         onClick={() => setUsernameDialogOpen(false)}
                         disabled={usernameLoading}
-                        sx={{ color: "rgba(255,255,255,0.6)", textTransform: "none" }}
+                        sx={{
+                            color: "rgba(255,255,255,0.6)",
+                            textTransform: "none",
+                        }}
                     >
                         Cancel
                     </Button>

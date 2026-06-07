@@ -33,8 +33,7 @@ const ErrorContent = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                background:
-                    "linear-gradient(135deg, #0f1117 0%, #131922 50%, #0f1117 100%)",
+                background: "transparent",
                 p: 2,
             }}
         >

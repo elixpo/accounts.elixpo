@@ -81,7 +81,7 @@ const SetupNameContent = () => {
             }
         })();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [router.push, next]);
 
     // Debounced availability check.
     useEffect(() => {
@@ -113,11 +113,19 @@ const SetupNameContent = () => {
         const dn = displayName.trim();
         const handle = username.trim().toLowerCase();
         if (dn.length < 2 || dn.length > 32) {
-            setToast({ open: true, message: "Display name must be 2-32 characters.", severity: "error" });
+            setToast({
+                open: true,
+                message: "Display name must be 2-32 characters.",
+                severity: "error",
+            });
             return;
         }
         if (check.state !== "available") {
-            setToast({ open: true, message: check.reason || "Pick an available username.", severity: "error" });
+            setToast({
+                open: true,
+                message: check.reason || "Pick an available username.",
+                severity: "error",
+            });
             return;
         }
 
@@ -230,18 +238,26 @@ const SetupNameContent = () => {
                     value={username}
                     onChange={(e) =>
                         setUsername(
-                            e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""),
+                            e.target.value
+                                .toLowerCase()
+                                .replace(/[^a-z0-9_-]/g, ""),
                         )
                     }
                     placeholder="e.g. anwesha, swift-fox"
                     helperText={handleHelper}
-                    FormHelperTextProps={{ sx: { color: `${handleHelperColor} !important` } }}
+                    FormHelperTextProps={{
+                        sx: { color: `${handleHelperColor} !important` },
+                    }}
                     sx={{ ...textFieldSx, mb: 2.5 }}
                     disabled={loading}
                     inputProps={{ maxLength: 32 }}
                     InputProps={{
                         startAdornment: (
-                            <Typography sx={{ color: "rgba(255,255,255,0.4)", mr: 0.5 }}>@</Typography>
+                            <Typography
+                                sx={{ color: "rgba(255,255,255,0.4)", mr: 0.5 }}
+                            >
+                                @
+                            </Typography>
                         ),
                     }}
                 />
