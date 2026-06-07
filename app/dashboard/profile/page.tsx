@@ -298,12 +298,7 @@ const ProfilePage = () => {
     }, [verifyCooldown]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => {
-        fetchProfile();
-        fetchNotifPrefs();
-        fetchConnectedServices();
-    }, [fetchProfile, fetchNotifPrefs, fetchConnectedServices]);
-
+    
     const fetchProfile = async () => {
         try {
             setProfileLoading(true);
@@ -368,6 +363,13 @@ const ProfilePage = () => {
             setNotifLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchProfile();
+        fetchNotifPrefs();
+        fetchConnectedServices();
+    }, [fetchProfile, fetchNotifPrefs, fetchConnectedServices]);
+
 
     const handleUpdateProfile = async () => {
         setUpdateError("");
