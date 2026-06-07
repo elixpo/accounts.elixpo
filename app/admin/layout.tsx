@@ -2,11 +2,14 @@
 
 import {
     Apps,
-    DevicesOther,
     GitHub,
+    History,
+    Key,
     Logout,
+    People,
     Person,
-    Webhook,
+    Settings,
+    Speed,
 } from "@mui/icons-material";
 import {
     AppBar,
@@ -26,8 +29,10 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
 import { useEffect, useState } from "react";
-
+import { AdminProvider, useAdminSession } from "../../src/lib/admin-context";
 import BackgroundAurora from "../components/background-aurora";
+
+export const runtime = "edge";
 
 const darkTheme = createTheme({
     palette: {
@@ -63,66 +68,31 @@ const darkTheme = createTheme({
     }
 });
 
-interface DashboardLayoutProps {
-    children: React.ReactNode;
-}
-
 const navItems = [
-    { label: "OAuth Apps", icon: Apps, href: "/dashboard/oauth-apps" },
-    { label: "Services", icon: DevicesOther, href: "/dashboard/services" },
-    { label: "Profile", icon: Person, href: "/dashboard/profile" },
-    { label: "Webhooks", icon: Webhook, href: "/dashboard/webhooks" },
+    { label: "Dashboard", icon: Speed, href: "/admin" },
+    { label: "Users", icon: People, href: "/admin/users" },
+    { label: "Apps", icon: Apps, href: "/admin/apps" },
+    { label: "API Keys", icon: Key, href: "/admin/api-keys" },
+    { label: "Logs", icon: History, href: "/admin/logs" },
+    { label: "Settings", icon: Settings, href: "/admin/settings" },
 ];
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const router = useRouter();
-    const [userEmail, setUserEmail] = useState<string>("");
-    const [displayName, setDisplayName] = useState<string>("");
-    const [userAvatar, setUserAvatar] = useState<string | null>(null);
-    const [authChecked, setAuthChecked] = useState(false);
+    const { session, loading, logout } = useAdminSession();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-    useEffect(() => {
-        fetch("/api/auth/me", { credentials: "include" })
-            .then((res) => {
-                if (res.ok) return res.json();
-                router.push("/login");
-                return null;
-            })
-            .then((data: any) => {
-                if (!data) return;
-                // Handle is mandatory — bounce to setup if it's not set yet.
-                if (!data.username) {
-                    router.replace("/setup-name");
-                    return;
-                }
-                if (data.email) setUserEmail(data.email);
-                if (data.displayName) setDisplayName(data.displayName);
-                if (data.avatar) setUserAvatar(data.avatar);
-                setAuthChecked(true);
-            })
-            .catch(() => {
-                router.push("/login");
-            });
-    }, [router]);
+    const isLoginPage = pathname === "/admin/login";
 
-    const handleLogout = async () => {
-        setAnchorEl(null);
-        try {
-            await fetch("/api/auth/logout", {
-                method: "POST",
-                credentials: "include",
-            });
-        } catch {
-            // silent
+    const isActive = (href: string) => {
+        if (href === "/admin") {
+            return pathname === "/admin";
         }
-        router.push("/");
+        return pathname.startsWith(href);
     };
 
-    const isActive = (href: string) => pathname.startsWith(href);
-
-    if (!authChecked) {
+    if (loading) {
         return (
             <Box
                 sx={{
@@ -130,7 +100,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    bgcolor: "#0f1117",
                 }}
             >
                 <CircularProgress sx={{ color: "#9b7bf7" }} />
@@ -138,12 +107,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         );
     }
 
-    return (
-        <ThemeProvider theme={darkTheme}>
+    if (isLoginPage) {
+        return (
             <Box sx={{ position: "relative", minHeight: "100vh" }}>
-                <BackgroundAurora variant="default" />
-                <Box sx={{ position: "relative", zIndex: 1 }}>
-                {/* Top Navbar */}
+                <BackgroundAurora variant="warm" />
+                <Box sx={{ position: "relative", zIndex: 1 }}>{children}</Box>
+            </Box>
+        );
+    }
+
+    return (
+        <Box sx={{ position: "relative", minHeight: "100vh" }}>
+            <BackgroundAurora variant="warm" />
+            <Box sx={{ position: "relative", zIndex: 1 }}>
                 <AppBar
                     position="sticky"
                     elevation={0}
@@ -161,10 +137,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                             px: { xs: 2, md: 3 },
                         }}
                     >
-                        {/* Logo + Brand */}
                         <Box
                             component={Link}
-                            href="/dashboard/oauth-apps"
+                            href="/admin"
                             sx={{
                                 display: "flex",
                                 alignItems: "center",
@@ -193,13 +168,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     letterSpacing: "-0.01em",
                                 }}
                             >
-                                Elixpo Accounts
+                                Elixpo Admin
                             </Typography>
                         </Box>
-                        {/* Spacer */}
 
                         <Box sx={{ flexGrow: 1 }} />
-                        {/* Nav Icons (right side) */}
 
                         <Box
                             sx={{
@@ -240,7 +213,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                 </IconButton>
                             ))}
                         </Box>
-                        {/* GitHub */}
 
                         <IconButton
                             component="a"
@@ -253,6 +225,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                 width: 38,
                                 height: 38,
                                 borderRadius: "8px",
+                                mr: 1,
                                 "&:hover": {
                                     color: "#fff",
                                     bgcolor: "rgba(255,255,255,0.06)",
@@ -261,45 +234,28 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         >
                             <GitHub sx={{ fontSize: "1.2rem" }} />
                         </IconButton>
-                        {/* User Avatar / Menu */}
 
                         <IconButton
                             onClick={(e) => setAnchorEl(e.currentTarget)}
                             sx={{ p: 0.5 }}
                         >
-                            {userAvatar ? (
-                                <Box
-                                    component="img"
-                                    src={userAvatar}
-                                    alt="Avatar"
-                                    sx={{
-                                        width: 34,
-                                        height: 34,
-                                        borderRadius: "50%",
-                                        border: "2px solid rgba(155, 123, 247, 0.3)",
-                                    }}
-                                />
-                            ) : (
-                                <Box
-                                    sx={{
-                                        width: 34,
-                                        height: 34,
-                                        borderRadius: "50%",
-                                        background:
-                                            "linear-gradient(135deg, #9b7bf7 0%, #65a30d 100%)",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        fontSize: "0.95rem",
-                                        fontWeight: 700,
-                                        color: "#161816",
-                                    }}
-                                >
-                                    {(displayName || userEmail)
-                                        ?.charAt(0)
-                                        .toUpperCase() || "E"}
-                                </Box>
-                            )}
+                            <Box
+                                sx={{
+                                    width: 34,
+                                    height: 34,
+                                    borderRadius: "50%",
+                                    background:
+                                        "linear-gradient(135deg, #ff8a5b 0%, #9b7bf7 100%)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    fontSize: "0.95rem",
+                                    fontWeight: 700,
+                                    color: "#161816",
+                                }}
+                            >
+                                {session?.email?.charAt(0).toUpperCase() || "A"}
+                            </Box>
                         </IconButton>
 
                         <Menu
@@ -336,7 +292,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         fontSize: "0.9rem",
                                     }}
                                 >
-                                    {displayName || "User"}
+                                    Admin User
                                 </Typography>
                                 <Typography
                                     sx={{
@@ -344,7 +300,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         fontSize: "0.8rem",
                                     }}
                                 >
-                                    {userEmail}
+                                    {session?.email}
                                 </Typography>
                             </Box>
                             <Divider
@@ -373,14 +329,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         fontSize: "0.875rem",
                                     }}
                                 >
-                                    Profile
+                                    User Profile
                                 </ListItemText>
                             </MenuItem>
                             <Divider
                                 sx={{ borderColor: "rgba(255,255,255,0.08)" }}
                             />
                             <MenuItem
-                                onClick={handleLogout}
+                                onClick={logout}
                                 sx={{
                                     py: 1.25,
                                     color: "rgba(255,255,255,0.5)",
@@ -406,7 +362,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         </Menu>
                     </Toolbar>
                 </AppBar>
-                {/* Page Content */}
 
                 <Box
                     component="main"
@@ -419,8 +374,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 >
                     {children}
                 </Box>
-                </Box>
-             </Box>
-         </ThemeProvider>
+            </Box>
+        </Box>
+    );
+}
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <AdminProvider>
+            <ThemeProvider theme={darkTheme}>
+                <AdminLayoutContent>{children}</AdminLayoutContent>
+            </ThemeProvider>
+        </AdminProvider>
     );
 }
