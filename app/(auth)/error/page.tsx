@@ -23,7 +23,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 
-const ACCENT = "#9b7bf7";
+const _ACCENT = "#9b7bf7";
 const SUPPORT_EMAIL = "hello@elixpo.com";
 
 interface Action {
@@ -74,7 +74,9 @@ function buildView(
                         label: "Create account",
                         href: "/register",
                         primary: true,
-                        icon: <PersonAddAlt1Icon sx={{ fontSize: "1.05rem" }} />,
+                        icon: (
+                            <PersonAddAlt1Icon sx={{ fontSize: "1.05rem" }} />
+                        ),
                     },
                     {
                         label: "Back to sign in",
@@ -100,11 +102,11 @@ function buildView(
                             : "Back to sign in",
                         href: "/login",
                         primary: true,
-                        icon: provider
-                            ? PROVIDER_ICONS[provider]
-                            : (
-                                  <LoginIcon sx={{ fontSize: "1.05rem" }} />
-                              ),
+                        icon: provider ? (
+                            PROVIDER_ICONS[provider]
+                        ) : (
+                            <LoginIcon sx={{ fontSize: "1.05rem" }} />
+                        ),
                     },
                     {
                         label: "Create a separate account",
