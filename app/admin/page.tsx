@@ -45,7 +45,8 @@ const StatCard = ({
 }) => (
     <Card
         sx={{
-            background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+            background:
+                "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
             backdropFilter: "blur(20px)",
             border: "1px solid rgba(255, 255, 255, 0.08)",
             borderRadius: "12px",
@@ -110,7 +111,8 @@ const ChartCard = ({
 }) => (
     <Card
         sx={{
-            background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+            background:
+                "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
             backdropFilter: "blur(20px)",
             border: "1px solid rgba(255, 255, 255, 0.08)",
             borderRadius: "12px",
@@ -192,7 +194,7 @@ export default function AdminDashboard() {
                         Real-time monitoring of your system
                     </Typography>
                 </Box>
-                 <ToggleButtonGroup
+                <ToggleButtonGroup
                     value={timeRange}
                     exclusive
                     onChange={handleTimeRangeChange}
@@ -220,7 +222,7 @@ export default function AdminDashboard() {
                 </ToggleButtonGroup>
             </Box>
             {/* Stats Grid */}
- 
+
             {loading ? (
                 <Box
                     sx={{
@@ -305,7 +307,8 @@ export default function AdminDashboard() {
                                         alignItems: "flex-end",
                                         gap: 1,
                                         height: "200px",
-                                        borderBottom: "1px solid rgba(255,255,255,0.08)",
+                                        borderBottom:
+                                            "1px solid rgba(255,255,255,0.08)",
                                         pb: 2,
                                     }}
                                 >
@@ -365,7 +368,8 @@ export default function AdminDashboard() {
                                             key={app.id}
                                             sx={{
                                                 pb: 1.5,
-                                                borderBottom: "1px solid rgba(255,255,255,0.08)",
+                                                borderBottom:
+                                                    "1px solid rgba(255,255,255,0.08)",
                                                 "&:last-child": {
                                                     borderBottom: "none",
                                                 },
@@ -429,7 +433,8 @@ export default function AdminDashboard() {
                         <Grid size={{ xs: 12, lg: 6 }}>
                             <Card
                                 sx={{
-                                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                                    background:
+                                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                                     backdropFilter: "blur(20px)",
                                     border: "1px solid rgba(255, 255, 255, 0.08)",
                                     borderRadius: "12px",
@@ -621,7 +626,8 @@ export default function AdminDashboard() {
                         <Grid size={{ xs: 12, lg: 6 }}>
                             <Card
                                 sx={{
-                                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                                    background:
+                                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                                     backdropFilter: "blur(20px)",
                                     border: "1px solid rgba(255, 255, 255, 0.08)",
                                     borderRadius: "12px",

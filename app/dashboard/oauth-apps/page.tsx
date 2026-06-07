@@ -28,7 +28,7 @@ import {
     Typography,
 } from "@mui/material";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { generatePixelAvatar } from "@/lib/pixel-avatar";
 
 interface OAuthApp {
@@ -159,7 +159,9 @@ const OAuthAppsPage = () => {
         redirect_uris: [""],
     });
 
-    const fetchVerificationStatus = async () => {
+    // useCallback gives stable refs so the auth/apps fetches don't loop
+    // when eslint-react-hooks puts them in the useEffect deps array.
+    const fetchVerificationStatus = useCallback(async () => {
         try {
             const res = await fetch("/api/auth/me", { credentials: "include" });
             if (res.ok) {
@@ -169,9 +171,9 @@ const OAuthAppsPage = () => {
         } catch {
             // fail silently
         }
-    };
+    }, []);
 
-    const fetchApps = async () => {
+    const fetchApps = useCallback(async () => {
         try {
             setAppLoading(true);
             const response = await fetch("/api/auth/oauth-apps", {
@@ -189,14 +191,12 @@ const OAuthAppsPage = () => {
         } finally {
             setAppLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchApps();
         fetchVerificationStatus();
-    }, [fetchVerificationStatus, fetchApps]);
-
-    
+    }, [fetchApps, fetchVerificationStatus]);
 
     const showToast = (
         message: string,
@@ -204,8 +204,6 @@ const OAuthAppsPage = () => {
     ) => {
         setToast({ open: true, message, severity });
     };
-
-    
 
     const handleCreateApp = async () => {
         setError("");

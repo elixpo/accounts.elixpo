@@ -245,7 +245,8 @@ export default function UsersPage() {
 
             <Card
                 sx={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "12px",
@@ -272,9 +273,13 @@ export default function UsersPage() {
                         sx={{
                             "& .MuiOutlinedInput-root": {
                                 color: "#e5e7eb",
-                                "& fieldset": { borderColor: "rgba(255, 255, 255, 0.12)" },
+                                "& fieldset": {
+                                    borderColor: "rgba(255, 255, 255, 0.12)",
+                                },
                                 "&:hover fieldset": { borderColor: "#9b7bf7" },
-                                "&.Mui-focused fieldset": { borderColor: "#9b7bf7" },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#9b7bf7",
+                                },
                             },
                             "& .MuiOutlinedInput-input::placeholder": {
                                 color: "#6b7280",
@@ -287,7 +292,8 @@ export default function UsersPage() {
 
             <Card
                 sx={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "12px",
@@ -312,7 +318,8 @@ export default function UsersPage() {
                                 <TableRow
                                     sx={{
                                         bgcolor: "rgba(155, 123, 247, 0.05)",
-                                        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                                        borderBottom:
+                                            "1px solid rgba(255, 255, 255, 0.08)",
                                     }}
                                 >
                                     <TableCell
@@ -378,7 +385,8 @@ export default function UsersPage() {
                                     <TableRow
                                         key={user.id}
                                         sx={{
-                                            borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                                            borderBottom:
+                                                "1px solid rgba(255, 255, 255, 0.08)",
                                             "&:hover": {
                                                 bgcolor:
                                                     "rgba(155, 123, 247, 0.05)",
@@ -618,7 +626,8 @@ export default function UsersPage() {
                                     "& .MuiOutlinedInput-root": {
                                         color: "#e5e7eb",
                                         "& fieldset": {
-                                            borderColor: "rgba(255, 255, 255, 0.12)",
+                                            borderColor:
+                                                "rgba(255, 255, 255, 0.12)",
                                         },
                                         "&:hover fieldset": {
                                             borderColor: "#9b7bf7",
@@ -698,7 +707,10 @@ export default function UsersPage() {
                                 mt: 1,
                                 "& .MuiOutlinedInput-root": {
                                     color: "#e5e7eb",
-                                    "& fieldset": { borderColor: "rgba(255, 255, 255, 0.12)" },
+                                    "& fieldset": {
+                                        borderColor:
+                                            "rgba(255, 255, 255, 0.12)",
+                                    },
                                     "&:hover fieldset": {
                                         borderColor: "#9b7bf7",
                                     },

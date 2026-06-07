@@ -38,7 +38,10 @@ const darkTheme = createTheme({
     palette: {
         mode: "dark",
         primary: { main: "#9b7bf7" },
-        background: { default: "transparent", paper: "rgba(255, 255, 255, 0.03)" },
+        background: {
+            default: "transparent",
+            paper: "rgba(255, 255, 255, 0.03)",
+        },
     },
     typography: {
         fontFamily: "var(--font-geist-sans), Arial, sans-serif",
@@ -47,25 +50,27 @@ const darkTheme = createTheme({
         MuiCard: {
             styleOverrides: {
                 root: {
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "16px",
                     boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
-                }
-            }
+                },
+            },
         },
         MuiPaper: {
             styleOverrides: {
                 root: {
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "16px",
-                }
-            }
-        }
-    }
+                },
+            },
+        },
+    },
 });
 
 const navItems = [
@@ -379,7 +384,11 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     );
 }
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
     return (
         <AdminProvider>
             <ThemeProvider theme={darkTheme}>

@@ -32,7 +32,7 @@ import {
     Tooltip,
     Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface ApiKey {
     id: string;
@@ -90,15 +90,10 @@ export default function ApiKeysPage() {
         });
         setFormData((prev) => ({ ...prev, scopes: defaultScopes }));
     }, []);
-    // Fetch API keys on mount.
-    // fetchApiKeys is declared below; we intentionally fire once, no deps.
-
-    useEffect(() => {
-        fetchApiKeys();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const fetchApiKeys = async () => {
+    // useCallback gives a stable reference. Declared BEFORE the useEffect
+    // so TS doesn't complain about block-scoped use-before-decl, and so
+    // eslint-react-hooks autofix can put it in deps without causing a loop.
+    const fetchApiKeys = useCallback(async () => {
         try {
             setLoading(true);
             const token = localStorage.getItem("jwt_token");
@@ -116,7 +111,11 @@ export default function ApiKeysPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchApiKeys();
+    }, [fetchApiKeys]);
 
     const handleCreateApiKey = async () => {
         if (!formData.name.trim()) {
@@ -247,7 +246,10 @@ export default function ApiKeysPage() {
                     alignItems: "center",
                 }}
             >
-                <Typography variant="h5" sx={{ fontWeight: 700, color: "#fff" }}>
+                <Typography
+                    variant="h5"
+                    sx={{ fontWeight: 700, color: "#fff" }}
+                >
                     API Keys
                 </Typography>
                 <Button
@@ -348,24 +350,62 @@ export default function ApiKeysPage() {
             <TableContainer
                 component={Paper}
                 sx={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "12px",
-                    overflow: "hidden"
+                    overflow: "hidden",
                 }}
             >
                 <Table>
                     <TableHead>
-                        <TableRow sx={{ borderBottom: "1px solid rgba(255, 255, 255, 0.08)" }}>
-                            <TableCell sx={{ color: "#9ca3af", fontWeight: 600 }}>Name</TableCell>
-                            <TableCell sx={{ color: "#9ca3af", fontWeight: 600 }}>Prefix</TableCell>
-                            <TableCell sx={{ color: "#9ca3af", fontWeight: 600 }}>Scopes</TableCell>
-                            <TableCell sx={{ color: "#9ca3af", fontWeight: 600 }}>Created</TableCell>
-                            <TableCell sx={{ color: "#9ca3af", fontWeight: 600 }}>Last Used</TableCell>
-                            <TableCell sx={{ color: "#9ca3af", fontWeight: 600 }}>Expires</TableCell>
-                            <TableCell sx={{ color: "#9ca3af", fontWeight: 600 }}>Status</TableCell>
-                            <TableCell sx={{ color: "#9ca3af", fontWeight: 600 }}>Actions</TableCell>
+                        <TableRow
+                            sx={{
+                                borderBottom:
+                                    "1px solid rgba(255, 255, 255, 0.08)",
+                            }}
+                        >
+                            <TableCell
+                                sx={{ color: "#9ca3af", fontWeight: 600 }}
+                            >
+                                Name
+                            </TableCell>
+                            <TableCell
+                                sx={{ color: "#9ca3af", fontWeight: 600 }}
+                            >
+                                Prefix
+                            </TableCell>
+                            <TableCell
+                                sx={{ color: "#9ca3af", fontWeight: 600 }}
+                            >
+                                Scopes
+                            </TableCell>
+                            <TableCell
+                                sx={{ color: "#9ca3af", fontWeight: 600 }}
+                            >
+                                Created
+                            </TableCell>
+                            <TableCell
+                                sx={{ color: "#9ca3af", fontWeight: 600 }}
+                            >
+                                Last Used
+                            </TableCell>
+                            <TableCell
+                                sx={{ color: "#9ca3af", fontWeight: 600 }}
+                            >
+                                Expires
+                            </TableCell>
+                            <TableCell
+                                sx={{ color: "#9ca3af", fontWeight: 600 }}
+                            >
+                                Status
+                            </TableCell>
+                            <TableCell
+                                sx={{ color: "#9ca3af", fontWeight: 600 }}
+                            >
+                                Actions
+                            </TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -386,14 +426,22 @@ export default function ApiKeysPage() {
                                 <TableRow
                                     key={key.id}
                                     sx={{
-                                        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                                        borderBottom:
+                                            "1px solid rgba(255, 255, 255, 0.08)",
                                         "&:hover": {
-                                            bgcolor: "rgba(155, 123, 247, 0.05)",
+                                            bgcolor:
+                                                "rgba(155, 123, 247, 0.05)",
                                         },
                                     }}
                                 >
                                     <TableCell>
-                                        <Typography variant="body2" sx={{ color: "#e5e7eb", fontWeight: 600 }}>
+                                        <Typography
+                                            variant="body2"
+                                            sx={{
+                                                color: "#e5e7eb",
+                                                fontWeight: 600,
+                                            }}
+                                        >
                                             {key.name}
                                         </Typography>
                                         {key.description && (
@@ -408,7 +456,8 @@ export default function ApiKeysPage() {
                                     <TableCell>
                                         <code
                                             style={{
-                                                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                                                backgroundColor:
+                                                    "rgba(255, 255, 255, 0.05)",
                                                 padding: "2px 6px",
                                                 borderRadius: "4px",
                                                 color: "#e5e7eb",
@@ -433,7 +482,8 @@ export default function ApiKeysPage() {
                                                         label={scope}
                                                         size="small"
                                                         sx={{
-                                                            bgcolor: "rgba(155, 123, 247, 0.15)",
+                                                            bgcolor:
+                                                                "rgba(155, 123, 247, 0.15)",
                                                             color: "#9b7bf7",
                                                             border: "1px solid rgba(155, 123, 247, 0.3)",
                                                             fontWeight: 600,
@@ -459,7 +509,8 @@ export default function ApiKeysPage() {
                                                 label="Revoked"
                                                 size="small"
                                                 sx={{
-                                                    bgcolor: "rgba(239, 68, 68, 0.2)",
+                                                    bgcolor:
+                                                        "rgba(239, 68, 68, 0.2)",
                                                     color: "#ef4444",
                                                     fontWeight: 600,
                                                 }}
@@ -469,7 +520,8 @@ export default function ApiKeysPage() {
                                                 label="Active"
                                                 size="small"
                                                 sx={{
-                                                    bgcolor: "rgba(155, 123, 247, 0.2)",
+                                                    bgcolor:
+                                                        "rgba(155, 123, 247, 0.2)",
                                                     color: "#9b7bf7",
                                                     fontWeight: 600,
                                                 }}
@@ -487,7 +539,12 @@ export default function ApiKeysPage() {
                                                         )
                                                     }
                                                     disabled={key.revoked}
-                                                    sx={{ color: "rgba(255, 255, 255, 0.6)", "&:hover": { color: "#9b7bf7" } }}
+                                                    sx={{
+                                                        color: "rgba(255, 255, 255, 0.6)",
+                                                        "&:hover": {
+                                                            color: "#9b7bf7",
+                                                        },
+                                                    }}
                                                 >
                                                     <EditIcon fontSize="small" />
                                                 </IconButton>
@@ -499,7 +556,12 @@ export default function ApiKeysPage() {
                                                 onClick={() =>
                                                     handleDeleteApiKey(key.id)
                                                 }
-                                                sx={{ color: "rgba(255, 255, 255, 0.6)", "&:hover": { color: "#ef4444" } }}
+                                                sx={{
+                                                    color: "rgba(255, 255, 255, 0.6)",
+                                                    "&:hover": {
+                                                        color: "#ef4444",
+                                                    },
+                                                }}
                                             >
                                                 <DeleteIcon fontSize="small" />
                                             </IconButton>
@@ -547,9 +609,13 @@ export default function ApiKeysPage() {
                             mt: 1,
                             "& .MuiOutlinedInput-root": {
                                 color: "#e5e7eb",
-                                "& fieldset": { borderColor: "rgba(255, 255, 255, 0.12)" },
+                                "& fieldset": {
+                                    borderColor: "rgba(255, 255, 255, 0.12)",
+                                },
                                 "&:hover fieldset": { borderColor: "#9b7bf7" },
-                                "&.Mui-focused fieldset": { borderColor: "#9b7bf7" },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#9b7bf7",
+                                },
                             },
                             "& .MuiInputLabel-root": {
                                 color: "#6b7280",
@@ -572,9 +638,13 @@ export default function ApiKeysPage() {
                             mb: 2,
                             "& .MuiOutlinedInput-root": {
                                 color: "#e5e7eb",
-                                "& fieldset": { borderColor: "rgba(255, 255, 255, 0.12)" },
+                                "& fieldset": {
+                                    borderColor: "rgba(255, 255, 255, 0.12)",
+                                },
                                 "&:hover fieldset": { borderColor: "#9b7bf7" },
-                                "&.Mui-focused fieldset": { borderColor: "#9b7bf7" },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#9b7bf7",
+                                },
                             },
                             "& .MuiInputLabel-root": {
                                 color: "#6b7280",
@@ -600,9 +670,13 @@ export default function ApiKeysPage() {
                             mb: 3,
                             "& .MuiOutlinedInput-root": {
                                 color: "#e5e7eb",
-                                "& fieldset": { borderColor: "rgba(255, 255, 255, 0.12)" },
+                                "& fieldset": {
+                                    borderColor: "rgba(255, 255, 255, 0.12)",
+                                },
                                 "&:hover fieldset": { borderColor: "#9b7bf7" },
-                                "&.Mui-focused fieldset": { borderColor: "#9b7bf7" },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#9b7bf7",
+                                },
                             },
                             "& .MuiInputLabel-root": {
                                 color: "#6b7280",
@@ -644,15 +718,21 @@ export default function ApiKeysPage() {
                                             })
                                         }
                                         sx={{
-                                            "& .MuiSwitch-switchBase.Mui-checked": { color: "#9b7bf7" },
-                                            "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                                                bgcolor: "rgba(155, 123, 247, 0.5)",
-                                            },
+                                            "& .MuiSwitch-switchBase.Mui-checked":
+                                                { color: "#9b7bf7" },
+                                            "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
+                                                {
+                                                    bgcolor:
+                                                        "rgba(155, 123, 247, 0.5)",
+                                                },
                                         }}
                                     />
                                 }
                                 label={
-                                    <Typography variant="body2" sx={{ color: "#d1d5db" }}>
+                                    <Typography
+                                        variant="body2"
+                                        sx={{ color: "#d1d5db" }}
+                                    >
                                         {scope.label}
                                     </Typography>
                                 }
@@ -661,7 +741,10 @@ export default function ApiKeysPage() {
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpenCreateDialog(false)} sx={{ color: "#9ca3af", textTransform: "none" }}>
+                    <Button
+                        onClick={() => setOpenCreateDialog(false)}
+                        sx={{ color: "#9ca3af", textTransform: "none" }}
+                    >
                         Cancel
                     </Button>
                     <Button
@@ -676,7 +759,14 @@ export default function ApiKeysPage() {
                         }}
                         disabled={loading}
                     >
-                        {loading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> : "Create"}
+                        {loading ? (
+                            <CircularProgress
+                                size={24}
+                                sx={{ color: "#fff" }}
+                            />
+                        ) : (
+                            "Create"
+                        )}
                     </Button>
                 </DialogActions>
             </Dialog>

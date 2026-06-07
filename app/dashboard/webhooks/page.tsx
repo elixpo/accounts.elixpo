@@ -30,7 +30,7 @@ import {
     Typography,
 } from "@mui/material";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const AVAILABLE_EVENTS = [
     { value: "user.created", label: "User Created" },
@@ -101,9 +101,10 @@ export default function WebhooksPage() {
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    
 
-    const fetchWebhooks = async () => {
+    // useCallback gives a stable reference so the effect doesn't loop when
+    // eslint-react-hooks puts fetchWebhooks in deps.
+    const fetchWebhooks = useCallback(async () => {
         try {
             setLoading(true);
             const res = await fetch("/api/auth/webhooks", {
@@ -113,16 +114,20 @@ export default function WebhooksPage() {
             const data: any = await res.json();
             setWebhooks(data.webhooks || []);
         } catch {
-            showSnack("Failed to load webhooks", "error");
+            setSnack({
+                open: true,
+                message: "Failed to load webhooks",
+                severity: "error",
+            });
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchWebhooks();
     }, [fetchWebhooks]);
-    
+
     const showSnack = (message: string, severity: "success" | "error") => {
         setSnack({ open: true, message, severity });
     };

@@ -27,7 +27,7 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { generatePixelAvatar } from "@/lib/pixel-avatar";
 
 interface UserProfile {
@@ -298,8 +298,10 @@ const ProfilePage = () => {
     }, [verifyCooldown]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    
-    const fetchProfile = async () => {
+
+    // useCallback gives stable refs so the mount effect doesn't loop when
+    // eslint-react-hooks puts the fetch fns in deps.
+    const fetchProfile = useCallback(async () => {
         try {
             setProfileLoading(true);
             const res = await fetch("/api/auth/me", { credentials: "include" });
@@ -319,9 +321,9 @@ const ProfilePage = () => {
         } finally {
             setProfileLoading(false);
         }
-    };
+    }, []);
 
-    const fetchConnectedServices = async () => {
+    const fetchConnectedServices = useCallback(async () => {
         try {
             setServicesLoading(true);
             const res = await fetch("/api/auth/connected-services", {
@@ -331,7 +333,6 @@ const ProfilePage = () => {
                 const data: any = await res.json();
                 const svcs = data.services || [];
                 setConnectedServices(svcs);
-                // Auto-expand top 3
                 setExpandedServices(
                     new Set(svcs.slice(0, 3).map((s: any) => s.client_id)),
                 );
@@ -341,9 +342,9 @@ const ProfilePage = () => {
         } finally {
             setServicesLoading(false);
         }
-    };
+    }, []);
 
-    const fetchNotifPrefs = async () => {
+    const fetchNotifPrefs = useCallback(async () => {
         try {
             setNotifLoading(true);
             const res = await fetch("/api/auth/notification-preferences", {
@@ -362,14 +363,13 @@ const ProfilePage = () => {
         } finally {
             setNotifLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchProfile();
         fetchNotifPrefs();
         fetchConnectedServices();
     }, [fetchProfile, fetchNotifPrefs, fetchConnectedServices]);
-
 
     const handleUpdateProfile = async () => {
         setUpdateError("");

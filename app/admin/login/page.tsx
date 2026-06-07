@@ -23,8 +23,10 @@ export default function AdminLogin() {
     const [loading, setLoading] = useState(false);
     const [checking, setChecking] = useState(true);
 
+    // Auth check uses window.location so router isn't referenced inside the
+    // effect (prevents eslint-react-hooks autofix from looping the effect).
     useEffect(() => {
-        const checkAuth = async () => {
+        (async () => {
             try {
                 const response = await fetch("/api/auth/me", {
                     credentials: "include",
@@ -32,7 +34,7 @@ export default function AdminLogin() {
                 if (response.ok) {
                     const user: any = await response.json();
                     if (user.isAdmin) {
-                        router.push("/admin");
+                        window.location.assign("/admin");
                         return;
                     }
                 }
@@ -41,10 +43,8 @@ export default function AdminLogin() {
             } finally {
                 setChecking(false);
             }
-        };
-
-        checkAuth();
-    }, [router]);
+        })();
+    }, []);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -111,7 +111,8 @@ export default function AdminLogin() {
                 sx={{
                     width: "100%",
                     maxWidth: 420,
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "16px",
@@ -175,7 +176,10 @@ export default function AdminLogin() {
                             sx={{
                                 "& .MuiOutlinedInput-root": {
                                     color: "#e5e7eb",
-                                    "& fieldset": { borderColor: "rgba(255, 255, 255, 0.12)" },
+                                    "& fieldset": {
+                                        borderColor:
+                                            "rgba(255, 255, 255, 0.12)",
+                                    },
                                     "&:hover fieldset": {
                                         borderColor: "#9b7bf7",
                                     },
@@ -201,7 +205,10 @@ export default function AdminLogin() {
                             sx={{
                                 "& .MuiOutlinedInput-root": {
                                     color: "#e5e7eb",
-                                    "& fieldset": { borderColor: "rgba(255, 255, 255, 0.12)" },
+                                    "& fieldset": {
+                                        borderColor:
+                                            "rgba(255, 255, 255, 0.12)",
+                                    },
                                     "&:hover fieldset": {
                                         borderColor: "#9b7bf7",
                                     },

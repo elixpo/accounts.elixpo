@@ -45,11 +45,29 @@ app.get('/callback', async (req, res) => {
 export default function QuickstartPage() {
     return (
         <Box>
-            <Typography variant="h1" sx={{ fontSize: "2rem", fontWeight: 800, color: "#fff", mb: 2, letterSpacing: "-0.02em" }}>
+            <Typography
+                variant="h1"
+                sx={{
+                    fontSize: "2rem",
+                    fontWeight: 800,
+                    color: "#fff",
+                    mb: 2,
+                    letterSpacing: "-0.02em",
+                }}
+            >
                 Quickstart
             </Typography>
-            <Typography sx={{ color: "rgba(255, 255, 255, 0.7)", mb: 4, fontSize: "1rem", lineHeight: 1.7 }}>
-                Get started with integrating Elixpo Accounts into your application. Register your client, obtain credentials, and implement the authorization flow.
+            <Typography
+                sx={{
+                    color: "rgba(255, 255, 255, 0.7)",
+                    mb: 4,
+                    fontSize: "1rem",
+                    lineHeight: 1.7,
+                }}
+            >
+                Get started with integrating Elixpo Accounts into your
+                application. Register your client, obtain credentials, and
+                implement the authorization flow.
             </Typography>
 
             <Box sx={{ mb: 4 }}>
@@ -65,32 +83,107 @@ export default function QuickstartPage() {
                 />
             </Box>
 
-            <Typography variant="h2" sx={{ fontSize: "1.4rem", fontWeight: 700, color: "#fff", mt: 4, mb: 2, letterSpacing: "-0.01em" }}>
+            <Typography
+                variant="h2"
+                sx={{
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#fff",
+                    mt: 4,
+                    mb: 2,
+                    letterSpacing: "-0.01em",
+                }}
+            >
                 1. Register OAuth Application
             </Typography>
-            <Typography sx={{ color: "rgba(255, 255, 255, 0.7)", mb: 2, lineHeight: 1.6 }}>
-                Navigate to the <strong>Dashboard &gt; OAuth Apps</strong> page and click <strong>New OAuth App</strong>. Provide the following details:
+            <Typography
+                sx={{
+                    color: "rgba(255, 255, 255, 0.7)",
+                    mb: 2,
+                    lineHeight: 1.6,
+                }}
+            >
+                Navigate to the <strong>Dashboard &gt; OAuth Apps</strong> page
+                and click <strong>New OAuth App</strong>. Provide the following
+                details:
             </Typography>
-            <Box component="ul" sx={{ color: "rgba(255, 255, 255, 0.7)", pl: 3, mb: 4, "& li": { mb: 1, lineHeight: 1.6 } }}>
-                <li><strong>Application Name:</strong> The user-facing name shown during the consent step.</li>
-                <li><strong>Homepage URL:</strong> The primary marketing or landing URL of your app.</li>
-                <li><strong>Redirect URI(s):</strong> The absolute callback URLs where users will be redirected upon successful authorization. You can register up to <strong>5</strong> URIs. HTTP and HTTPS are both permitted (useful for local development).</li>
+            <Box
+                component="ul"
+                sx={{
+                    color: "rgba(255, 255, 255, 0.7)",
+                    pl: 3,
+                    mb: 4,
+                    "& li": { mb: 1, lineHeight: 1.6 },
+                }}
+            >
+                <li>
+                    <strong>Application Name:</strong> The user-facing name
+                    shown during the consent step.
+                </li>
+                <li>
+                    <strong>Homepage URL:</strong> The primary marketing or
+                    landing URL of your app.
+                </li>
+                <li>
+                    <strong>Redirect URI(s):</strong> The absolute callback URLs
+                    where users will be redirected upon successful
+                    authorization. You can register up to <strong>5</strong>{" "}
+                    URIs. HTTP and HTTPS are both permitted (useful for local
+                    development).
+                </li>
             </Box>
 
-            <Typography variant="h2" sx={{ fontSize: "1.4rem", fontWeight: 700, color: "#fff", mt: 4, mb: 2, letterSpacing: "-0.01em" }}>
+            <Typography
+                variant="h2"
+                sx={{
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#fff",
+                    mt: 4,
+                    mb: 2,
+                    letterSpacing: "-0.01em",
+                }}
+            >
                 2. Secure Credentials
             </Typography>
-            <Typography sx={{ color: "rgba(255, 255, 255, 0.7)", mb: 4, lineHeight: 1.6 }}>
-                Upon creation, the system generates a unique <strong>Client ID</strong> and <strong>Client Secret</strong>. 
-                The client secret is hashed before storage and is displayed <strong>only once</strong>. 
-                Ensure you copy and store it in your server's secure configuration or environment file (e.g. <code>.env</code>).
+            <Typography
+                sx={{
+                    color: "rgba(255, 255, 255, 0.7)",
+                    mb: 4,
+                    lineHeight: 1.6,
+                }}
+            >
+                Upon creation, the system generates a unique{" "}
+                <strong>Client ID</strong> and <strong>Client Secret</strong>.
+                The client secret is hashed before storage and is displayed{" "}
+                <strong>only once</strong>. Ensure you copy and store it in your
+                server's secure configuration or environment file (e.g.{" "}
+                <code>.env</code>).
             </Typography>
 
-            <Typography variant="h2" sx={{ fontSize: "1.4rem", fontWeight: 700, color: "#fff", mt: 4, mb: 2, letterSpacing: "-0.01em" }}>
+            <Typography
+                variant="h2"
+                sx={{
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#fff",
+                    mt: 4,
+                    mb: 2,
+                    letterSpacing: "-0.01em",
+                }}
+            >
                 Node.js Integration Code
             </Typography>
-            <Typography sx={{ color: "rgba(255, 255, 255, 0.7)", mb: 3, lineHeight: 1.6 }}>
-                Here is a brief server-side implementation example showing how to initialize the auth redirect, handle the callback, exchange code, and fetch user info.
+            <Typography
+                sx={{
+                    color: "rgba(255, 255, 255, 0.7)",
+                    mb: 3,
+                    lineHeight: 1.6,
+                }}
+            >
+                Here is a brief server-side implementation example showing how
+                to initialize the auth redirect, handle the callback, exchange
+                code, and fetch user info.
             </Typography>
             <CodeBlock code={NODE_JS_EXAMPLE} language="javascript" />
         </Box>

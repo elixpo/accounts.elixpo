@@ -188,7 +188,8 @@ export default function SettingsPage() {
 
             <Card
                 sx={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "12px",
@@ -244,7 +245,8 @@ export default function SettingsPage() {
 
             <Card
                 sx={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "12px",
@@ -297,7 +299,8 @@ export default function SettingsPage() {
 
             <Card
                 sx={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "12px",
@@ -352,7 +355,8 @@ export default function SettingsPage() {
 
             <Card
                 sx={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "12px",
@@ -388,7 +392,8 @@ export default function SettingsPage() {
 
             <Card
                 sx={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "12px",
@@ -444,7 +449,9 @@ export default function SettingsPage() {
                                 </Box>
                             }
                         />
-                        <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)" }} />
+                        <Divider
+                            sx={{ borderColor: "rgba(255, 255, 255, 0.08)" }}
+                        />
                         <FormControlLabel
                             control={
                                 <Switch
@@ -480,7 +487,9 @@ export default function SettingsPage() {
                                 </Box>
                             }
                         />
-                        <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)" }} />
+                        <Divider
+                            sx={{ borderColor: "rgba(255, 255, 255, 0.08)" }}
+                        />
                         <FormControlLabel
                             control={
                                 <Switch
@@ -568,7 +577,8 @@ export default function SettingsPage() {
 
             <Card
                 sx={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "12px",
@@ -641,7 +651,9 @@ export default function SettingsPage() {
                                 </Box>
                             }
                         />
-                        <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)" }} />
+                        <Divider
+                            sx={{ borderColor: "rgba(255, 255, 255, 0.08)" }}
+                        />
                         <FormControlLabel
                             control={
                                 <Switch
@@ -678,7 +690,9 @@ export default function SettingsPage() {
                                 </Box>
                             }
                         />
-                        <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)" }} />
+                        <Divider
+                            sx={{ borderColor: "rgba(255, 255, 255, 0.08)" }}
+                        />
                         <FormControlLabel
                             control={
                                 <Switch
@@ -715,7 +729,9 @@ export default function SettingsPage() {
                                 </Box>
                             }
                         />
-                        <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)" }} />
+                        <Divider
+                            sx={{ borderColor: "rgba(255, 255, 255, 0.08)" }}
+                        />
                         <FormControlLabel
                             control={
                                 <Switch
@@ -754,7 +770,9 @@ export default function SettingsPage() {
                                 </Box>
                             }
                         />
-                        <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)" }} />
+                        <Divider
+                            sx={{ borderColor: "rgba(255, 255, 255, 0.08)" }}
+                        />
                         <FormControlLabel
                             control={
                                 <Switch

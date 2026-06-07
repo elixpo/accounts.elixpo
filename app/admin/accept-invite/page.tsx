@@ -109,7 +109,9 @@ function AcceptInviteContent() {
                 >
                     {status === "loading" && (
                         <>
-                            <CircularProgress sx={{ color: "#9b7bf7", mb: 2 }} />
+                            <CircularProgress
+                                sx={{ color: "#9b7bf7", mb: 2 }}
+                            />
                             <Typography sx={{ color: "#f5f5f4" }}>
                                 Validating invitation...
                             </Typography>
@@ -120,15 +122,19 @@ function AcceptInviteContent() {
                         <>
                             <Typography
                                 variant="h5"
-                                sx={{ fontWeight: 700, color: "#f5f5f4", mb: 1 }}
+                                sx={{
+                                    fontWeight: 700,
+                                    color: "#f5f5f4",
+                                    mb: 1,
+                                }}
                             >
                                 Admin Invitation
                             </Typography>
                             <Typography
                                 sx={{ color: "rgba(255,255,255,0.6)", mb: 1 }}
                             >
-                                You have been invited to become an administrator on
-                                Elixpo Accounts.
+                                You have been invited to become an administrator
+                                on Elixpo Accounts.
                             </Typography>
                             <Typography
                                 sx={{
@@ -147,7 +153,9 @@ function AcceptInviteContent() {
 
                     {status === "accepting" && (
                         <>
-                            <CircularProgress sx={{ color: "#9b7bf7", mb: 2 }} />
+                            <CircularProgress
+                                sx={{ color: "#9b7bf7", mb: 2 }}
+                            />
                             <Typography sx={{ color: "#f5f5f4" }}>
                                 Accepting invitation...
                             </Typography>
@@ -159,7 +167,11 @@ function AcceptInviteContent() {
                             <Box sx={{ fontSize: "3rem", mb: 1 }}>&#10003;</Box>
                             <Typography
                                 variant="h5"
-                                sx={{ fontWeight: 700, color: "#9b7bf7", mb: 1 }}
+                                sx={{
+                                    fontWeight: 700,
+                                    color: "#9b7bf7",
+                                    mb: 1,
+                                }}
                             >
                                 Welcome, Admin!
                             </Typography>
@@ -176,12 +188,22 @@ function AcceptInviteContent() {
 
                     {status === "error" && (
                         <>
-                            <Box sx={{ fontSize: "3rem", mb: 1, color: "#ef4444" }}>
+                            <Box
+                                sx={{
+                                    fontSize: "3rem",
+                                    mb: 1,
+                                    color: "#ef4444",
+                                }}
+                            >
                                 &#10007;
                             </Box>
                             <Typography
                                 variant="h5"
-                                sx={{ fontWeight: 700, color: "#ef4444", mb: 1 }}
+                                sx={{
+                                    fontWeight: 700,
+                                    color: "#ef4444",
+                                    mb: 1,
+                                }}
                             >
                                 Invitation Error
                             </Typography>

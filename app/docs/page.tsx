@@ -5,41 +5,109 @@ import { Box, Typography } from "@mui/material";
 export default function OverviewPage() {
     return (
         <Box>
-            <Typography variant="h1" sx={{ fontSize: "2rem", fontWeight: 800, color: "#fff", mb: 2, letterSpacing: "-0.02em" }}>
+            <Typography
+                variant="h1"
+                sx={{
+                    fontSize: "2rem",
+                    fontWeight: 800,
+                    color: "#fff",
+                    mb: 2,
+                    letterSpacing: "-0.02em",
+                }}
+            >
                 Overview
             </Typography>
-            <Typography sx={{ color: "rgba(255, 255, 255, 0.7)", mb: 3, fontSize: "1rem", lineHeight: 1.7 }}>
-                Elixpo Accounts is the central Single Sign-On (SSO) gateway and OAuth 2.0 Identity Provider for the Elixpo ecosystem. 
-                It allows users to authenticate once and access all services securely. Third-party applications can integrate 
-                with Elixpo Accounts to allow users to sign in using their Elixpo credentials.
+            <Typography
+                sx={{
+                    color: "rgba(255, 255, 255, 0.7)",
+                    mb: 3,
+                    fontSize: "1rem",
+                    lineHeight: 1.7,
+                }}
+            >
+                Elixpo Accounts is the central Single Sign-On (SSO) gateway and
+                OAuth 2.0 Identity Provider for the Elixpo ecosystem. It allows
+                users to authenticate once and access all services securely.
+                Third-party applications can integrate with Elixpo Accounts to
+                allow users to sign in using their Elixpo credentials.
             </Typography>
 
-            <Typography variant="h2" sx={{ fontSize: "1.4rem", fontWeight: 700, color: "#fff", mt: 4, mb: 2, letterSpacing: "-0.01em" }}>
+            <Typography
+                variant="h2"
+                sx={{
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#fff",
+                    mt: 4,
+                    mb: 2,
+                    letterSpacing: "-0.01em",
+                }}
+            >
                 Core Capabilities
             </Typography>
-            <Box component="ul" sx={{ color: "rgba(255, 255, 255, 0.7)", pl: 3, mb: 4, "& li": { mb: 1.5, lineHeight: 1.6 } }}>
+            <Box
+                component="ul"
+                sx={{
+                    color: "rgba(255, 255, 255, 0.7)",
+                    pl: 3,
+                    mb: 4,
+                    "& li": { mb: 1.5, lineHeight: 1.6 },
+                }}
+            >
                 <li>
-                    <strong>Universal SSO:</strong> One account accesses every app in the Elixpo ecosystem, including Chat, Art, Blogs, and Sketch.
+                    <strong>Universal SSO:</strong> One account accesses every
+                    app in the Elixpo ecosystem, including Chat, Art, Blogs, and
+                    Sketch.
                 </li>
                 <li>
-                    <strong>OAuth 2.0 Provider:</strong> Standard Authorization Code Flow with Refresh Token rotation for secure, seamless third-party integrations.
+                    <strong>OAuth 2.0 Provider:</strong> Standard Authorization
+                    Code Flow with Refresh Token rotation for secure, seamless
+                    third-party integrations.
                 </li>
                 <li>
-                    <strong>Passwordless Login:</strong> Secure phishing-resistant authentication using WebAuthn / Passkeys.
+                    <strong>Passwordless Login:</strong> Secure
+                    phishing-resistant authentication using WebAuthn / Passkeys.
                 </li>
                 <li>
-                    <strong>Edge-Native Runtime:</strong> Optimized execution globally on Cloudflare Pages and Cloudflare D1 with minimal latency.
+                    <strong>Edge-Native Runtime:</strong> Optimized execution
+                    globally on Cloudflare Pages and Cloudflare D1 with minimal
+                    latency.
                 </li>
                 <li>
-                    <strong>Developer Portal:</strong> Self-service portal to register OAuth applications, subscribe to Webhooks, and generate API Keys.
+                    <strong>Developer Portal:</strong> Self-service portal to
+                    register OAuth applications, subscribe to Webhooks, and
+                    generate API Keys.
                 </li>
             </Box>
 
-            <Typography variant="h2" sx={{ fontSize: "1.4rem", fontWeight: 700, color: "#fff", mt: 4, mb: 2, letterSpacing: "-0.01em" }}>
+            <Typography
+                variant="h2"
+                sx={{
+                    fontSize: "1.4rem",
+                    fontWeight: 700,
+                    color: "#fff",
+                    mt: 4,
+                    mb: 2,
+                    letterSpacing: "-0.01em",
+                }}
+            >
                 Architecture & Security
             </Typography>
-            <Typography sx={{ color: "rgba(255, 255, 255, 0.7)", mb: 3, fontSize: "1.0rem", lineHeight: 1.7 }}>
-                The authentication protocol follows standard OAuth 2.0 and OpenID Connect patterns. Token issuance comprises short-lived JWT Access Tokens (15 minutes expiry) signed using HS256 (Web Crypto API), combined with rotated Refresh Tokens. Refresh token rotation guarantees that every time a client refreshes an access token, the current refresh token is invalidated, and a new one is returned to prevent replay attacks.
+            <Typography
+                sx={{
+                    color: "rgba(255, 255, 255, 0.7)",
+                    mb: 3,
+                    fontSize: "1.0rem",
+                    lineHeight: 1.7,
+                }}
+            >
+                The authentication protocol follows standard OAuth 2.0 and
+                OpenID Connect patterns. Token issuance comprises short-lived
+                JWT Access Tokens (15 minutes expiry) signed using HS256 (Web
+                Crypto API), combined with rotated Refresh Tokens. Refresh token
+                rotation guarantees that every time a client refreshes an access
+                token, the current refresh token is invalidated, and a new one
+                is returned to prevent replay attacks.
             </Typography>
         </Box>
     );

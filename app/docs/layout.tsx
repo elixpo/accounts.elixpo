@@ -1,12 +1,14 @@
 "use client";
 
 import {
-    Menu as MenuIcon,
-    Search as SearchIcon,
     ArrowBack as ArrowBackIcon,
     ArrowForward as ArrowForwardIcon,
-    GitHub as GitHubIcon,
+    Check as CheckIcon,
+    ContentCopy as ContentCopyIcon,
     Dashboard as DashboardIcon,
+    GitHub as GitHubIcon,
+    Menu as MenuIcon,
+    Search as SearchIcon,
 } from "@mui/icons-material";
 import {
     AppBar,
@@ -20,8 +22,10 @@ import {
     ListItem,
     ListItemButton,
     ListItemText,
+    Snackbar,
     TextField,
     Toolbar,
+    Tooltip,
     Typography,
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -37,7 +41,10 @@ const darkTheme = createTheme({
     palette: {
         mode: "dark",
         primary: { main: "#9b7bf7" },
-        background: { default: "transparent", paper: "rgba(255, 255, 255, 0.03)" },
+        background: {
+            default: "transparent",
+            paper: "rgba(255, 255, 255, 0.03)",
+        },
     },
     typography: {
         fontFamily: "var(--font-geist-sans), Arial, sans-serif",
@@ -46,25 +53,27 @@ const darkTheme = createTheme({
         MuiCard: {
             styleOverrides: {
                 root: {
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "16px",
                     boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
-                }
-            }
+                },
+            },
         },
         MuiPaper: {
             styleOverrides: {
                 root: {
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     backdropFilter: "blur(20px)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "16px",
-                }
-            }
-        }
-    }
+                },
+            },
+        },
+    },
 });
 
 const DOCS_NAV = [
@@ -84,19 +93,136 @@ interface HeadingItem {
     level: number;
 }
 
-export default function DocsLayout({ children }: { children: React.ReactNode }) {
+export default function DocsLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
     const pathname = usePathname();
     const [search, setSearch] = useState("");
     const [mobileOpen, setMobileOpen] = useState(false);
     const [headings, setHeadings] = useState<HeadingItem[]>([]);
     const [activeHeadingId, setActiveHeadingId] = useState("");
+    const [copied, setCopied] = useState(false);
 
-    const currentPageIndex = DOCS_NAV.findIndex(item => item.href === pathname);
-    const prevPage = currentPageIndex > 0 ? DOCS_NAV[currentPageIndex - 1] : null;
-    const nextPage = currentPageIndex < DOCS_NAV.length - 1 ? DOCS_NAV[currentPageIndex + 1] : null;
+    // Convert the rendered docs content into a markdown-ish text blob that's
+    // friendly to paste into an LLM chat. We walk the DOM tree of the
+    // #docs-content node and emit headings, lists, code, and paragraphs.
+    const buildLlmPayload = (): string => {
+        const root = document.getElementById("docs-content");
+        if (!root) return "";
 
-    const filteredNav = DOCS_NAV.filter(item =>
-        item.label.toLowerCase().includes(search.toLowerCase())
+        const lines: string[] = [];
+        const walk = (node: Node) => {
+            if (node.nodeType === Node.TEXT_NODE) return;
+            if (node.nodeType !== Node.ELEMENT_NODE) return;
+            const el = node as HTMLElement;
+            const tag = el.tagName.toLowerCase();
+            const text = (el.textContent || "").trim();
+            if (!text && tag !== "pre" && tag !== "code") {
+                el.childNodes.forEach(walk);
+                return;
+            }
+            switch (tag) {
+                case "h1":
+                    lines.push(`# ${text}`, "");
+                    return;
+                case "h2":
+                    lines.push("", `## ${text}`, "");
+                    return;
+                case "h3":
+                    lines.push("", `### ${text}`, "");
+                    return;
+                case "h4":
+                    lines.push("", `#### ${text}`, "");
+                    return;
+                case "li":
+                    lines.push(`- ${text}`);
+                    return;
+                case "pre": {
+                    const code = el.textContent || "";
+                    lines.push("", "```", code.trim(), "```", "");
+                    return;
+                }
+                case "code":
+                    if (
+                        el.parentElement &&
+                        el.parentElement.tagName.toLowerCase() !== "pre"
+                    ) {
+                        // inline code already captured inside paragraph text
+                        return;
+                    }
+                    return;
+                case "p":
+                    lines.push(text, "");
+                    return;
+                default:
+                    el.childNodes.forEach(walk);
+            }
+        };
+        root.childNodes.forEach(walk);
+
+        const pageTitle =
+            DOCS_NAV.find((n) => n.href === pathname)?.label || "Overview";
+        const url =
+            typeof window !== "undefined"
+                ? `${window.location.origin}${pathname}`
+                : pathname;
+
+        const header = [
+            `# Elixpo Accounts Docs — ${pageTitle}`,
+            "",
+            `Source: ${url}`,
+            "",
+            "This is one section of the Elixpo Accounts developer documentation. Elixpo Accounts is an open OAuth 2.0 single sign-on built on Cloudflare's edge.",
+            "",
+            "---",
+            "",
+        ].join("\n");
+
+        return (
+            header +
+            lines
+                .join("\n")
+                .replace(/\n{3,}/g, "\n\n")
+                .trim() +
+            "\n"
+        );
+    };
+
+    const handleCopyForLlm = async () => {
+        const payload = buildLlmPayload();
+        if (!payload) return;
+        try {
+            await navigator.clipboard.writeText(payload);
+            setCopied(true);
+        } catch {
+            const ta = document.createElement("textarea");
+            ta.value = payload;
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand("copy");
+                setCopied(true);
+            } catch {
+                // give up silently
+            }
+            document.body.removeChild(ta);
+        }
+    };
+
+    const currentPageIndex = DOCS_NAV.findIndex(
+        (item) => item.href === pathname,
+    );
+    const prevPage =
+        currentPageIndex > 0 ? DOCS_NAV[currentPageIndex - 1] : null;
+    const nextPage =
+        currentPageIndex < DOCS_NAV.length - 1
+            ? DOCS_NAV[currentPageIndex + 1]
+            : null;
+
+    const filteredNav = DOCS_NAV.filter((item) =>
+        item.label.toLowerCase().includes(search.toLowerCase()),
     );
 
     useEffect(() => {
@@ -111,7 +237,10 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             const text = el.textContent || "";
             let id = el.id;
             if (!id) {
-                id = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+                id = text
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, "-")
+                    .replace(/(^-|-$)/g, "");
                 el.id = id;
             }
             list.push({ id, text, level });
@@ -125,11 +254,14 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             (entries) => {
                 const visible = entries.filter((e) => e.isIntersecting);
                 if (visible.length > 0) {
-                    const sorted = visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+                    const sorted = visible.sort(
+                        (a, b) =>
+                            a.boundingClientRect.top - b.boundingClientRect.top,
+                    );
                     setActiveHeadingId(sorted[0].target.id);
                 }
             },
-            { rootMargin: "-80px 0px -60% 0px" }
+            { rootMargin: "-80px 0px -60% 0px" },
         );
 
         const contentEl = document.getElementById("docs-content");
@@ -146,7 +278,14 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
     };
 
     const sidebarContent = (
-        <Box sx={{ p: 2, height: "100%", display: "flex", flexDirection: "column" }}>
+        <Box
+            sx={{
+                p: 2,
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+            }}
+        >
             <TextField
                 placeholder="Search docs..."
                 size="small"
@@ -156,7 +295,12 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                 InputProps={{
                     startAdornment: (
                         <InputAdornment position="start">
-                            <SearchIcon sx={{ color: "rgba(255, 255, 255, 0.4)", fontSize: "1.1rem" }} />
+                            <SearchIcon
+                                sx={{
+                                    color: "rgba(255, 255, 255, 0.4)",
+                                    fontSize: "1.1rem",
+                                }}
+                            />
                         </InputAdornment>
                     ),
                 }}
@@ -165,8 +309,12 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                     "& .MuiOutlinedInput-root": {
                         color: "#e5e7eb",
                         background: "rgba(255, 255, 255, 0.02)",
-                        "& fieldset": { borderColor: "rgba(255, 255, 255, 0.08)" },
-                        "&:hover fieldset": { borderColor: "rgba(155, 123, 247, 0.4)" },
+                        "& fieldset": {
+                            borderColor: "rgba(255, 255, 255, 0.08)",
+                        },
+                        "&:hover fieldset": {
+                            borderColor: "rgba(155, 123, 247, 0.4)",
+                        },
                         "&.Mui-focused fieldset": { borderColor: "#9b7bf7" },
                     },
                 }}
@@ -176,7 +324,11 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                 {filteredNav.map((item) => {
                     const active = pathname === item.href;
                     return (
-                        <ListItem key={item.href} disablePadding sx={{ mb: 0.5 }}>
+                        <ListItem
+                            key={item.href}
+                            disablePadding
+                            sx={{ mb: 0.5 }}
+                        >
                             <ListItemButton
                                 component={Link}
                                 href={item.href}
@@ -185,11 +337,19 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                                     borderRadius: "8px",
                                     py: 1,
                                     px: 2,
-                                    bgcolor: active ? "rgba(155, 123, 247, 0.1)" : "transparent",
-                                    color: active ? "#9b7bf7" : "rgba(255, 255, 255, 0.65)",
+                                    bgcolor: active
+                                        ? "rgba(155, 123, 247, 0.1)"
+                                        : "transparent",
+                                    color: active
+                                        ? "#9b7bf7"
+                                        : "rgba(255, 255, 255, 0.65)",
                                     "&:hover": {
-                                        bgcolor: active ? "rgba(155, 123, 247, 0.15)" : "rgba(255, 255, 255, 0.05)",
-                                        color: active ? "#9b7bf7" : "rgba(255, 255, 255, 0.9)",
+                                        bgcolor: active
+                                            ? "rgba(155, 123, 247, 0.15)"
+                                            : "rgba(255, 255, 255, 0.05)",
+                                        color: active
+                                            ? "#9b7bf7"
+                                            : "rgba(255, 255, 255, 0.9)",
                                     },
                                 }}
                             >
@@ -205,7 +365,14 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                     );
                 })}
                 {filteredNav.length === 0 && (
-                    <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.4)", p: 2, textAlign: "center" }}>
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            color: "rgba(255,255,255,0.4)",
+                            p: 2,
+                            textAlign: "center",
+                        }}
+                    >
                         No results found
                     </Typography>
                 )}
@@ -215,9 +382,23 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
 
     return (
         <ThemeProvider theme={darkTheme}>
-            <Box sx={{ position: "relative", minHeight: "100vh", bgcolor: "#0b0c10" }}>
+            <Box
+                sx={{
+                    position: "relative",
+                    minHeight: "100vh",
+                    bgcolor: "#0b0c10",
+                }}
+            >
                 <BackgroundAurora variant="docs" />
-                <Box sx={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+                <Box
+                    sx={{
+                        position: "relative",
+                        zIndex: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        minHeight: "100vh",
+                    }}
+                >
                     <AppBar
                         position="sticky"
                         elevation={0}
@@ -227,7 +408,14 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                             borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
                         }}
                     >
-                        <Toolbar sx={{ maxWidth: "1400px", width: "100%", mx: "auto", px: { xs: 2, md: 3 } }}>
+                        <Toolbar
+                            sx={{
+                                maxWidth: "1400px",
+                                width: "100%",
+                                mx: "auto",
+                                px: { xs: 2, md: 3 },
+                            }}
+                        >
                             <IconButton
                                 color="inherit"
                                 aria-label="open drawer"
@@ -238,25 +426,106 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                                 <MenuIcon />
                             </IconButton>
 
-                            <Box component={Link} href="/docs" sx={{ display: "flex", alignItems: "center", gap: 1.5, textDecoration: "none" }}>
+                            <Box
+                                component={Link}
+                                href="/docs"
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1.5,
+                                    textDecoration: "none",
+                                }}
+                            >
                                 <Box
                                     component="img"
                                     src="/LOGO/logo.png"
                                     alt="Elixpo"
-                                    sx={{ height: 30, width: 30, borderRadius: "6px" }}
+                                    sx={{
+                                        height: 30,
+                                        width: 30,
+                                        borderRadius: "6px",
+                                    }}
                                 />
-                                <Typography sx={{ fontWeight: 700, fontSize: "1.05rem", color: "#f5f5f4", letterSpacing: "-0.01em" }}>
+                                <Typography
+                                    sx={{
+                                        fontWeight: 700,
+                                        fontSize: "1.05rem",
+                                        color: "#f5f5f4",
+                                        letterSpacing: "-0.01em",
+                                    }}
+                                >
                                     Elixpo Accounts
                                 </Typography>
                             </Box>
 
                             <Box sx={{ flexGrow: 1 }} />
 
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                }}
+                            >
+                                <Tooltip
+                                    title={
+                                        copied
+                                            ? "Copied!"
+                                            : "Copy this page as plain text to paste into an LLM"
+                                    }
+                                    arrow
+                                >
+                                    <Button
+                                        onClick={handleCopyForLlm}
+                                        startIcon={
+                                            copied ? (
+                                                <CheckIcon
+                                                    sx={{
+                                                        fontSize:
+                                                            "1.1rem !important",
+                                                    }}
+                                                />
+                                            ) : (
+                                                <ContentCopyIcon
+                                                    sx={{
+                                                        fontSize:
+                                                            "1.05rem !important",
+                                                    }}
+                                                />
+                                            )
+                                        }
+                                        sx={{
+                                            color: copied
+                                                ? "#86efac"
+                                                : "rgba(255, 255, 255, 0.75)",
+                                            textTransform: "none",
+                                            fontWeight: 600,
+                                            fontSize: "0.85rem",
+                                            px: 1.5,
+                                            borderRadius: "8px",
+                                            border: "1px solid rgba(255,255,255,0.12)",
+                                            "&:hover": {
+                                                color: "#fff",
+                                                bgcolor:
+                                                    "rgba(155,123,247,0.08)",
+                                                borderColor:
+                                                    "rgba(155,123,247,0.4)",
+                                            },
+                                        }}
+                                    >
+                                        {copied ? "Copied" : "Copy for LLM"}
+                                    </Button>
+                                </Tooltip>
                                 <Button
                                     component={Link}
                                     href="/dashboard/oauth-apps"
-                                    startIcon={<DashboardIcon sx={{ fontSize: "1.1rem !important" }} />}
+                                    startIcon={
+                                        <DashboardIcon
+                                            sx={{
+                                                fontSize: "1.1rem !important",
+                                            }}
+                                        />
+                                    }
                                     sx={{
                                         color: "rgba(255, 255, 255, 0.65)",
                                         textTransform: "none",
@@ -264,7 +533,10 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                                         fontSize: "0.85rem",
                                         px: 1.5,
                                         borderRadius: "6px",
-                                        "&:hover": { color: "#fff", bgcolor: "rgba(255,255,255,0.06)" }
+                                        "&:hover": {
+                                            color: "#fff",
+                                            bgcolor: "rgba(255,255,255,0.06)",
+                                        },
                                     }}
                                 >
                                     Dashboard
@@ -276,7 +548,10 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                                     rel="noopener noreferrer"
                                     sx={{
                                         color: "rgba(255, 255, 255, 0.5)",
-                                        "&:hover": { color: "#fff", bgcolor: "rgba(255,255,255,0.06)" }
+                                        "&:hover": {
+                                            color: "#fff",
+                                            bgcolor: "rgba(255,255,255,0.06)",
+                                        },
                                     }}
                                 >
                                     <GitHubIcon sx={{ fontSize: "1.2rem" }} />
@@ -285,14 +560,35 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                         </Toolbar>
                     </AppBar>
 
-                    <Box sx={{ display: "flex", flexGrow: 1, maxWidth: "1400px", width: "100%", mx: "auto", px: { xs: 2, md: 3 } }}>
+                    <Snackbar
+                        open={copied}
+                        autoHideDuration={2400}
+                        onClose={() => setCopied(false)}
+                        anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "center",
+                        }}
+                        message="Copied page as markdown to clipboard — paste into any LLM"
+                    />
+
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexGrow: 1,
+                            maxWidth: "1400px",
+                            width: "100%",
+                            mx: "auto",
+                            px: { xs: 2, md: 3 },
+                        }}
+                    >
                         <Box
                             component="nav"
                             sx={{
                                 width: 260,
                                 flexShrink: 0,
                                 display: { xs: "none", md: "block" },
-                                borderRight: "1px solid rgba(255, 255, 255, 0.06)",
+                                borderRight:
+                                    "1px solid rgba(255, 255, 255, 0.06)",
                                 position: "sticky",
                                 top: 64,
                                 height: "calc(100vh - 64px)",
@@ -315,7 +611,8 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                                     width: 280,
                                     bgcolor: "rgba(11, 13, 18, 0.95)",
                                     backdropFilter: "blur(20px)",
-                                    borderRight: "1px solid rgba(255, 255, 255, 0.08)",
+                                    borderRight:
+                                        "1px solid rgba(255, 255, 255, 0.08)",
                                 },
                             }}
                         >
@@ -332,13 +629,23 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                                 px: { xs: 0, md: 4, lg: 6 },
                             }}
                         >
-                            <Box id="docs-content">
-                                {children}
-                            </Box>
+                            <Box id="docs-content">{children}</Box>
 
-                            <Divider sx={{ my: 4, borderColor: "rgba(255, 255, 255, 0.06)" }} />
+                            <Divider
+                                sx={{
+                                    my: 4,
+                                    borderColor: "rgba(255, 255, 255, 0.06)",
+                                }}
+                            />
 
-                            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2, flexWrap: "wrap" }}>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    gap: 2,
+                                    flexWrap: "wrap",
+                                }}
+                            >
                                 {prevPage ? (
                                     <Button
                                         component={Link}
@@ -346,7 +653,8 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                                         startIcon={<ArrowBackIcon />}
                                         sx={{
                                             color: "#9b7bf7",
-                                            borderColor: "rgba(155, 123, 247, 0.2)",
+                                            borderColor:
+                                                "rgba(155, 123, 247, 0.2)",
                                             textTransform: "none",
                                             fontWeight: 600,
                                             px: 2,
@@ -355,7 +663,8 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                                             borderRadius: "8px",
                                             "&:hover": {
                                                 borderColor: "#9b7bf7",
-                                                bgcolor: "rgba(155, 123, 247, 0.05)",
+                                                bgcolor:
+                                                    "rgba(155, 123, 247, 0.05)",
                                             },
                                         }}
                                     >
@@ -372,7 +681,8 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                                         endIcon={<ArrowForwardIcon />}
                                         sx={{
                                             color: "#9b7bf7",
-                                            borderColor: "rgba(155, 123, 247, 0.2)",
+                                            borderColor:
+                                                "rgba(155, 123, 247, 0.2)",
                                             textTransform: "none",
                                             fontWeight: 600,
                                             px: 2,
@@ -381,7 +691,8 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                                             borderRadius: "8px",
                                             "&:hover": {
                                                 borderColor: "#9b7bf7",
-                                                bgcolor: "rgba(155, 123, 247, 0.05)",
+                                                bgcolor:
+                                                    "rgba(155, 123, 247, 0.05)",
                                             },
                                         }}
                                     >
@@ -405,26 +716,53 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                                     overflowY: "auto",
                                     pt: 4,
                                     pl: 3,
-                                    borderLeft: "1px solid rgba(255, 255, 255, 0.06)",
+                                    borderLeft:
+                                        "1px solid rgba(255, 255, 255, 0.06)",
                                 }}
                             >
-                                <Typography variant="caption" sx={{ color: "rgba(255, 255, 255, 0.4)", fontWeight: 700, textTransform: "uppercase", tracking: "0.05em", display: "block", mb: 2 }}>
+                                <Typography
+                                    variant="caption"
+                                    sx={{
+                                        color: "rgba(255, 255, 255, 0.4)",
+                                        fontWeight: 700,
+                                        textTransform: "uppercase",
+                                        tracking: "0.05em",
+                                        display: "block",
+                                        mb: 2,
+                                    }}
+                                >
                                     On this page
                                 </Typography>
                                 <List sx={{ p: 0 }}>
                                     {headings.map((h) => (
-                                        <ListItem key={h.id} disablePadding sx={{ mb: 1, pl: h.level === 3 ? 1.5 : 0 }}>
+                                        <ListItem
+                                            key={h.id}
+                                            disablePadding
+                                            sx={{
+                                                mb: 1,
+                                                pl: h.level === 3 ? 1.5 : 0,
+                                            }}
+                                        >
                                             <Typography
                                                 component="a"
                                                 href={`#${h.id}`}
                                                 sx={{
                                                     fontSize: "0.82rem",
-                                                    color: activeHeadingId === h.id ? "#9b7bf7" : "rgba(255, 255, 255, 0.45)",
-                                                    fontWeight: activeHeadingId === h.id ? 600 : 400,
+                                                    color:
+                                                        activeHeadingId === h.id
+                                                            ? "#9b7bf7"
+                                                            : "rgba(255, 255, 255, 0.45)",
+                                                    fontWeight:
+                                                        activeHeadingId === h.id
+                                                            ? 600
+                                                            : 400,
                                                     textDecoration: "none",
                                                     lineHeight: 1.4,
-                                                    transition: "color 0.15s ease",
-                                                    "&:hover": { color: "#fff" },
+                                                    transition:
+                                                        "color 0.15s ease",
+                                                    "&:hover": {
+                                                        color: "#fff",
+                                                    },
                                                 }}
                                             >
                                                 {h.text}
@@ -434,7 +772,6 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                                 </List>
                             </Box>
                         )}
-                        
                     </Box>
                 </Box>
             </Box>

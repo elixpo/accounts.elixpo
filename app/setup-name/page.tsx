@@ -37,7 +37,7 @@ function slugifyHandle(s: string): string {
 }
 
 const SetupNameContent = () => {
-    const router = useRouter();
+    const _router = useRouter();
     const searchParams = useSearchParams();
     const next = searchParams.get("next");
     const [username, setUsername] = useState("");
@@ -54,6 +54,9 @@ const SetupNameContent = () => {
         severity: "success" | "error";
     }>({ open: false, message: "", severity: "success" });
 
+    // Uses window.location for the catch branch so router isn't referenced
+    // inside the effect — prevents eslint-react-hooks from autofixing it
+    // back into deps (which would loop the /me fetch).
     useEffect(() => {
         (async () => {
             try {
@@ -67,7 +70,6 @@ const SetupNameContent = () => {
                     return;
                 }
                 const data: any = await res.json();
-                // Already has a handle → setup complete, move on.
                 if (data.username) {
                     window.location.href = next || "/dashboard/oauth-apps";
                     return;
@@ -76,13 +78,12 @@ const SetupNameContent = () => {
                 setDisplayName(dn);
                 setUsername(slugifyHandle(dn));
             } catch {
-                router.push("/login");
+                window.location.href = "/login";
             } finally {
                 setPageLoading(false);
             }
         })();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [router.push, next]);
+    }, [next]);
     // Debounced availability check.
 
     useEffect(() => {
@@ -170,7 +171,13 @@ const SetupNameContent = () => {
                 }}
             >
                 <BackgroundAurora variant="default" />
-                <Typography sx={{ position: "relative", zIndex: 1, color: "rgba(255,255,255,0.5)" }}>
+                <Typography
+                    sx={{
+                        position: "relative",
+                        zIndex: 1,
+                        color: "rgba(255,255,255,0.5)",
+                    }}
+                >
                     Loading...
                 </Typography>
             </Box>
@@ -211,7 +218,8 @@ const SetupNameContent = () => {
                     maxWidth: "460px",
                     width: "100%",
                     backdropFilter: "blur(20px)",
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
                     border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "16px",
                     boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
