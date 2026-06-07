@@ -267,7 +267,9 @@ export default function DocsLayout({
         const contentEl = document.getElementById("docs-content");
         if (contentEl) {
             const targets = contentEl.querySelectorAll("h2, h3");
-            targets.forEach((target) => observer.observe(target));
+            targets.forEach((target) => {
+                observer.observe(target);
+            });
         }
 
         return () => observer.disconnect();
