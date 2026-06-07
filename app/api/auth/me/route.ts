@@ -32,7 +32,7 @@ async function getUserIdentity(db: D1Database, userId: string) {
 async function tryAutoRefresh(_request: NextRequest, refreshToken: string) {
     try {
         const payload = await verifyJWT(refreshToken);
-        if (!payload || payload.type !== "refresh") {
+        if (payload?.type !== "refresh") {
             return NextResponse.json(
                 { error: "Invalid refresh token" },
                 { status: 401 },
@@ -171,15 +171,11 @@ export async function GET(request: NextRequest) {
         const payload = await verifyJWT(accessToken);
 
         // Access token expired but refresh token cookie exists — auto-refresh
-        if (
-            (!payload || payload.type !== "access") &&
-            refreshTokenCookie &&
-            cookieToken
-        ) {
+        if (payload?.type !== "access" && refreshTokenCookie && cookieToken) {
             return await tryAutoRefresh(request, refreshTokenCookie);
         }
 
-        if (!payload || payload.type !== "access") {
+        if (payload?.type !== "access") {
             return NextResponse.json(
                 { error: "Invalid token" },
                 { status: 401 },
@@ -260,7 +256,7 @@ export async function PATCH(request: NextRequest) {
         }
 
         const payload = await verifyJWT(accessToken);
-        if (!payload || payload.type !== "access") {
+        if (payload?.type !== "access") {
             return NextResponse.json(
                 { error: "Invalid token" },
                 { status: 401 },

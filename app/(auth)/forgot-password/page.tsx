@@ -139,7 +139,7 @@ function ForgotPasswordContent() {
         e.preventDefault();
         setError("");
 
-        if (!otp || otp.length !== 6) {
+        if (otp?.length !== 6) {
             setError("Please enter a valid 6-digit OTP");
             return;
         }
