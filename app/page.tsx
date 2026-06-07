@@ -8,6 +8,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Box, Button, Chip, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import BackgroundAurora from "./components/background-aurora";
+import Footer from "./components/footer";
 import Navbar from "./components/navbar";
 
 const ACCENT = "#9b7bf7";
