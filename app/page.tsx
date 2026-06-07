@@ -283,8 +283,7 @@ export default function LandingPage() {
                             "&:hover": {
                                 background:
                                     "linear-gradient(135deg, #b094ff 0%, #8a6dff 100%)",
-                                boxShadow:
-                                    "0 12px 32px rgba(155,123,247,0.5)",
+                                boxShadow: "0 12px 32px rgba(155,123,247,0.5)",
                                 transform: "translateY(-1px)",
                             },
                         }}
@@ -306,12 +305,9 @@ export default function LandingPage() {
                     textAlign: "center",
                 }}
             >
-                © {new Date().getFullYear()} Elixpo · Built on Cloudflare's
-                edge ·{" "}
-                <Link
-                    href="/about"
-                    style={{ color: "rgba(255,255,255,0.7)" }}
-                >
+                © {new Date().getFullYear()} Elixpo · Built on Cloudflare's edge
+                ·{" "}
+                <Link href="/about" style={{ color: "rgba(255,255,255,0.7)" }}>
                     About
                 </Link>
             </Box>

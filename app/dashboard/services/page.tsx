@@ -108,7 +108,8 @@ const ServicesPage = () => {
         );
         if (!target) {
             // Not connected (or already revoked) — just send them back.
-            if (returnTo && isSafeReturn(returnTo)) window.location.href = returnTo;
+            if (returnTo && isSafeReturn(returnTo))
+                window.location.href = returnTo;
             return;
         }
         (async () => {
@@ -141,7 +142,7 @@ const ServicesPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchServices();
-    }, []);
+    }, [fetchServices]);
 
     const fetchServices = async () => {
         try {
