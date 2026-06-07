@@ -2,6 +2,7 @@ export const runtime = "edge";
 
 import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
+import { createPasswordResetRateLimiter } from "@/lib/rate-limit";
 import { emailTemplates, sendEmail } from "@/lib/email";
 import { generateUUID } from "@/lib/webcrypto";
 
@@ -28,6 +29,19 @@ export async function POST(request: NextRequest) {
         }
 
         const db = await getDatabase();
+        const ipAddress =
+            request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+            request.headers.get("cf-connecting-ip") ||
+            "unknown";
+
+        const rateLimiter = createPasswordResetRateLimiter();
+        const rateLimit = await rateLimiter.check(db, ipAddress, "forgot-password");
+        if (!rateLimit.allowed) {
+            return NextResponse.json(
+                { error: "Too many requests. Please try again later.", retryAfter: rateLimit.retryAfter },
+                { status: 429, headers: { "Retry-After": String(rateLimit.retryAfter || 3600) } },
+            );
+        }
 
         // Look up user — always return success to avoid user enumeration
         const user = (await db
