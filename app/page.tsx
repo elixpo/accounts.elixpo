@@ -7,6 +7,7 @@ import HubIcon from "@mui/icons-material/Hub";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Box, Button, Chip, Stack, Typography } from "@mui/material";
 import Link from "next/link";
+import BackgroundAurora from "./components/background-aurora";
 import Navbar from "./components/navbar";
 
 const ACCENT = "#9b7bf7";
@@ -14,23 +15,27 @@ const ACCENT = "#9b7bf7";
 const FEATURES = [
     {
         icon: HubIcon,
-        title: "One account, everywhere",
-        body: "Sign in once and reach every Elixpo product — chat, art, blogs, clock, jackey, sketch — without juggling passwords.",
+        title: "One identity, any app",
+        body: "Use a single account across the Elixpo ecosystem and any third-party app that adopts our OAuth — no juggling passwords.",
+        soon: false,
     },
     {
         icon: FingerprintIcon,
         title: "Passkey + WebAuthn",
-        body: "Phishing-resistant, passwordless login the moment your device supports it. Falls back gracefully to email and OAuth.",
+        body: "Phishing-resistant, passwordless sign-in is on the way. For now you can use email + password or social providers.",
+        soon: true,
     },
     {
         icon: LockOutlinedIcon,
-        title: "OAuth 2.0 for integrators",
-        body: "A first-class Authorization Code flow with PKCE. Bring Elixpo identity to your own app in minutes.",
+        title: "OAuth 2.0 for everyone",
+        body: "A first-class Authorization Code flow with PKCE. Drop our SSO into your own product in minutes — Elixpo or not.",
+        soon: false,
     },
     {
         icon: BoltIcon,
         title: "Edge-native, instant",
         body: "Runs on Cloudflare's edge — sign-in checks complete in milliseconds, anywhere on the planet.",
+        soon: false,
     },
 ];
 
@@ -39,14 +44,17 @@ export default function LandingPage() {
         <Box
             sx={{
                 minHeight: "100vh",
-                background:
-                    "linear-gradient(180deg, #0f1117 0%, #131922 50%, #0f1117 100%)",
                 color: "#f5f5f4",
                 display: "flex",
                 flexDirection: "column",
+                position: "relative",
             }}
         >
-            <Navbar />
+            <BackgroundAurora variant="default" />
+
+            <Box sx={{ position: "relative", zIndex: 1 }}>
+                <Navbar />
+            </Box>
 
             <Box
                 component="main"
@@ -56,11 +64,12 @@ export default function LandingPage() {
                     width: "100%",
                     mx: "auto",
                     px: { xs: 2.5, md: 4 },
-                    pt: { xs: 8, md: 14 },
+                    pt: { xs: 4, md: 6 },
                     pb: { xs: 8, md: 12 },
+                    position: "relative",
+                    zIndex: 1,
                 }}
             >
-                {/* Hero */}
                 <Stack
                     spacing={3}
                     alignItems="center"
@@ -68,7 +77,7 @@ export default function LandingPage() {
                     sx={{ maxWidth: "820px", mx: "auto" }}
                 >
                     <Chip
-                        label="The Elixpo identity layer"
+                        label="Open SSO for any app"
                         size="small"
                         sx={{
                             bgcolor: "rgba(155, 123, 247, 0.12)",
@@ -93,9 +102,9 @@ export default function LandingPage() {
                             WebkitTextFillColor: "transparent",
                         }}
                     >
-                        One sign-in for the whole{" "}
+                        One sign-in.{" "}
                         <Box component="span" sx={{ color: ACCENT }}>
-                            Elixpo ecosystem.
+                            Every app you ship.
                         </Box>
                     </Typography>
                     <Typography
@@ -104,11 +113,13 @@ export default function LandingPage() {
                             fontSize: { xs: "1rem", md: "1.15rem" },
                             maxWidth: "640px",
                             lineHeight: 1.55,
+                            fontFamily: "var(--font-geist-sans)",
                         }}
                     >
-                        Secure OAuth 2.0 single sign-on built on the edge. Use
-                        one account across every Elixpo product, and let your
-                        own apps tap into the same identity in minutes.
+                        Secure OAuth 2.0 single sign-on built on the edge. Born
+                        inside the Elixpo ecosystem, open for any product or
+                        developer to use — drop it into your app and let users
+                        sign in in seconds.
                     </Typography>
 
                     <Stack
@@ -166,7 +177,6 @@ export default function LandingPage() {
                     </Stack>
                 </Stack>
 
-                {/* Features */}
                 <Box
                     sx={{
                         display: "grid",
@@ -175,17 +185,18 @@ export default function LandingPage() {
                             sm: "1fr 1fr",
                         },
                         gap: 2.5,
-                        mt: { xs: 8, md: 12 },
+                        mt: { xs: 7, md: 10 },
                     }}
                 >
-                    {FEATURES.map(({ icon: Icon, title, body }) => (
+                    {FEATURES.map(({ icon: Icon, title, body, soon }) => (
                         <Box
                             key={title}
                             sx={{
+                                position: "relative",
                                 p: 3,
                                 borderRadius: "16px",
                                 background:
-                                    "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.015) 100%)",
+                                    "linear-gradient(135deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.015) 100%)",
                                 border: "1px solid rgba(255,255,255,0.08)",
                                 backdropFilter: "blur(20px)",
                                 transition: "border-color 0.2s ease",
@@ -196,15 +207,40 @@ export default function LandingPage() {
                         >
                             <Box
                                 sx={{
-                                    display: "inline-flex",
-                                    p: 1.1,
-                                    borderRadius: "10px",
-                                    background: "rgba(155,123,247,0.12)",
-                                    border: "1px solid rgba(155,123,247,0.25)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
                                     mb: 2,
                                 }}
                             >
-                                <Icon sx={{ color: ACCENT, fontSize: 22 }} />
+                                <Box
+                                    sx={{
+                                        display: "inline-flex",
+                                        p: 1.1,
+                                        borderRadius: "10px",
+                                        background: "rgba(155,123,247,0.12)",
+                                        border: "1px solid rgba(155,123,247,0.25)",
+                                    }}
+                                >
+                                    <Icon
+                                        sx={{ color: ACCENT, fontSize: 22 }}
+                                    />
+                                </Box>
+                                {soon && (
+                                    <Chip
+                                        label="Coming soon"
+                                        size="small"
+                                        sx={{
+                                            bgcolor: "rgba(255,255,255,0.06)",
+                                            color: "rgba(255,255,255,0.7)",
+                                            border: "1px solid rgba(255,255,255,0.12)",
+                                            fontWeight: 600,
+                                            fontSize: "0.68rem",
+                                            letterSpacing: "0.04em",
+                                            height: 22,
+                                        }}
+                                    />
+                                )}
                             </Box>
                             <Typography
                                 sx={{
@@ -212,15 +248,17 @@ export default function LandingPage() {
                                     fontSize: "1.05rem",
                                     color: "#f5f5f4",
                                     mb: 0.8,
+                                    fontFamily: "var(--font-geist-sans)",
                                 }}
                             >
                                 {title}
                             </Typography>
                             <Typography
                                 sx={{
-                                    color: "rgba(255,255,255,0.6)",
+                                    color: "rgba(255,255,255,0.62)",
                                     fontSize: "0.92rem",
                                     lineHeight: 1.55,
+                                    fontFamily: "var(--font-geist-mono)",
                                 }}
                             >
                                 {body}
@@ -229,14 +267,13 @@ export default function LandingPage() {
                     ))}
                 </Box>
 
-                {/* CTA */}
                 <Box
                     sx={{
                         mt: { xs: 8, md: 12 },
                         p: { xs: 4, md: 5 },
                         borderRadius: "20px",
                         background:
-                            "linear-gradient(135deg, rgba(155,123,247,0.12) 0%, rgba(124,92,255,0.05) 100%)",
+                            "linear-gradient(135deg, rgba(155,123,247,0.14) 0%, rgba(95,182,255,0.06) 100%)",
                         border: "1px solid rgba(155,123,247,0.25)",
                         textAlign: "center",
                     }}
@@ -261,9 +298,9 @@ export default function LandingPage() {
                             mx: "auto",
                         }}
                     >
-                        Create an account in seconds, or sign in if you already
-                        have one. Your identity carries across every Elixpo
-                        product automatically.
+                        Create an account in seconds or sign in if you already
+                        have one. The same identity works across Elixpo and any
+                        app integrating our SSO.
                     </Typography>
                     <Button
                         component={Link}
@@ -293,7 +330,6 @@ export default function LandingPage() {
                 </Box>
             </Box>
 
-            {/* Footer */}
             <Box
                 component="footer"
                 sx={{
@@ -303,6 +339,8 @@ export default function LandingPage() {
                     color: "rgba(255,255,255,0.45)",
                     fontSize: "0.85rem",
                     textAlign: "center",
+                    position: "relative",
+                    zIndex: 1,
                 }}
             >
                 © {new Date().getFullYear()} Elixpo · Built on Cloudflare's edge
