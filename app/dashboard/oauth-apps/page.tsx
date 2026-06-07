@@ -159,12 +159,6 @@ const OAuthAppsPage = () => {
         redirect_uris: [""],
     });
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => {
-        fetchApps();
-        fetchVerificationStatus();
-    }, []);
-
     const fetchVerificationStatus = async () => {
         try {
             const res = await fetch("/api/auth/me", { credentials: "include" });
@@ -175,13 +169,6 @@ const OAuthAppsPage = () => {
         } catch {
             // fail silently
         }
-    };
-
-    const showToast = (
-        message: string,
-        severity: "success" | "error" | "warning",
-    ) => {
-        setToast({ open: true, message, severity });
     };
 
     const fetchApps = async () => {
@@ -203,6 +190,22 @@ const OAuthAppsPage = () => {
             setAppLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchApps();
+        fetchVerificationStatus();
+    }, [fetchVerificationStatus, fetchApps]);
+
+    
+
+    const showToast = (
+        message: string,
+        severity: "success" | "error" | "warning",
+    ) => {
+        setToast({ open: true, message, severity });
+    };
+
+    
 
     const handleCreateApp = async () => {
         setError("");

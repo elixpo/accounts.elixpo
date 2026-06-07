@@ -103,7 +103,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
         fetchUnreadCount();
         const interval = setInterval(fetchUnreadCount, 60000);
         return () => clearInterval(interval);
-    }, []);
+    }, [fetchUnreadCount]);
 
     const handleNotifOpen = async (event: React.MouseEvent<HTMLElement>) => {
         setNotifAnchorEl(event.currentTarget);

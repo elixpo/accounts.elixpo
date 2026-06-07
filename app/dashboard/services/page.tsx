@@ -153,9 +153,7 @@ const ServicesPage = () => {
     }, [loading, services, paramHandled]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => {
-        fetchServices();
-    }, []);
+    
 
     const fetchServices = async () => {
         try {
@@ -174,6 +172,10 @@ const ServicesPage = () => {
         }
     };
 
+    useEffect(() => {
+        fetchServices();
+    }, [fetchServices]);
+    
     const revokeService = async (clientId: string) => {
         if (
             !confirm(
