@@ -28,7 +28,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AdminProvider, useAdminSession } from "../../src/lib/admin-context";
 import BackgroundAurora from "../components/background-aurora";
 
@@ -84,7 +84,7 @@ const navItems = [
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const router = useRouter();
+    const _router = useRouter();
     const { session, loading, logout } = useAdminSession();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 

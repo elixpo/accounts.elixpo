@@ -232,7 +232,7 @@ export default function DocsLayout({
         const headingElements = contentEl.querySelectorAll("h2, h3");
         const list: HeadingItem[] = [];
 
-        headingElements.forEach((el, index) => {
+        headingElements.forEach((el, _index) => {
             const level = Number.parseInt(el.tagName.substring(1), 10);
             const text = el.textContent || "";
             let id = el.id;
@@ -247,7 +247,7 @@ export default function DocsLayout({
         });
 
         setHeadings(list);
-    }, [pathname]);
+    }, []);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -271,7 +271,7 @@ export default function DocsLayout({
         }
 
         return () => observer.disconnect();
-    }, [headings]);
+    }, []);
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
