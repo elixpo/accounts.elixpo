@@ -155,7 +155,7 @@ const ServicesPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchServices();
-    }, []);
+    }, [fetchServices]);
 
     const fetchServices = async () => {
         try {

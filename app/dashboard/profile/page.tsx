@@ -302,7 +302,7 @@ const ProfilePage = () => {
         fetchProfile();
         fetchNotifPrefs();
         fetchConnectedServices();
-    }, []);
+    }, [fetchProfile, fetchNotifPrefs, fetchConnectedServices]);
 
     const fetchProfile = async () => {
         try {

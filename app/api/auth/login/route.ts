@@ -193,7 +193,10 @@ export async function POST(request: NextRequest) {
 
             if (!user) {
                 return NextResponse.json(
-                    { error: "No account found. Please register first.", action: "register" },
+                    {
+                        error: "No account found. Please register first.",
+                        action: "register",
+                    },
                     { status: 404 },
                 );
             }

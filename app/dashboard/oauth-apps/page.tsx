@@ -163,7 +163,7 @@ const OAuthAppsPage = () => {
     useEffect(() => {
         fetchApps();
         fetchVerificationStatus();
-    }, []);
+    }, [fetchVerificationStatus, fetchApps]);
 
     const fetchVerificationStatus = async () => {
         try {
