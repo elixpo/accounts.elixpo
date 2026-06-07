@@ -101,9 +101,7 @@ export default function WebhooksPage() {
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => {
-        fetchWebhooks();
-    }, [fetchWebhooks]);
+    
 
     const fetchWebhooks = async () => {
         try {
@@ -121,6 +119,10 @@ export default function WebhooksPage() {
         }
     };
 
+    useEffect(() => {
+        fetchWebhooks();
+    }, [fetchWebhooks]);
+    
     const showSnack = (message: string, severity: "success" | "error") => {
         setSnack({ open: true, message, severity });
     };
