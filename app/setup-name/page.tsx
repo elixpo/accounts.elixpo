@@ -36,7 +36,7 @@ function slugifyHandle(s: string): string {
 }
 
 const SetupNameContent = () => {
-    const router = useRouter();
+    const _router = useRouter();
     const searchParams = useSearchParams();
     const next = searchParams.get("next");
     const [username, setUsername] = useState("");

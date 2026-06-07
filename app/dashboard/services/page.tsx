@@ -3,7 +3,7 @@
 import LinkOffIcon from "@mui/icons-material/LinkOff";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { Box, Button, Chip, CircularProgress, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { generatePixelAvatar } from "@/lib/pixel-avatar";
 
 interface ConnectedService {
@@ -154,7 +154,9 @@ const ServicesPage = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
 
-    const fetchServices = async () => {
+    // useCallback gives a stable reference so the effect doesn't loop when
+    // eslint-react-hooks puts fetchServices in deps.
+    const fetchServices = useCallback(async () => {
         try {
             setLoading(true);
             const res = await fetch("/api/auth/connected-services", {
@@ -169,11 +171,11 @@ const ServicesPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchServices();
-    }, [fetchServices]); // mount-only; inline fetches recreated each render cause a loop
+    }, [fetchServices]);
 
     const revokeService = async (clientId: string) => {
         if (
