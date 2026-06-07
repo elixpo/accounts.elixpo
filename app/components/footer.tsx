@@ -226,7 +226,8 @@ const Footer = () => {
                                             color: "#fff",
                                             borderColor:
                                                 "rgba(155,123,247,0.45)",
-                                            background: "rgba(155,123,247,0.08)",
+                                            background:
+                                                "rgba(155,123,247,0.08)",
                                         },
                                     }}
                                 >
