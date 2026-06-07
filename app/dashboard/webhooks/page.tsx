@@ -103,7 +103,7 @@ export default function WebhooksPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchWebhooks();
-    }, [fetchWebhooks]);
+    }, []);
 
     const fetchWebhooks = async () => {
         try {
