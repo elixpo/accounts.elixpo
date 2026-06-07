@@ -80,8 +80,10 @@ const SetupNameContent = () => {
                 setPageLoading(false);
             }
         })();
+        // Mount-only — router is unstable across renders under Next 15.2 +
+        // React 19 and using it as a dep loops the /me fetch.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [router.push, next]);
+    }, [next]);
 
     // Debounced availability check.
     useEffect(() => {

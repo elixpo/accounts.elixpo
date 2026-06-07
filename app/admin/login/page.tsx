@@ -44,7 +44,9 @@ export default function AdminLogin() {
         };
 
         checkAuth();
-    }, [router]);
+        // Mount-only — router ref is unstable under Next 15.2 + React 19.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();

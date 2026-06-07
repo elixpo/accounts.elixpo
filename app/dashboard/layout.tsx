@@ -77,7 +77,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             .catch(() => {
                 router.push("/login");
             });
-    }, [router]);
+        // Mount-only auth check. Adding `router` to deps causes an infinite
+        // loop because useRouter returns a new ref on every render under
+        // Next 15.2 + React 19.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleLogout = async () => {
         setAnchorEl(null);
