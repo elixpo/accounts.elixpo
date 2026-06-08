@@ -33,7 +33,6 @@ class SmtpConnection {
     private encoder = new TextEncoder();
 
     async connect(config: SmtpConfig): Promise<void> {
-        // @ts-expect-error — cloudflare:sockets is a Cloudflare Workers built-in module
         const { connect } = await import(
             /* webpackIgnore: true */ "cloudflare:sockets"
         );

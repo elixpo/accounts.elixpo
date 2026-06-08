@@ -3,7 +3,7 @@
 import LinkOffIcon from "@mui/icons-material/LinkOff";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { Box, Button, Chip, CircularProgress, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { generatePixelAvatar } from "@/lib/pixel-avatar";
 
 interface ConnectedService {
@@ -69,16 +69,94 @@ function ServiceIcon({
     );
 }
 
+// Only allow post-revoke redirects back to first-party elixpo.com hosts.
+function _isSafeReturn(url: string): boolean {
+    try {
+        const u = new URL(url);
+        return (
+            u.protocol === "https:" &&
+            (u.hostname === "elixpo.com" || u.hostname.endsWith(".elixpo.com"))
+        );
+    } catch {
+        return false;
+    }
+}
+
+const getSafeReturnPath = (value: string | null): string | null => {
+    if (!value || typeof window === "undefined") return null;
+    try {
+        const url = new URL(value, window.location.origin);
+        const isHttp = url.protocol === "http:" || url.protocol === "https:";
+        if (!isHttp) return null;
+        if (url.origin !== window.location.origin) return null;
+        return `${url.pathname}${url.search}${url.hash}`;
+    } catch {
+        return null;
+    }
+};
+
 const ServicesPage = () => {
     const [services, setServices] = useState<ConnectedService[]>([]);
     const [loading, setLoading] = useState(true);
     const [revoking, setRevoking] = useState<string | null>(null);
+    const [paramHandled, setParamHandled] = useState(false);
 
+    // Deep-link revoke: blogs.elixpo (and other first-party apps) send the user
+    // here with ?revoke=<app>&return_to=<url>. Auto-trigger the revoke for the
+    // matching connected app, then bounce them back so they're signed out there.
     useEffect(() => {
-        fetchServices();
-    }, [fetchServices]);
+        if (loading || paramHandled || typeof window === "undefined") return;
+        const sp = new URLSearchParams(window.location.search);
+        const revoke = sp.get("revoke");
+        const returnTo = sp.get("return_to");
+        const safeReturnPath = getSafeReturnPath(returnTo);
+        if (!revoke) return;
+        setParamHandled(true);
 
-    const fetchServices = async () => {
+        const needle = revoke.toLowerCase();
+        const target = services.find(
+            (s) =>
+                s.name?.toLowerCase() === needle ||
+                s.name?.toLowerCase().includes(needle) ||
+                (s.homepage_url || "").toLowerCase().includes(needle),
+        );
+        if (!target) {
+            // Not connected (or already revoked) — just send them back.
+            if (safeReturnPath) window.location.href = safeReturnPath;
+            return;
+        }
+        (async () => {
+            const ok = confirm(
+                `Revoke access for ${target.name}? This permanently deletes your ${target.name} account and all its data. This cannot be undone.`,
+            );
+            if (!ok) return;
+            setRevoking(target.client_id);
+            try {
+                const res = await fetch(
+                    `/api/auth/connected-services?client_id=${target.client_id}`,
+                    { method: "DELETE", credentials: "include" },
+                );
+                if (res.ok) {
+                    setServices((prev) =>
+                        prev.filter((s) => s.client_id !== target.client_id),
+                    );
+                    if (safeReturnPath) {
+                        window.location.href = safeReturnPath;
+                        return;
+                    }
+                }
+            } finally {
+                setRevoking(null);
+            }
+        })();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loading, services, paramHandled]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    // useCallback gives a stable reference so the effect doesn't loop when
+    // eslint-react-hooks puts fetchServices in deps.
+    const fetchServices = useCallback(async () => {
         try {
             setLoading(true);
             const res = await fetch("/api/auth/connected-services", {
@@ -93,7 +171,11 @@ const ServicesPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchServices();
+    }, [fetchServices]);
 
     const revokeService = async (clientId: string) => {
         if (
@@ -140,7 +222,7 @@ const ServicesPage = () => {
 
             {loading ? (
                 <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-                    <CircularProgress sx={{ color: "#a3e635" }} />
+                    <CircularProgress sx={{ color: "#9b7bf7" }} />
                 </Box>
             ) : services.length === 0 ? (
                 <Box
@@ -240,7 +322,7 @@ const ServicesPage = () => {
                                                     alignItems: "center",
                                                     gap: 0.5,
                                                     "&:hover": {
-                                                        color: "#a3e635",
+                                                        color: "#9b7bf7",
                                                     },
                                                 }}
                                             >

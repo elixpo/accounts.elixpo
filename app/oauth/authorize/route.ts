@@ -2,7 +2,7 @@ export const runtime = "edge";
 
 import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
-import { createAuthRequest, getOAuthClientById } from "@/lib/db";
+import { createAuthRequest, getOAuthClientById, getUserById } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
 import { generateRandomString, generateUUID } from "@/lib/webcrypto";
 
@@ -143,7 +143,7 @@ export async function GET(request: NextRequest) {
 
         // Verify the token is valid
         const payload = await verifyJWT(accessToken);
-        if (!payload || payload.type !== "access") {
+        if (payload?.type !== "access") {
             // Token present but invalid/expired — same as not logged in
             const pendingParams = new URLSearchParams({
                 response_type: responseType,
@@ -161,6 +161,29 @@ export async function GET(request: NextRequest) {
             );
 
             return NextResponse.redirect(loginUrl);
+        }
+
+        // --- 3b. Require a username before issuing any SSO token ---
+        // Consumers (e.g. blogs.elixpo) rely on the handle; never hand one out
+        // for a handle-less account. Send them to /setup-name and resume here.
+        const ssoUser = (await getUserById(db, payload.sub)) as {
+            username?: string;
+        } | null;
+        if (!ssoUser?.username) {
+            const pendingParams = new URLSearchParams({
+                response_type: responseType,
+                client_id: clientId,
+                redirect_uri: redirectUri,
+                state,
+                scope,
+                ...(nonce ? { nonce } : {}),
+            });
+            const setupUrl = new URL("/setup-name", request.url);
+            setupUrl.searchParams.set(
+                "next",
+                `/oauth/authorize?${pendingParams.toString()}`,
+            );
+            return NextResponse.redirect(setupUrl);
         }
 
         // --- 4. Store the auth request in DB ---

@@ -3,6 +3,7 @@
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import BackgroundAurora from "../components/background-aurora";
 
 type Status = "loading" | "success" | "error";
 
@@ -39,8 +40,8 @@ function VerifyContent() {
                     }
                     return;
                 }
-
                 // 2. Auto-submit the OTP code to verify the email
+
                 const verifyRes = await fetch("/api/auth/verify-email", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -74,31 +75,34 @@ function VerifyContent() {
     return (
         <Box
             sx={{
+                position: "relative",
                 minHeight: "100vh",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                background:
-                    "linear-gradient(135deg, #141a16 0%, #1c2420 50%, #141a16 100%)",
                 p: 2,
             }}
         >
+            <BackgroundAurora variant="default" />
             <Box
                 sx={{
+                    position: "relative",
+                    zIndex: 1,
                     maxWidth: 420,
                     width: "100%",
                     textAlign: "center",
                     backdropFilter: "blur(20px)",
                     background:
                         "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.08)",
                     borderRadius: "16px",
+                    boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
                     p: 4,
                 }}
             >
                 {status === "loading" && (
                     <>
-                        <CircularProgress sx={{ color: "#a3e635", mb: 2 }} />
+                        <CircularProgress sx={{ color: "#9b7bf7", mb: 2 }} />
                         <Typography
                             sx={{ color: "#f5f5f4", fontSize: "1.1rem" }}
                         >
@@ -112,7 +116,7 @@ function VerifyContent() {
                         <Box sx={{ fontSize: "3rem", mb: 1 }}>&#10003;</Box>
                         <Typography
                             variant="h5"
-                            sx={{ fontWeight: 700, color: "#a3e635", mb: 1 }}
+                            sx={{ fontWeight: 700, color: "#9b7bf7", mb: 1 }}
                         >
                             Verified
                         </Typography>
@@ -134,12 +138,12 @@ function VerifyContent() {
                         <Button
                             href="/dashboard/oauth-apps"
                             sx={{
-                                color: "#a3e635",
-                                border: "1px solid rgba(163, 230, 53, 0.3)",
+                                color: "#9b7bf7",
+                                border: "1px solid rgba(155, 123, 247, 0.3)",
                                 textTransform: "none",
                                 fontWeight: 600,
                                 "&:hover": {
-                                    background: "rgba(163, 230, 53, 0.1)",
+                                    background: "rgba(155, 123, 247, 0.1)",
                                 },
                             }}
                         >
@@ -167,12 +171,12 @@ function VerifyContent() {
                         <Button
                             href="/login"
                             sx={{
-                                color: "#a3e635",
-                                border: "1px solid rgba(163, 230, 53, 0.3)",
+                                color: "#9b7bf7",
+                                border: "1px solid rgba(155, 123, 247, 0.3)",
                                 textTransform: "none",
                                 fontWeight: 600,
                                 "&:hover": {
-                                    background: "rgba(163, 230, 53, 0.1)",
+                                    background: "rgba(155, 123, 247, 0.1)",
                                 },
                             }}
                         >
@@ -195,10 +199,10 @@ export default function VerifyPage() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        bgcolor: "#141a16",
+                        bgcolor: "#0f1117",
                     }}
                 >
-                    <CircularProgress sx={{ color: "#a3e635" }} />
+                    <CircularProgress sx={{ color: "#9b7bf7" }} />
                 </Box>
             }
         >

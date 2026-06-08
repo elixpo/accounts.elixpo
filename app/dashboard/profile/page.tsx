@@ -27,7 +27,7 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { generatePixelAvatar } from "@/lib/pixel-avatar";
 
 interface UserProfile {
@@ -37,6 +37,7 @@ interface UserProfile {
     provider: string;
     avatar?: string | null;
     emailVerified?: boolean;
+    username?: string | null;
     displayName?: string | null;
     bio?: string | null;
     country?: string | null;
@@ -75,14 +76,14 @@ const textFieldSx = {
         background: "transparent",
         "& fieldset": { borderColor: "rgba(255, 255, 255, 0.1)" },
         "&:hover fieldset": { borderColor: "rgba(255, 255, 255, 0.2)" },
-        "&.Mui-focused fieldset": { borderColor: "#a3e635" },
+        "&.Mui-focused fieldset": { borderColor: "#9b7bf7" },
     },
     "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.7)" },
-    "& .MuiInputLabel-root.Mui-focused": { color: "#a3e635" },
+    "& .MuiInputLabel-root.Mui-focused": { color: "#9b7bf7" },
 };
 
 const switchSx = {
-    "& .MuiSwitch-switchBase.Mui-checked": { color: "#a3e635" },
+    "& .MuiSwitch-switchBase.Mui-checked": { color: "#9b7bf7" },
     "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
         bgcolor: "#65a30d",
     },
@@ -149,13 +150,13 @@ function ServiceIconSmall({ svc }: { svc: ConnectedService }) {
 
 const ProfilePage = () => {
     const router = useRouter();
-
     // Profile state
+
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [profileLoading, setProfileLoading] = useState(true);
     const [profileError, setProfileError] = useState("");
-
     // Update profile state
+
     const [bio, setBio] = useState("");
     const [country, setCountry] = useState("");
     const [city, setCity] = useState("");
@@ -165,8 +166,8 @@ const ProfilePage = () => {
     const [updateLoading, setUpdateLoading] = useState(false);
     const [updateSuccess, setUpdateSuccess] = useState("");
     const [updateError, setUpdateError] = useState("");
-
     // Notification preferences state
+
     const [notifPrefs, setNotifPrefs] = useState<NotificationPreferences>({
         email_login_alerts: false,
         email_app_activity: false,
@@ -177,13 +178,13 @@ const ProfilePage = () => {
     const [notifSaveLoading, setNotifSaveLoading] = useState(false);
     const [notifSuccess, setNotifSuccess] = useState("");
     const [notifError, setNotifError] = useState("");
-
     // Delete account state
+
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [deleteError, setDeleteError] = useState("");
-
     // Display name state
+
     const [editingName, setEditingName] = useState(false);
     const [newDisplayName, setNewDisplayName] = useState("");
     const [nameLoading, setNameLoading] = useState(false);
@@ -191,8 +192,81 @@ const ProfilePage = () => {
         text: string;
         type: "success" | "error";
     } | null>(null);
+    // Username (handle) change state — changing a handle is destructive.
 
+    const [usernameDialogOpen, setUsernameDialogOpen] = useState(false);
+    const [newUsername, setNewUsername] = useState("");
+    const [usernameLoading, setUsernameLoading] = useState(false);
+    const [usernameMsg, setUsernameMsg] = useState<{
+        text: string;
+        type: "success" | "error";
+    } | null>(null);
+    const [usernameCheck, setUsernameCheck] = useState<{
+        state: "idle" | "checking" | "available" | "taken";
+        reason?: string;
+    }>({ state: "idle" });
+    // Debounced availability check while the change dialog is open.
+
+    useEffect(() => {
+        if (!usernameDialogOpen) return;
+        const u = newUsername.trim().toLowerCase();
+        if (!u || u === profile?.username) {
+            setUsernameCheck({ state: "idle" });
+            return;
+        }
+        setUsernameCheck({ state: "checking" });
+        const t = setTimeout(async () => {
+            try {
+                const res = await fetch(
+                    `/api/auth/username/check?u=${encodeURIComponent(u)}`,
+                );
+                const data: any = await res.json();
+                setUsernameCheck(
+                    data.available
+                        ? { state: "available" }
+                        : { state: "taken", reason: data.reason },
+                );
+            } catch {
+                setUsernameCheck({ state: "idle" });
+            }
+        }, 350);
+        return () => clearTimeout(t);
+    }, [newUsername, usernameDialogOpen, profile?.username]);
+
+    const handleUpdateUsername = async () => {
+        const handle = newUsername.trim().toLowerCase();
+        if (usernameCheck.state !== "available") {
+            setUsernameMsg({
+                text: usernameCheck.reason || "Pick an available username.",
+                type: "error",
+            });
+            return;
+        }
+        setUsernameLoading(true);
+        setUsernameMsg(null);
+        try {
+            const res = await fetch("/api/auth/me", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ username: handle, confirm: true }),
+            });
+            if (!res.ok) {
+                const data: any = await res.json();
+                throw new Error(data.error || "Failed to update username");
+            }
+            setUsernameMsg({ text: "Username updated!", type: "success" });
+            setUsernameDialogOpen(false);
+            setNewUsername("");
+            fetchProfile();
+        } catch (err: any) {
+            setUsernameMsg({ text: err.message, type: "error" });
+        } finally {
+            setUsernameLoading(false);
+        }
+    };
     // Connected services state
+
     const [connectedServices, setConnectedServices] = useState<
         ConnectedService[]
     >([]);
@@ -200,8 +274,8 @@ const ProfilePage = () => {
     const [expandedServices, setExpandedServices] = useState<Set<string>>(
         new Set(),
     );
-
     // Email verification state
+
     const [verifyStep, setVerifyStep] = useState<"idle" | "sent" | "verifying">(
         "idle",
     );
@@ -223,13 +297,11 @@ const ProfilePage = () => {
         }
     }, [verifyCooldown]);
 
-    useEffect(() => {
-        fetchProfile();
-        fetchNotifPrefs();
-        fetchConnectedServices();
-    }, [fetchProfile, fetchNotifPrefs, fetchConnectedServices]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
 
-    const fetchProfile = async () => {
+    // useCallback gives stable refs so the mount effect doesn't loop when
+    // eslint-react-hooks puts the fetch fns in deps.
+    const fetchProfile = useCallback(async () => {
         try {
             setProfileLoading(true);
             const res = await fetch("/api/auth/me", { credentials: "include" });
@@ -249,9 +321,9 @@ const ProfilePage = () => {
         } finally {
             setProfileLoading(false);
         }
-    };
+    }, []);
 
-    const fetchConnectedServices = async () => {
+    const fetchConnectedServices = useCallback(async () => {
         try {
             setServicesLoading(true);
             const res = await fetch("/api/auth/connected-services", {
@@ -261,7 +333,6 @@ const ProfilePage = () => {
                 const data: any = await res.json();
                 const svcs = data.services || [];
                 setConnectedServices(svcs);
-                // Auto-expand top 3
                 setExpandedServices(
                     new Set(svcs.slice(0, 3).map((s: any) => s.client_id)),
                 );
@@ -271,9 +342,9 @@ const ProfilePage = () => {
         } finally {
             setServicesLoading(false);
         }
-    };
+    }, []);
 
-    const fetchNotifPrefs = async () => {
+    const fetchNotifPrefs = useCallback(async () => {
         try {
             setNotifLoading(true);
             const res = await fetch("/api/auth/notification-preferences", {
@@ -292,7 +363,13 @@ const ProfilePage = () => {
         } finally {
             setNotifLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchProfile();
+        fetchNotifPrefs();
+        fetchConnectedServices();
+    }, [fetchProfile, fetchNotifPrefs, fetchConnectedServices]);
 
     const handleUpdateProfile = async () => {
         setUpdateError("");
@@ -514,8 +591,8 @@ const ProfilePage = () => {
                     Manage your account information and preferences
                 </Typography>
             </Box>
-
             {/* Bento Grid */}
+
             <Box
                 sx={{
                     display: "grid",
@@ -527,7 +604,7 @@ const ProfilePage = () => {
                 <Box sx={cardSx}>
                     <Typography variant="h6" sx={sectionTitleSx}>
                         <PersonIcon
-                            sx={{ color: "#a3e635", fontSize: "1.2rem" }}
+                            sx={{ color: "#9b7bf7", fontSize: "1.2rem" }}
                         />
                         Profile Info
                     </Typography>
@@ -546,7 +623,7 @@ const ProfilePage = () => {
                         >
                             <CircularProgress
                                 size={18}
-                                sx={{ color: "#a3e635" }}
+                                sx={{ color: "#9b7bf7" }}
                             />
                             <Typography
                                 sx={{
@@ -593,7 +670,7 @@ const ProfilePage = () => {
                                             width: 48,
                                             height: 48,
                                             borderRadius: "50%",
-                                            border: "2px solid rgba(163,230,53,0.3)",
+                                            border: "2px solid rgba(155, 123, 247,0.3)",
                                         }}
                                     />
                                 ) : (
@@ -603,7 +680,7 @@ const ProfilePage = () => {
                                             height: 48,
                                             borderRadius: "50%",
                                             background:
-                                                "linear-gradient(135deg, #a3e635 0%, #65a30d 100%)",
+                                                "linear-gradient(135deg, #9b7bf7 0%, #65a30d 100%)",
                                             display: "flex",
                                             alignItems: "center",
                                             justifyContent: "center",
@@ -642,7 +719,7 @@ const ProfilePage = () => {
                                                         sx={{
                                                             fontSize:
                                                                 "0.95rem !important",
-                                                            color: "#a3e635 !important",
+                                                            color: "#9b7bf7 !important",
                                                         }}
                                                     />
                                                 }
@@ -650,9 +727,9 @@ const ProfilePage = () => {
                                                 size="small"
                                                 sx={{
                                                     backgroundColor:
-                                                        "rgba(163,230,53,0.1)",
-                                                    color: "#a3e635",
-                                                    border: "1px solid rgba(163,230,53,0.25)",
+                                                        "rgba(155, 123, 247,0.1)",
+                                                    color: "#9b7bf7",
+                                                    border: "1px solid rgba(155, 123, 247,0.25)",
                                                     fontWeight: 500,
                                                     height: 24,
                                                 }}
@@ -674,8 +751,79 @@ const ProfilePage = () => {
                                     </Box>
                                 </Box>
                             </Box>
+                            {/* Username (handle) */}
 
+                            <Box sx={{ mb: 3 }}>
+                                <Typography
+                                    sx={{
+                                        color: "rgba(255,255,255,0.55)",
+                                        fontSize: "0.8rem",
+                                        mb: 0.8,
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.05em",
+                                    }}
+                                >
+                                    Username
+                                </Typography>
+                                {usernameMsg && (
+                                    <Alert
+                                        severity={usernameMsg.type}
+                                        sx={{ mb: 1.5, py: 0 }}
+                                    >
+                                        {usernameMsg.text}
+                                    </Alert>
+                                )}
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1.5,
+                                        p: 1.5,
+                                        background: "rgba(255,255,255,0.04)",
+                                        border: "1px solid rgba(255,255,255,0.08)",
+                                        borderRadius: "10px",
+                                    }}
+                                >
+                                    <Typography
+                                        sx={{
+                                            color: "#f4f4f6",
+                                            fontWeight: 500,
+                                            flex: 1,
+                                        }}
+                                    >
+                                        @{profile.username || "—"}
+                                    </Typography>
+                                    <Button
+                                        size="small"
+                                        onClick={() => {
+                                            setNewUsername(
+                                                profile.username || "",
+                                            );
+                                            setUsernameCheck({ state: "idle" });
+                                            setUsernameMsg(null);
+                                            setUsernameDialogOpen(true);
+                                        }}
+                                        startIcon={
+                                            <EditIcon
+                                                sx={{ fontSize: "0.9rem" }}
+                                            />
+                                        }
+                                        sx={{
+                                            color: "#9b7bf7",
+                                            textTransform: "none",
+                                            fontSize: "0.8rem",
+                                            "&:hover": {
+                                                backgroundColor:
+                                                    "rgba(155, 123, 247,0.08)",
+                                            },
+                                        }}
+                                    >
+                                        Change
+                                    </Button>
+                                </Box>
+                            </Box>
                             {/* Display Name */}
+
                             <Box>
                                 <Typography
                                     sx={{
@@ -695,17 +843,17 @@ const ProfilePage = () => {
                                             mb: 1.5,
                                             bgcolor:
                                                 nameMsg.type === "success"
-                                                    ? "rgba(163,230,53,0.1)"
+                                                    ? "rgba(155, 123, 247,0.1)"
                                                     : "rgba(239,68,68,0.1)",
                                             color:
                                                 nameMsg.type === "success"
-                                                    ? "#a3e635"
+                                                    ? "#9b7bf7"
                                                     : "#ef4444",
-                                            border: `1px solid ${nameMsg.type === "success" ? "rgba(163,230,53,0.3)" : "rgba(239,68,68,0.3)"}`,
+                                            border: `1px solid ${nameMsg.type === "success" ? "rgba(155, 123, 247,0.3)" : "rgba(239,68,68,0.3)"}`,
                                             "& .MuiAlert-icon": {
                                                 color:
                                                     nameMsg.type === "success"
-                                                        ? "#a3e635"
+                                                        ? "#9b7bf7"
                                                         : "#ef4444",
                                             },
                                             py: 0,
@@ -760,12 +908,12 @@ const ProfilePage = () => {
                                                 />
                                             }
                                             sx={{
-                                                color: "#a3e635",
+                                                color: "#9b7bf7",
                                                 textTransform: "none",
                                                 fontSize: "0.8rem",
                                                 "&:hover": {
                                                     backgroundColor:
-                                                        "rgba(163,230,53,0.08)",
+                                                        "rgba(155, 123, 247,0.08)",
                                                 },
                                             }}
                                         >
@@ -804,16 +952,16 @@ const ProfilePage = () => {
                                                 }
                                                 sx={{
                                                     background:
-                                                        "rgba(163,230,53,0.15)",
-                                                    color: "#a3e635",
-                                                    border: "1px solid rgba(163,230,53,0.3)",
+                                                        "rgba(155, 123, 247,0.15)",
+                                                    color: "#9b7bf7",
+                                                    border: "1px solid rgba(155, 123, 247,0.3)",
                                                     fontWeight: 600,
                                                     textTransform: "none",
                                                     fontSize: "0.85rem",
                                                     py: 0.8,
                                                     "&:hover": {
                                                         background:
-                                                            "rgba(163,230,53,0.25)",
+                                                            "rgba(155, 123, 247,0.25)",
                                                     },
                                                     "&:disabled": {
                                                         color: "rgba(255,255,255,0.3)",
@@ -853,8 +1001,8 @@ const ProfilePage = () => {
                                     </Box>
                                 )}
                             </Box>
-
                             {/* Sign-in Method */}
+
                             <Box>
                                 <Typography
                                     sx={{
@@ -917,7 +1065,7 @@ const ProfilePage = () => {
                                         !profile.provider) && (
                                         <PersonIcon
                                             sx={{
-                                                color: "#a3e635",
+                                                color: "#9b7bf7",
                                                 fontSize: "1.2rem",
                                             }}
                                         />
@@ -936,8 +1084,8 @@ const ProfilePage = () => {
                                     </Typography>
                                 </Box>
                             </Box>
-
                             {/* Email Verification */}
+
                             {!profile.emailVerified && (
                                 <Box
                                     sx={{
@@ -964,18 +1112,18 @@ const ProfilePage = () => {
                                                 mb: 1.5,
                                                 bgcolor:
                                                     verifyMsg.type === "success"
-                                                        ? "rgba(163,230,53,0.1)"
+                                                        ? "rgba(155, 123, 247,0.1)"
                                                         : "rgba(239,68,68,0.1)",
                                                 color:
                                                     verifyMsg.type === "success"
-                                                        ? "#a3e635"
+                                                        ? "#9b7bf7"
                                                         : "#ef4444",
-                                                border: `1px solid ${verifyMsg.type === "success" ? "rgba(163,230,53,0.3)" : "rgba(239,68,68,0.3)"}`,
+                                                border: `1px solid ${verifyMsg.type === "success" ? "rgba(155, 123, 247,0.3)" : "rgba(239,68,68,0.3)"}`,
                                                 "& .MuiAlert-icon": {
                                                     color:
                                                         verifyMsg.type ===
                                                         "success"
-                                                            ? "#a3e635"
+                                                            ? "#9b7bf7"
                                                             : "#ef4444",
                                                 },
                                                 py: 0,
@@ -1096,16 +1244,16 @@ const ProfilePage = () => {
                                                     }
                                                     sx={{
                                                         background:
-                                                            "rgba(163,230,53,0.15)",
-                                                        color: "#a3e635",
-                                                        border: "1px solid rgba(163,230,53,0.3)",
+                                                            "rgba(155, 123, 247,0.15)",
+                                                        color: "#9b7bf7",
+                                                        border: "1px solid rgba(155, 123, 247,0.3)",
                                                         fontWeight: 600,
                                                         textTransform: "none",
                                                         fontSize: "0.85rem",
                                                         py: 1,
                                                         "&:hover": {
                                                             background:
-                                                                "rgba(163,230,53,0.25)",
+                                                                "rgba(155, 123, 247,0.25)",
                                                         },
                                                         "&:disabled": {
                                                             color: "rgba(255,255,255,0.3)",
@@ -1141,8 +1289,8 @@ const ProfilePage = () => {
                                     )}
                                 </Box>
                             )}
-
                             {/* Account ID */}
+
                             <Box>
                                 <Typography
                                     sx={{
@@ -1172,8 +1320,8 @@ const ProfilePage = () => {
                                     {profile.id}
                                 </Typography>
                             </Box>
-
                             {/* Badges */}
+
                             <Box>
                                 <Typography
                                     sx={{
@@ -1232,8 +1380,8 @@ const ProfilePage = () => {
                         </Box>
                     ) : null}
                 </Box>
-
                 {/* Connected Services — right column */}
+
                 <Box
                     sx={{
                         ...cardSx,
@@ -1255,7 +1403,7 @@ const ProfilePage = () => {
                             <Typography variant="h6" sx={sectionTitleSx}>
                                 <DevicesOtherIcon
                                     sx={{
-                                        color: "#a3e635",
+                                        color: "#9b7bf7",
                                         fontSize: "1.2rem",
                                     }}
                                 />
@@ -1282,12 +1430,12 @@ const ProfilePage = () => {
                                     />
                                 }
                                 sx={{
-                                    color: "#a3e635",
+                                    color: "#9b7bf7",
                                     textTransform: "none",
                                     fontSize: "0.78rem",
                                     flexShrink: 0,
                                     "&:hover": {
-                                        bgcolor: "rgba(163,230,53,0.08)",
+                                        bgcolor: "rgba(155, 123, 247,0.08)",
                                     },
                                 }}
                             >
@@ -1306,7 +1454,7 @@ const ProfilePage = () => {
                         >
                             <CircularProgress
                                 size={20}
-                                sx={{ color: "#a3e635" }}
+                                sx={{ color: "#9b7bf7" }}
                             />
                         </Box>
                     ) : connectedServices.length === 0 ? (
@@ -1357,7 +1505,7 @@ const ProfilePage = () => {
                                             transition: "border-color 0.2s",
                                             "&:hover": {
                                                 borderColor:
-                                                    "rgba(163,230,53,0.15)",
+                                                    "rgba(155, 123, 247,0.15)",
                                             },
                                             flexShrink: 0,
                                         }}
@@ -1472,7 +1620,7 @@ const ProfilePage = () => {
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         sx={{
-                                                            color: "#a3e635",
+                                                            color: "#9b7bf7",
                                                             fontSize: "0.7rem",
                                                             fontFamily:
                                                                 "monospace",
@@ -1520,7 +1668,7 @@ const ProfilePage = () => {
                                         fontSize: "0.75rem",
                                         mt: 0.25,
                                         flexShrink: 0,
-                                        "&:hover": { color: "#a3e635" },
+                                        "&:hover": { color: "#9b7bf7" },
                                     }}
                                 >
                                     +{connectedServices.length - 3} more — view
@@ -1530,12 +1678,12 @@ const ProfilePage = () => {
                         </Box>
                     )}
                 </Box>
-
                 {/* 2. Update Profile Card */}
+
                 <Box sx={cardSx}>
                     <Typography variant="h6" sx={sectionTitleSx}>
                         <EditIcon
-                            sx={{ color: "#a3e635", fontSize: "1.2rem" }}
+                            sx={{ color: "#9b7bf7", fontSize: "1.2rem" }}
                         />
                         Update Profile
                     </Typography>
@@ -1548,9 +1696,9 @@ const ProfilePage = () => {
                             severity="success"
                             sx={{
                                 mb: 2.5,
-                                backgroundColor: "rgba(163,230,53,0.1)",
-                                color: "#a3e635",
-                                borderColor: "rgba(163,230,53,0.3)",
+                                backgroundColor: "rgba(155, 123, 247,0.1)",
+                                color: "#9b7bf7",
+                                borderColor: "rgba(155, 123, 247,0.3)",
                             }}
                         >
                             {updateSuccess}
@@ -1699,17 +1847,17 @@ const ProfilePage = () => {
                             onClick={handleUpdateProfile}
                             disabled={updateLoading}
                             sx={{
-                                background: "rgba(163,230,53,0.15)",
-                                color: "#a3e635",
-                                border: "1px solid rgba(163,230,53,0.3)",
+                                background: "rgba(155, 123, 247,0.15)",
+                                color: "#9b7bf7",
+                                border: "1px solid rgba(155, 123, 247,0.3)",
                                 fontWeight: 600,
                                 textTransform: "none",
                                 fontSize: "0.95rem",
                                 py: 1.1,
                                 px: 3,
                                 "&:hover": {
-                                    background: "rgba(163,230,53,0.25)",
-                                    borderColor: "rgba(163,230,53,0.5)",
+                                    background: "rgba(155, 123, 247,0.25)",
+                                    borderColor: "rgba(155, 123, 247,0.5)",
                                 },
                                 "&:disabled": {
                                     color: "rgba(255,255,255,0.35)",
@@ -1726,7 +1874,7 @@ const ProfilePage = () => {
                                 >
                                     <CircularProgress
                                         size={16}
-                                        sx={{ color: "#a3e635" }}
+                                        sx={{ color: "#9b7bf7" }}
                                     />
                                     Saving...
                                 </Box>
@@ -1736,12 +1884,12 @@ const ProfilePage = () => {
                         </Button>
                     </Box>
                 </Box>
-
                 {/* 3. Notification Preferences Card */}
+
                 <Box sx={cardSx}>
                     <Typography variant="h6" sx={sectionTitleSx}>
                         <NotificationsIcon
-                            sx={{ color: "#a3e635", fontSize: "1.2rem" }}
+                            sx={{ color: "#9b7bf7", fontSize: "1.2rem" }}
                         />
                         Notification Preferences
                     </Typography>
@@ -1754,9 +1902,9 @@ const ProfilePage = () => {
                             severity="success"
                             sx={{
                                 mb: 2.5,
-                                backgroundColor: "rgba(163,230,53,0.1)",
-                                color: "#a3e635",
-                                borderColor: "rgba(163,230,53,0.3)",
+                                backgroundColor: "rgba(155, 123, 247,0.1)",
+                                color: "#9b7bf7",
+                                borderColor: "rgba(155, 123, 247,0.3)",
                             }}
                         >
                             {notifSuccess}
@@ -1786,7 +1934,7 @@ const ProfilePage = () => {
                         >
                             <CircularProgress
                                 size={18}
-                                sx={{ color: "#a3e635" }}
+                                sx={{ color: "#9b7bf7" }}
                             />
                             <Typography
                                 sx={{
@@ -1875,17 +2023,17 @@ const ProfilePage = () => {
                                 onClick={handleSaveNotifPrefs}
                                 disabled={notifSaveLoading}
                                 sx={{
-                                    background: "rgba(163,230,53,0.15)",
-                                    color: "#a3e635",
-                                    border: "1px solid rgba(163,230,53,0.3)",
+                                    background: "rgba(155, 123, 247,0.15)",
+                                    color: "#9b7bf7",
+                                    border: "1px solid rgba(155, 123, 247,0.3)",
                                     fontWeight: 600,
                                     textTransform: "none",
                                     fontSize: "0.95rem",
                                     py: 1.1,
                                     px: 3,
                                     "&:hover": {
-                                        background: "rgba(163,230,53,0.25)",
-                                        borderColor: "rgba(163,230,53,0.5)",
+                                        background: "rgba(155, 123, 247,0.25)",
+                                        borderColor: "rgba(155, 123, 247,0.5)",
                                     },
                                     "&:disabled": {
                                         color: "rgba(255,255,255,0.35)",
@@ -1902,7 +2050,7 @@ const ProfilePage = () => {
                                     >
                                         <CircularProgress
                                             size={16}
-                                            sx={{ color: "#a3e635" }}
+                                            sx={{ color: "#9b7bf7" }}
                                         />
                                         Saving...
                                     </Box>
@@ -1913,8 +2061,8 @@ const ProfilePage = () => {
                         </Box>
                     )}
                 </Box>
-
                 {/* 4. Danger Zone — full width */}
+
                 <Box
                     sx={{
                         ...cardSx,
@@ -2010,8 +2158,8 @@ const ProfilePage = () => {
                                 Disable
                             </Button>
                         </Box>
-
                         {/* Delete Account */}
+
                         <Box
                             sx={{
                                 flex: 1,
@@ -2067,8 +2215,111 @@ const ProfilePage = () => {
                     </Box>
                 </Box>
             </Box>
+            {/* Username Change (destructive) Dialog */}
 
+            <Dialog
+                open={usernameDialogOpen}
+                onClose={() => !usernameLoading && setUsernameDialogOpen(false)}
+                PaperProps={{
+                    sx: {
+                        background: "rgba(15, 18, 25, 0.95)",
+                        backdropFilter: "blur(16px)",
+                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                        borderRadius: "14px",
+                        width: "100%",
+                        maxWidth: 420,
+                    },
+                }}
+            >
+                <DialogTitle sx={{ color: "#f4f4f6", fontWeight: 700 }}>
+                    Change username
+                </DialogTitle>
+                <DialogContent>
+                    <Alert
+                        severity="warning"
+                        sx={{
+                            mb: 2,
+                            bgcolor: "rgba(245,158,11,0.1)",
+                            color: "#f59e0b",
+                        }}
+                    >
+                        This is destructive. Any link pointing to @
+                        {profile?.username} on other Elixpo services (profiles,
+                        shared blogs) will break. Your account and data stay the
+                        same.
+                    </Alert>
+                    <TextField
+                        fullWidth
+                        autoFocus
+                        label="New username"
+                        value={newUsername}
+                        onChange={(e) =>
+                            setNewUsername(
+                                e.target.value
+                                    .toLowerCase()
+                                    .replace(/[^a-z0-9_-]/g, ""),
+                            )
+                        }
+                        inputProps={{ maxLength: 32 }}
+                        disabled={usernameLoading}
+                        helperText={
+                            usernameCheck.state === "checking"
+                                ? "Checking availability…"
+                                : usernameCheck.state === "available"
+                                  ? "✓ Available"
+                                  : usernameCheck.state === "taken"
+                                    ? `✗ ${usernameCheck.reason || "Taken"}`
+                                    : "3–32 chars. Lowercase letters, numbers, - and _."
+                        }
+                        FormHelperTextProps={{
+                            sx: {
+                                color:
+                                    usernameCheck.state === "available"
+                                        ? "#4ade80"
+                                        : usernameCheck.state === "taken"
+                                          ? "#f87171"
+                                          : "rgba(255,255,255,0.4)",
+                            },
+                        }}
+                        sx={textFieldSx}
+                    />
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
+                    <Button
+                        onClick={() => setUsernameDialogOpen(false)}
+                        disabled={usernameLoading}
+                        sx={{
+                            color: "rgba(255,255,255,0.6)",
+                            textTransform: "none",
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleUpdateUsername}
+                        disabled={
+                            usernameLoading ||
+                            usernameCheck.state !== "available"
+                        }
+                        variant="contained"
+                        sx={{
+                            background: "#9b7bf7",
+                            color: "#fff",
+                            textTransform: "none",
+                            fontWeight: 600,
+                            "&:hover": { background: "#b69aff" },
+                            "&:disabled": {
+                                background: "rgba(255,255,255,0.08)",
+                                color: "rgba(255,255,255,0.3)",
+                            },
+                        }}
+                    >
+                        {usernameLoading ? "Changing…" : "Change username"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
             {/* Delete Account Confirmation Dialog */}
+
             <Dialog
                 open={deleteDialogOpen}
                 onClose={() => !deleteLoading && setDeleteDialogOpen(false)}
