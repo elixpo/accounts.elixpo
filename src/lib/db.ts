@@ -435,6 +435,62 @@ export async function updateOAuthClient(
     return await stmt.bind(...(values as (string | number)[])).run();
 }
 
+/**
+ * Update an OAuth app's webhook subscription. Caller passes one or more of
+ * webhookUrl / webhookEvents to change them. Pass empty string + null to
+ * clear the whole subscription (effectively disabling). Returns whether a
+ * row was affected, so callers can 404 cleanly on no-such-app.
+ */
+export async function updateOAuthClientWebhook(
+    db: D1Database,
+    clientId: string,
+    ownerId: string,
+    patch: {
+        webhookUrl?: string | null;
+        webhookEvents?: string | null; // JSON stringified array, or null/empty to clear
+    },
+): Promise<boolean> {
+    const setClauses: string[] = [];
+    const values: (string | null)[] = [];
+    if ("webhookUrl" in patch) {
+        setClauses.push("webhook_url = ?");
+        values.push(patch.webhookUrl ?? null);
+    }
+    if ("webhookEvents" in patch) {
+        setClauses.push("webhook_events = ?");
+        values.push(patch.webhookEvents ?? null);
+    }
+    if (setClauses.length === 0) return false;
+    values.push(clientId, ownerId);
+    const stmt = db.prepare(
+        `UPDATE oauth_clients SET ${setClauses.join(", ")} WHERE client_id = ? AND owner_id = ?`,
+    );
+    const result = await stmt.bind(...values).run();
+    return (result.meta?.changes ?? 0) > 0;
+}
+
+/**
+ * Atomic secret rotation. New hash + reset of webhook_secret_set_at in
+ * one statement; KV write is the caller's responsibility (so they can
+ * sequence it however their environment requires).
+ */
+export async function rotateOAuthClientWebhookSecret(
+    db: D1Database,
+    clientId: string,
+    ownerId: string,
+    newSecretHash: string,
+): Promise<boolean> {
+    const stmt = db.prepare(
+        `UPDATE oauth_clients
+            SET webhook_secret_hash = ?, webhook_secret_set_at = ?
+            WHERE client_id = ? AND owner_id = ? AND webhook_url IS NOT NULL`,
+    );
+    const result = await stmt
+        .bind(newSecretHash, new Date().toISOString(), clientId, ownerId)
+        .run();
+    return (result.meta?.changes ?? 0) > 0;
+}
+
 export async function listOAuthClients(
     db: D1Database,
     limit: number = 50,
