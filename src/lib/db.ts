@@ -300,6 +300,9 @@ export async function createOAuthClient(
         ownerId,
         description,
         homepageUrl,
+        webhookUrl,
+        webhookSecretHash,
+        webhookEvents,
     }: {
         clientId: string;
         clientSecretHash: string;
@@ -309,11 +312,21 @@ export async function createOAuthClient(
         ownerId: string;
         description?: string;
         homepageUrl?: string;
+        // Optional webhook subscription set at registration time. Plaintext
+        // secret is stored only in KV — D1 only sees the SHA-256 hash.
+        webhookUrl?: string | null;
+        webhookSecretHash?: string | null;
+        webhookEvents?: string | null; // JSON stringified array
     },
 ) {
+    const webhookSecretSetAt =
+        webhookUrl && webhookSecretHash ? new Date().toISOString() : null;
     const stmt = db.prepare(
-        `INSERT INTO oauth_clients (client_id, client_secret_hash, name, redirect_uris, scopes, owner_id, description, homepage_url)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO oauth_clients (
+            client_id, client_secret_hash, name, redirect_uris, scopes,
+            owner_id, description, homepage_url,
+            webhook_url, webhook_secret_hash, webhook_events, webhook_secret_set_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     );
     return await stmt
         .bind(
@@ -325,6 +338,10 @@ export async function createOAuthClient(
             ownerId,
             description ?? null,
             homepageUrl ?? null,
+            webhookUrl ?? null,
+            webhookSecretHash ?? null,
+            webhookEvents ?? null,
+            webhookSecretSetAt,
         )
         .run();
 }
