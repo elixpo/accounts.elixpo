@@ -1,4 +1,6 @@
 "use client";
+export const runtime = "edge"
+
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LinkOffIcon from "@mui/icons-material/LinkOff";
@@ -153,6 +155,13 @@ const ServiceDetailPage = ({
         ...svc.sign_in_timeline.map((p) => p.count),
     );
 
+    // Icon: explicit logo_url > favicon (via google's s2 service) > first
+    // letter fallback. The state machine is rendered below in the JSX.
+    const faviconSrc =
+        !svc.logo_url && hostname
+            ? `https://www.google.com/s2/favicons?domain=${hostname}&sz=128`
+            : null;
+
     return (
         <Box sx={{ maxWidth: 880, mx: "auto", px: 3, py: 5 }}>
             <Button
@@ -195,29 +204,11 @@ const ServiceDetailPage = ({
                             flexShrink: 0,
                         }}
                     >
-                        {svc.logo_url ? (
-                            <img
-                                src={svc.logo_url}
-                                alt={svc.name}
-                                width={56}
-                                height={56}
-                                style={{
-                                    objectFit: "cover",
-                                    width: "100%",
-                                    height: "100%",
-                                }}
-                            />
-                        ) : (
-                            <Typography
-                                sx={{
-                                    color: "#9b7bf7",
-                                    fontWeight: 700,
-                                    fontSize: "1.5rem",
-                                }}
-                            >
-                                {svc.name.slice(0, 1).toUpperCase()}
-                            </Typography>
-                        )}
+                        <ServiceHeaderIcon
+                            logoUrl={svc.logo_url}
+                            faviconSrc={faviconSrc}
+                            name={svc.name}
+                        />
                     </Box>
                     <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                         <Typography
@@ -441,6 +432,62 @@ const ServiceDetailPage = ({
         </Box>
     );
 };
+
+function ServiceHeaderIcon({
+    logoUrl,
+    faviconSrc,
+    name,
+}: {
+    logoUrl: string | null;
+    faviconSrc: string | null;
+    name: string;
+}) {
+    // Tracks which source failed so we fall through cleanly: logo → favicon
+    // → letter. Without these flags an onError-loop on the favicon would
+    // never reach the letter fallback.
+    const [logoFailed, setLogoFailed] = useState(false);
+    const [favFailed, setFavFailed] = useState(false);
+
+    if (logoUrl && !logoFailed) {
+        return (
+            <img
+                src={logoUrl}
+                alt={name}
+                width={56}
+                height={56}
+                onError={() => setLogoFailed(true)}
+                style={{
+                    objectFit: "cover",
+                    width: "100%",
+                    height: "100%",
+                }}
+            />
+        );
+    }
+    if (faviconSrc && !favFailed) {
+        return (
+            <img
+                src={faviconSrc}
+                alt={name}
+                width={32}
+                height={32}
+                onError={() => setFavFailed(true)}
+                style={{ objectFit: "contain" }}
+            />
+        );
+    }
+    return (
+        <Typography
+            sx={{
+                color: "#9b7bf7",
+                fontWeight: 700,
+                fontSize: "1.5rem",
+            }}
+        >
+            {name.slice(0, 1).toUpperCase()}
+        </Typography>
+    );
+}
 
 function StatTile({ label, value }: { label: string; value: number | string }) {
     return (

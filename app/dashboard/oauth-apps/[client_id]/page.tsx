@@ -102,6 +102,44 @@ export default function OAuthAppSettingsPage() {
         type: "success" | "error";
     } | null>(null);
 
+    // ── Activity stats (sign-ins + webhook delivery) ────────────────────
+    interface AppStats {
+        request_count: number;
+        last_used: string | null;
+        total_sign_ins: number;
+        unique_users: number;
+        active_sessions: number;
+        sign_in_timeline: Array<{ date: string; count: number }>;
+        webhook: {
+            configured: boolean;
+            url: string | null;
+            events: string[];
+            secret_set_at: string | null;
+            last_delivery_at: string | null;
+        };
+    }
+    const [stats, setStats] = useState<AppStats | null>(null);
+
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await fetch(
+                    `/api/auth/oauth-clients/${clientId}/stats`,
+                    { credentials: "include" },
+                );
+                if (!res.ok) return;
+                const data: any = await res.json();
+                if (!cancelled) setStats(data);
+            } catch {
+                /* non-fatal — stats panel just renders empty state */
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [clientId]);
+
     useEffect(() => {
         const fetchApp = async () => {
             try {
