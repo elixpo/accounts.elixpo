@@ -882,6 +882,123 @@ export default function OAuthAppSettingsPage() {
                 </Box>
             </Box>
 
+            {/* Activity panel — sign-ins, sessions, request count, and a
+                30-day sign-in mini chart. Free to all tiers for now; we'll
+                gate the longer windows when the tier system lands. */}
+            {stats && (
+                <Box sx={{ ...cardSx, mb: 3 }}>
+                    <Typography
+                        sx={{ color: "#f5f5f4", fontWeight: 600, mb: 0.5 }}
+                    >
+                        Activity
+                    </Typography>
+                    <Typography
+                        sx={{
+                            color: "rgba(255,255,255,0.5)",
+                            fontSize: "0.85rem",
+                            mb: 2.5,
+                        }}
+                    >
+                        How your app is being used by signed-in users.
+                    </Typography>
+
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: {
+                                xs: "1fr 1fr",
+                                sm: "repeat(4, 1fr)",
+                            },
+                            gap: 2,
+                            mb: 3,
+                        }}
+                    >
+                        <StatTile
+                            label="Total sign-ins"
+                            value={stats.total_sign_ins.toLocaleString()}
+                        />
+                        <StatTile
+                            label="Unique users"
+                            value={stats.unique_users.toLocaleString()}
+                        />
+                        <StatTile
+                            label="Active sessions"
+                            value={stats.active_sessions.toLocaleString()}
+                        />
+                        <StatTile
+                            label="API requests"
+                            value={stats.request_count.toLocaleString()}
+                        />
+                    </Box>
+
+                    <Typography
+                        sx={{
+                            color: "rgba(255,255,255,0.45)",
+                            fontSize: "0.72rem",
+                            fontWeight: 700,
+                            letterSpacing: "0.08em",
+                            textTransform: "uppercase",
+                            mb: 1.5,
+                        }}
+                    >
+                        Sign-ins · last 30 days
+                    </Typography>
+                    {stats.sign_in_timeline.length === 0 ? (
+                        <Typography
+                            sx={{
+                                color: "rgba(255,255,255,0.35)",
+                                fontStyle: "italic",
+                                fontSize: "0.9rem",
+                                py: 3,
+                                textAlign: "center",
+                            }}
+                        >
+                            No sign-ins yet.
+                        </Typography>
+                    ) : (
+                        <SignInBars
+                            points={stats.sign_in_timeline}
+                            height={120}
+                        />
+                    )}
+
+                    <Box
+                        sx={{
+                            mt: 2.5,
+                            pt: 2,
+                            borderTop: "1px solid rgba(255,255,255,0.08)",
+                            display: "flex",
+                            gap: 2,
+                            flexWrap: "wrap",
+                            color: "rgba(255,255,255,0.5)",
+                            fontSize: "0.8rem",
+                        }}
+                    >
+                        <span>
+                            Last used:{" "}
+                            <strong style={{ color: "#e5e7eb" }}>
+                                {stats.last_used
+                                    ? new Date(
+                                          stats.last_used,
+                                      ).toLocaleString()
+                                    : "Never"}
+                            </strong>
+                        </span>
+                        <span>•</span>
+                        <span>
+                            Webhook:{" "}
+                            <strong style={{ color: "#e5e7eb" }}>
+                                {stats.webhook.configured
+                                    ? stats.webhook.last_delivery_at
+                                        ? `last delivered ${new Date(stats.webhook.last_delivery_at).toLocaleString()}`
+                                        : "configured, never delivered"
+                                    : "not configured"}
+                            </strong>
+                        </span>
+                    </Box>
+                </Box>
+            )}
+
             {/* Webhooks panel — per-app event subscription */}
             <Box sx={{ ...cardSx, mb: 3 }}>
                 <Typography
@@ -1288,6 +1405,79 @@ export default function OAuthAppSettingsPage() {
                     </Button>
                 </Box>
             </Box>
+        </Box>
+    );
+}
+
+function StatTile({ label, value }: { label: string; value: string }) {
+    return (
+        <Box
+            sx={{
+                p: 2,
+                borderRadius: "12px",
+                bgcolor: "rgba(255,255,255,0.025)",
+                border: "1px solid rgba(255,255,255,0.06)",
+            }}
+        >
+            <Typography
+                sx={{
+                    color: "rgba(255,255,255,0.45)",
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                    mb: 0.5,
+                }}
+            >
+                {label}
+            </Typography>
+            <Typography
+                sx={{
+                    color: "#f5f5f4",
+                    fontWeight: 700,
+                    fontSize: "1.5rem",
+                    fontVariantNumeric: "tabular-nums",
+                }}
+            >
+                {value}
+            </Typography>
+        </Box>
+    );
+}
+
+function SignInBars({
+    points,
+    height = 120,
+}: {
+    points: Array<{ date: string; count: number }>;
+    height?: number;
+}) {
+    const max = Math.max(1, ...points.map((p) => p.count));
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                alignItems: "flex-end",
+                gap: "4px",
+                height,
+            }}
+        >
+            {points.map((p) => (
+                <Box
+                    key={p.date}
+                    title={`${p.date}: ${p.count}`}
+                    sx={{
+                        flex: "1 1 0",
+                        maxWidth: 36,
+                        height: `${Math.max((p.count / max) * 100, 4)}%`,
+                        borderRadius: "3px 3px 0 0",
+                        background:
+                            "linear-gradient(180deg, rgba(155,123,247,0.95) 0%, rgba(124,92,255,0.55) 100%)",
+                        transition: "filter 0.15s ease",
+                        "&:hover": { filter: "brightness(1.25)" },
+                    }}
+                />
+            ))}
         </Box>
     );
 }
