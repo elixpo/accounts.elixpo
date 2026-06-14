@@ -37,9 +37,7 @@ export async function GET(
 
     const app = await db
         .prepare(
-            `SELECT client_id, owner_id, request_count, last_used,
-              webhook_url, webhook_events, webhook_secret_set_at,
-              webhook_last_delivery_at, created_at
+            `SELECT client_id, owner_id, request_count, last_used, created_at
              FROM oauth_clients
              WHERE client_id = ? AND is_active = 1`,
         )
@@ -49,10 +47,6 @@ export async function GET(
             owner_id: string;
             request_count: number | null;
             last_used: string | null;
-            webhook_url: string | null;
-            webhook_events: string | null;
-            webhook_secret_set_at: string | null;
-            webhook_last_delivery_at: string | null;
             created_at: string;
         }>();
 
@@ -65,7 +59,7 @@ export async function GET(
     // string to YYYY-MM-DD so the GROUP BY collapses cleanly per day.
     const since = new Date(Date.now() - 30 * 86400000).toISOString();
 
-    const [aggregate, timeline] = await db.batch([
+    const [aggregate, timeline, endpoints] = await db.batch([
         db
             .prepare(
                 `SELECT
@@ -85,6 +79,16 @@ export async function GET(
                  ORDER BY date`,
             )
             .bind(client_id, since),
+        db
+            .prepare(
+                `SELECT
+                    COUNT(*) AS total,
+                    SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) AS active,
+                    MAX(last_delivery_at) AS last_delivery_at
+                 FROM oauth_client_webhook_endpoints
+                 WHERE client_id = ?`,
+            )
+            .bind(client_id),
     ]);
 
     const agg = (aggregate.results || [])[0] as
@@ -94,16 +98,13 @@ export async function GET(
               active_sessions: number;
           }
         | undefined;
-
-    let webhookEvents: string[] = [];
-    if (app.webhook_events) {
-        try {
-            const parsed = JSON.parse(app.webhook_events);
-            if (Array.isArray(parsed)) webhookEvents = parsed;
-        } catch {
-            /* leave empty */
-        }
-    }
+    const ep = (endpoints.results || [])[0] as
+        | {
+              total: number;
+              active: number;
+              last_delivery_at: string | null;
+          }
+        | undefined;
 
     return NextResponse.json({
         client_id: app.client_id,
@@ -117,12 +118,10 @@ export async function GET(
             date: string;
             count: number;
         }>,
-        webhook: {
-            configured: !!app.webhook_url,
-            url: app.webhook_url,
-            events: webhookEvents,
-            secret_set_at: app.webhook_secret_set_at,
-            last_delivery_at: app.webhook_last_delivery_at,
+        webhooks: {
+            total_endpoints: ep?.total ?? 0,
+            active_endpoints: ep?.active ?? 0,
+            last_delivery_at: ep?.last_delivery_at ?? null,
         },
     });
 }

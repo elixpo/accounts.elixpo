@@ -46,19 +46,20 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body: any = await request.json();
-    const { client_id, events, secret } = body as {
-        client_id: string;
+    const { endpoint_id, events, secret } = body as {
+        endpoint_id: string;
         events: string[];
         secret?: string;
     };
 
-    // Per the safety policy, a user-scoped webhook can only target a URL
-    // that's already registered on one of the caller's own OAuth apps.
-    // This eliminates the free-text-URL SSRF / spam vector that the old
-    // form allowed.
-    if (!client_id || typeof client_id !== "string") {
+    // Per the safety policy, a user-scoped webhook must target a specific
+    // webhook endpoint registered on one of the caller's own OAuth apps.
+    // Apps can now have multiple endpoints (e.g. localhost + production),
+    // so the caller picks which one. The URL is resolved server-side from
+    // the endpoint row — never trusted from the request body.
+    if (!endpoint_id || typeof endpoint_id !== "string") {
         return NextResponse.json(
-            { error: "client_id is required" },
+            { error: "endpoint_id is required" },
             { status: 400 },
         );
     }
@@ -70,37 +71,33 @@ export async function POST(request: NextRequest) {
     }
 
     const db = await getDatabase();
-    const app = await db
+    const endpoint = await db
         .prepare(
-            "SELECT client_id, name, webhook_url, owner_id FROM oauth_clients WHERE client_id = ? AND is_active = 1",
+            `SELECT e.id, e.url, e.client_id, c.name AS app_name, c.owner_id
+             FROM oauth_client_webhook_endpoints e
+             JOIN oauth_clients c ON c.client_id = e.client_id
+             WHERE e.id = ? AND c.is_active = 1 AND e.is_active = 1`,
         )
-        .bind(client_id)
+        .bind(endpoint_id)
         .first<{
+            id: string;
+            url: string;
             client_id: string;
-            name: string;
-            webhook_url: string | null;
+            app_name: string;
             owner_id: string;
         }>();
 
-    if (!app)
+    if (!endpoint)
         return NextResponse.json(
-            { error: "OAuth app not found" },
+            { error: "Endpoint not found or inactive" },
             { status: 404 },
         );
-    if (app.owner_id !== auth.sub) {
+    if (endpoint.owner_id !== auth.sub) {
         return NextResponse.json(
             {
-                error: "You can only create webhooks pointing to OAuth apps you own",
+                error: "You can only target webhook endpoints on OAuth apps you own",
             },
             { status: 403 },
-        );
-    }
-    if (!app.webhook_url) {
-        return NextResponse.json(
-            {
-                error: "Selected app has no webhook URL configured. Set one in OAuth Apps → app settings first.",
-            },
-            { status: 400 },
         );
     }
 
@@ -109,14 +106,15 @@ export async function POST(request: NextRequest) {
 
     await db
         .prepare(
-            `INSERT INTO webhooks (id, user_id, client_id, url, events, secret, is_active, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+            `INSERT INTO webhooks (id, user_id, client_id, endpoint_id, url, events, secret, is_active, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
         )
         .bind(
             id,
             auth.sub,
-            app.client_id,
-            app.webhook_url,
+            endpoint.client_id,
+            endpoint.id,
+            endpoint.url,
             JSON.stringify(events),
             webhookSecret,
         )
@@ -125,9 +123,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
         {
             id,
-            client_id: app.client_id,
-            client_name: app.name,
-            url: app.webhook_url,
+            client_id: endpoint.client_id,
+            client_name: endpoint.app_name,
+            endpoint_id: endpoint.id,
+            url: endpoint.url,
             events,
             secret: webhookSecret,
             is_active: true,

@@ -110,11 +110,9 @@ export default function OAuthAppSettingsPage() {
         unique_users: number;
         active_sessions: number;
         sign_in_timeline: Array<{ date: string; count: number }>;
-        webhook: {
-            configured: boolean;
-            url: string | null;
-            events: string[];
-            secret_set_at: string | null;
+        webhooks: {
+            total_endpoints: number;
+            active_endpoints: number;
             last_delivery_at: string | null;
         };
     }
@@ -986,13 +984,15 @@ export default function OAuthAppSettingsPage() {
                         </span>
                         <span>•</span>
                         <span>
-                            Webhook:{" "}
+                            Webhooks:{" "}
                             <strong style={{ color: "#e5e7eb" }}>
-                                {stats.webhook.configured
-                                    ? stats.webhook.last_delivery_at
-                                        ? `last delivered ${new Date(stats.webhook.last_delivery_at).toLocaleString()}`
-                                        : "configured, never delivered"
-                                    : "not configured"}
+                                {stats.webhooks.total_endpoints === 0
+                                    ? "none configured"
+                                    : `${stats.webhooks.active_endpoints}/${stats.webhooks.total_endpoints} active${
+                                          stats.webhooks.last_delivery_at
+                                              ? `, last delivery ${new Date(stats.webhooks.last_delivery_at).toLocaleString()}`
+                                              : ", never delivered"
+                                      }`}
                             </strong>
                         </span>
                     </Box>
