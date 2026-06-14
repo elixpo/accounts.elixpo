@@ -836,10 +836,13 @@ export async function logAdminAction(
 }
 
 export async function listUserOAuthClients(db: D1Database, userId: string) {
+    // webhook_url is selected because the dashboard webhooks page filters
+    // dropdown options on it. Don't drop it without updating that filter.
     return db
         .prepare(
             `SELECT client_id, name, description, logo_url, homepage_url, redirect_uris, scopes,
-              is_active, created_at, last_used, request_count
+              is_active, created_at, last_used, request_count,
+              webhook_url, webhook_events, webhook_secret_set_at, webhook_last_delivery_at
        FROM oauth_clients
        WHERE owner_id = ? AND is_active = 1
        ORDER BY created_at DESC`,
