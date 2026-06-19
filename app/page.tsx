@@ -7,9 +7,11 @@ import HubIcon from "@mui/icons-material/Hub";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Box, Button, Chip, Stack, Typography } from "@mui/material";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import BackgroundAurora from "./components/background-aurora";
 import Footer from "./components/footer";
 import Navbar from "./components/navbar";
+import PixelHero from "./components/pixel-hero";
 
 const ACCENT = "#9b7bf7";
 
