@@ -489,13 +489,20 @@ const OAuthAppsPage = () => {
                                                         </Typography>
                                                         {app.homepage_url && (
                                                             <Typography
+                                                                component="a"
+                                                                href={app.homepage_url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
                                                                 variant="caption"
                                                                 sx={{
-                                                                    color: "rgba(255,255,255,0.35)",
+                                                                    display: "block",
+                                                                    color: "rgba(255,255,255,0.4)",
                                                                     fontFamily:
                                                                         "monospace",
                                                                     fontSize:
                                                                         "0.7rem",
+                                                                    textDecoration: "none",
+                                                                    "&:hover": { color: "#c8b6ff", textDecoration: "underline" },
                                                                 }}
                                                             >
                                                                 {(() => {
