@@ -293,10 +293,9 @@ const Navbar = () => {
                             // "Sign in" to an already-signed-in user.
                             <Box sx={{ width: 104, height: 38 }} />
                         ) : me ? (
-                            // Signed in: profile chip → /dashboard (logout lives in the dashboard).
                             <Box
                                 component={Link}
-                                href="/dashboard"
+                                href="/dashboard/oauth-apps"
                                 sx={{
                                     display: "flex",
                                     alignItems: "center",
