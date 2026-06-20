@@ -210,7 +210,7 @@ const ArrowRight = () => (
 
 export default function PixelHero({ authed }: { authed?: boolean | null }) {
     const signedIn = authed === true;
-    const primaryHref = signedIn ? "/dashboard" : "/login";
+    const primaryHref = signedIn ? "/dashboard/oauth-apps" : "/login";
     const primaryLabel = signedIn ? "Go to your dashboard" : "Create your Elixpo ID";
     const [mounted, setMounted] = useState(false);
     useEffect(() => {

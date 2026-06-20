@@ -154,58 +154,76 @@ const Navbar = () => {
                     mx: "auto",
                     px: { xs: 2, md: 4 },
                     minHeight: { xs: 60, md: 68 },
-                    gap: 1,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                 }}
             >
-                <Link
-                    href="/"
-                    style={{
-                        textDecoration: "none",
-                        color: "inherit",
+                <Box
+                    sx={{
+                        flex: 1,
                         display: "flex",
+                        justifyContent: "flex-start",
                         alignItems: "center",
-                        gap: "12px",
                     }}
                 >
-                    <Box
-                        component="img"
-                        src="/LOGO/logo.png"
-                        alt="Elixpo Accounts"
-                        sx={{ height: 30, width: 30, borderRadius: "9px", display: "block" }}
-                    />
-                    <Typography
-                        sx={{
-                            fontWeight: 700,
-                            fontSize: "1.15rem",
-                            color: "#f4f4f6",
-                            letterSpacing: "-0.01em",
+                    <Link
+                        href="/"
+                        style={{
+                            textDecoration: "none",
+                            color: "inherit",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "12px",
                         }}
                     >
-                        Elixpo
-                        <Box component="span" sx={{ color: ACCENT }}>
-                            {" "}
-                            Accounts
-                        </Box>
-                    </Typography>
-                    {!me && (
-                        <Chip
-                            label="SSO"
-                            size="small"
-                            sx={{
-                                display: { xs: "none", sm: "inline-flex" },
-                                bgcolor: "rgba(155, 123, 247, 0.12)",
-                                color: ACCENT,
-                                fontSize: "10px",
-                                height: "22px",
-                                fontWeight: 600,
-                                letterSpacing: "0.04em",
-                                border: "1px solid rgba(155, 123, 247, 0.3)",
-                            }}
+                        <Box
+                            component="img"
+                            src="/LOGO/logo.png"
+                            alt="Elixpo Accounts"
+                            sx={{ height: 30, width: 30, borderRadius: "9px", display: "block" }}
                         />
-                    )}
-                </Link>
+                        <Typography
+                            sx={{
+                                fontWeight: 700,
+                                fontSize: "1.15rem",
+                                color: "#f4f4f6",
+                                letterSpacing: "-0.01em",
+                            }}
+                        >
+                            Elixpo
+                            <Box component="span" sx={{ color: ACCENT }}>
+                                {" "}
+                                Accounts
+                            </Box>
+                        </Typography>
+                        {!me && (
+                            <Chip
+                                label="SSO"
+                                size="small"
+                                sx={{
+                                    display: { xs: "none", sm: "inline-flex" },
+                                    bgcolor: "rgba(155, 123, 247, 0.12)",
+                                    color: ACCENT,
+                                    fontSize: "10px",
+                                    height: "22px",
+                                    fontWeight: 600,
+                                    letterSpacing: "0.04em",
+                                    border: "1px solid rgba(155, 123, 247, 0.3)",
+                                }}
+                            />
+                        )}
+                    </Link>
+                </Box>
 
-                <Box sx={{ flexGrow: 1, justifyContent: "center", display: { xs: "none", md: "flex" } }}>
+                <Box
+                    sx={{
+                        flex: "0 0 auto",
+                        display: { xs: "none", md: "flex" },
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}
+                >
                     {me === undefined ? null : me ? (
                         <AppNavLinks orientation="horizontal" />
                     ) : (
@@ -232,112 +250,119 @@ const Navbar = () => {
                     )}
                 </Box>
 
-                <Box sx={{ flexGrow: { xs: 1, md: 0 } }} />
+                <Box
+                    sx={{
+                        flex: 1,
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        alignItems: "center",
+                    }}
+                >
+                    <Stack direction="row" spacing={{ xs: 1, md: 1.2 }} alignItems="center">
+                        {/* GitHub — marketing nav only (hidden once signed in) */}
+                        {!me && (
+                            <Tooltip title="View source on GitHub" arrow>
+                                <IconButton
+                                    component="a"
+                                    href={REPO_URL}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label="View source on GitHub"
+                                    sx={{
+                                        display: { xs: "none", sm: "inline-flex" },
+                                        color: "rgba(244,244,246,0.85)",
+                                        border: "1px solid rgba(255,255,255,0.1)",
+                                        borderRadius: "10px",
+                                        width: 38,
+                                        height: 38,
+                                        transition: "all 0.18s ease",
+                                        "&:hover": {
+                                            color: "#fff",
+                                            borderColor: "rgba(155,123,247,0.45)",
+                                            background: "rgba(155,123,247,0.08)",
+                                        },
+                                    }}
+                                >
+                                    <GitHubIcon sx={{ fontSize: 20 }} />
+                                </IconButton>
+                            </Tooltip>
+                        )}
 
-                <Stack direction="row" spacing={{ xs: 1, md: 1.2 }} alignItems="center">
-                    {/* GitHub — marketing nav only (hidden once signed in) */}
-                    {!me && (
-                        <Tooltip title="View source on GitHub" arrow>
-                            <IconButton
-                                component="a"
-                                href={REPO_URL}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                aria-label="View source on GitHub"
+                        {me === undefined ? (
+                            // Placeholder while resolving the session — avoids flashing
+                            // "Sign in" to an already-signed-in user.
+                            <Box sx={{ width: 104, height: 38 }} />
+                        ) : me ? (
+                            // Signed in: profile chip → /dashboard (logout lives in the dashboard).
+                            <Box
+                                component={Link}
+                                href="/dashboard"
                                 sx={{
-                                    display: { xs: "none", sm: "inline-flex" },
-                                    color: "rgba(244,244,246,0.85)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                    textDecoration: "none",
+                                    color: "inherit",
                                     border: "1px solid rgba(255,255,255,0.1)",
                                     borderRadius: "10px",
-                                    width: 38,
-                                    height: 38,
-                                    transition: "all 0.18s ease",
+                                    pl: 0.6,
+                                    pr: { xs: 0.6, sm: 1 },
+                                    py: 0.5,
+                                    transition: "all 0.15s ease",
+                                    "&:hover": { borderColor: "rgba(155,123,247,0.4)", background: "rgba(155,123,247,0.06)" },
+                                }}
+                            >
+                                <Avatar
+                                    src={me.avatar || undefined}
+                                    sx={{ width: 28, height: 28, fontSize: "0.85rem", bgcolor: "rgba(155,123,247,0.4)" }}
+                                >
+                                    {(me.displayName || me.email || "?").charAt(0).toUpperCase()}
+                                </Avatar>
+                                <Stack sx={{ display: { xs: "none", sm: "flex" }, alignItems: "flex-start", lineHeight: 1.1 }}>
+                                    <Typography sx={{ fontSize: "0.82rem", fontWeight: 600, color: "#f5f5f4", maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                        {me.displayName || me.email}
+                                    </Typography>
+                                    <Typography sx={{ fontSize: "0.7rem", color: "rgba(245,245,244,0.45)", maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                        {me.email}
+                                    </Typography>
+                                </Stack>
+                                <KeyboardArrowDownIcon sx={{ fontSize: 18, color: "rgba(245,245,244,0.5)", display: { xs: "none", sm: "block" } }} />
+                            </Box>
+                        ) : (
+                            <Button
+                                component={Link}
+                                href="/login"
+                                disableElevation
+                                sx={{
+                                    textTransform: "none",
+                                    fontWeight: 600,
+                                    fontSize: "0.9rem",
+                                    color: "#fff",
+                                    background: "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
+                                    borderRadius: "10px",
+                                    px: 2.2,
+                                    py: 0.8,
+                                    boxShadow: "0 4px 14px rgba(155,123,247,0.32)",
                                     "&:hover": {
-                                        color: "#fff",
-                                        borderColor: "rgba(155,123,247,0.45)",
-                                        background: "rgba(155,123,247,0.08)",
+                                        background: "linear-gradient(135deg, #b094ff 0%, #8a6dff 100%)",
+                                        boxShadow: "0 6px 20px rgba(155,123,247,0.45)",
                                     },
                                 }}
                             >
-                                <GitHubIcon sx={{ fontSize: 20 }} />
-                            </IconButton>
-                        </Tooltip>
-                    )}
+                                Sign in
+                            </Button>
+                        )}
 
-                    {me === undefined ? (
-                        // Placeholder while resolving the session — avoids flashing
-                        // "Sign in" to an already-signed-in user.
-                        <Box sx={{ width: 104, height: 38 }} />
-                    ) : me ? (
-                        // Signed in: profile chip → /dashboard (logout lives in the dashboard).
-                        <Box
-                            component={Link}
-                            href="/dashboard"
-                            sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1,
-                                textDecoration: "none",
-                                color: "inherit",
-                                border: "1px solid rgba(255,255,255,0.1)",
-                                borderRadius: "10px",
-                                pl: 0.6,
-                                pr: { xs: 0.6, sm: 1 },
-                                py: 0.5,
-                                transition: "all 0.15s ease",
-                                "&:hover": { borderColor: "rgba(155,123,247,0.4)", background: "rgba(155,123,247,0.06)" },
-                            }}
+                        {/* Mobile hamburger */}
+                        <IconButton
+                            onClick={() => setDrawerOpen(true)}
+                            aria-label="Open menu"
+                            sx={{ display: { xs: "inline-flex", md: "none" }, color: "rgba(244,244,246,0.85)" }}
                         >
-                            <Avatar
-                                src={me.avatar || undefined}
-                                sx={{ width: 28, height: 28, fontSize: "0.85rem", bgcolor: "rgba(155,123,247,0.4)" }}
-                            >
-                                {(me.displayName || me.email || "?").charAt(0).toUpperCase()}
-                            </Avatar>
-                            <Stack sx={{ display: { xs: "none", sm: "flex" }, alignItems: "flex-start", lineHeight: 1.1 }}>
-                                <Typography sx={{ fontSize: "0.82rem", fontWeight: 600, color: "#f5f5f4", maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                    {me.displayName || me.email}
-                                </Typography>
-                                <Typography sx={{ fontSize: "0.7rem", color: "rgba(245,245,244,0.45)", maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                    {me.email}
-                                </Typography>
-                            </Stack>
-                            <KeyboardArrowDownIcon sx={{ fontSize: 18, color: "rgba(245,245,244,0.5)", display: { xs: "none", sm: "block" } }} />
-                        </Box>
-                    ) : (
-                        <Button
-                            component={Link}
-                            href="/login"
-                            disableElevation
-                            sx={{
-                                textTransform: "none",
-                                fontWeight: 600,
-                                fontSize: "0.9rem",
-                                color: "#fff",
-                                background: "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
-                                borderRadius: "10px",
-                                px: 2.2,
-                                py: 0.8,
-                                boxShadow: "0 4px 14px rgba(155,123,247,0.32)",
-                                "&:hover": {
-                                    background: "linear-gradient(135deg, #b094ff 0%, #8a6dff 100%)",
-                                    boxShadow: "0 6px 20px rgba(155,123,247,0.45)",
-                                },
-                            }}
-                        >
-                            Sign in
-                        </Button>
-                    )}
-
-                    {/* Mobile hamburger */}
-                    <IconButton
-                        onClick={() => setDrawerOpen(true)}
-                        aria-label="Open menu"
-                        sx={{ display: { xs: "inline-flex", md: "none" }, color: "rgba(244,244,246,0.85)" }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                </Stack>
+                            <MenuIcon />
+                        </IconButton>
+                    </Stack>
+                </Box>
             </Toolbar>
 
             {/* Mobile nav drawer */}
