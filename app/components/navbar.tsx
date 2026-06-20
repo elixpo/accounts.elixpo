@@ -45,7 +45,11 @@ const MARKETING_LINKS = [
 ];
 
 // App nav (signed-in) — the dashboard sections that make sense up top.
-const APP_LINKS: { label: string; href: string; icon: ComponentType<{ sx?: object }> }[] = [
+const APP_LINKS: {
+    label: string;
+    href: string;
+    icon: ComponentType<{ sx?: object }>;
+}[] = [
     { label: "Dashboard", href: "/dashboard", icon: SpaceDashboard },
     { label: "OAuth Apps", href: "/dashboard/oauth-apps", icon: Apps },
     { label: "Services", href: "/dashboard/services", icon: DevicesOther },
@@ -83,7 +87,9 @@ function AppNavLinks({
                         onClick={onNavigate}
                         startIcon={<Icon sx={{ fontSize: 18 }} />}
                         sx={{
-                            justifyContent: horizontal ? "center" : "flex-start",
+                            justifyContent: horizontal
+                                ? "center"
+                                : "flex-start",
                             textTransform: "none",
                             fontWeight: 600,
                             fontSize: horizontal ? "0.88rem" : "0.95rem",
@@ -91,9 +97,13 @@ function AppNavLinks({
                             px: horizontal ? 1.4 : 1.5,
                             py: horizontal ? 0.6 : 1.1,
                             borderRadius: "9px",
-                            background: active ? "rgba(155,123,247,0.12)" : "transparent",
+                            background: active
+                                ? "rgba(155,123,247,0.12)"
+                                : "transparent",
                             "& .MuiButton-startIcon": {
-                                color: active ? ACCENT : "rgba(244,244,246,0.55)",
+                                color: active
+                                    ? ACCENT
+                                    : "rgba(244,244,246,0.55)",
                             },
                             "&:hover": {
                                 color: "#fff",
@@ -123,8 +133,12 @@ const Navbar = () => {
             .then((d: any) => {
                 if (cancelled) return;
                 setMe(
-                    d && d.email
-                        ? { email: d.email, displayName: d.displayName ?? null, avatar: d.avatar ?? null }
+                    d?.email
+                        ? {
+                              email: d.email,
+                              displayName: d.displayName ?? null,
+                              avatar: d.avatar ?? null,
+                          }
                         : null,
                 );
             })
@@ -181,7 +195,12 @@ const Navbar = () => {
                             component="img"
                             src="/LOGO/logo.png"
                             alt="Elixpo Accounts"
-                            sx={{ height: 30, width: 30, borderRadius: "9px", display: "block" }}
+                            sx={{
+                                height: 30,
+                                width: 30,
+                                borderRadius: "9px",
+                                display: "block",
+                            }}
                         />
                         <Typography
                             sx={{
@@ -240,7 +259,11 @@ const Navbar = () => {
                                         color: "rgba(244,244,246,0.7)",
                                         px: 1.6,
                                         borderRadius: "9px",
-                                        "&:hover": { color: "#fff", background: "rgba(255,255,255,0.05)" },
+                                        "&:hover": {
+                                            color: "#fff",
+                                            background:
+                                                "rgba(255,255,255,0.05)",
+                                        },
                                     }}
                                 >
                                     {l.label}
@@ -258,7 +281,11 @@ const Navbar = () => {
                         alignItems: "center",
                     }}
                 >
-                    <Stack direction="row" spacing={{ xs: 1, md: 1.2 }} alignItems="center">
+                    <Stack
+                        direction="row"
+                        spacing={{ xs: 1, md: 1.2 }}
+                        alignItems="center"
+                    >
                         {/* GitHub — marketing nav only (hidden once signed in) */}
                         {!me && (
                             <Tooltip title="View source on GitHub" arrow>
@@ -269,7 +296,10 @@ const Navbar = () => {
                                     rel="noopener noreferrer"
                                     aria-label="View source on GitHub"
                                     sx={{
-                                        display: { xs: "none", sm: "inline-flex" },
+                                        display: {
+                                            xs: "none",
+                                            sm: "inline-flex",
+                                        },
                                         color: "rgba(244,244,246,0.85)",
                                         border: "1px solid rgba(255,255,255,0.1)",
                                         borderRadius: "10px",
@@ -278,8 +308,10 @@ const Navbar = () => {
                                         transition: "all 0.18s ease",
                                         "&:hover": {
                                             color: "#fff",
-                                            borderColor: "rgba(155,123,247,0.45)",
-                                            background: "rgba(155,123,247,0.08)",
+                                            borderColor:
+                                                "rgba(155,123,247,0.45)",
+                                            background:
+                                                "rgba(155,123,247,0.08)",
                                         },
                                     }}
                                 >
@@ -308,24 +340,65 @@ const Navbar = () => {
                                     pr: { xs: 0.6, sm: 1 },
                                     py: 0.5,
                                     transition: "all 0.15s ease",
-                                    "&:hover": { borderColor: "rgba(155,123,247,0.4)", background: "rgba(155,123,247,0.06)" },
+                                    "&:hover": {
+                                        borderColor: "rgba(155,123,247,0.4)",
+                                        background: "rgba(155,123,247,0.06)",
+                                    },
                                 }}
                             >
                                 <Avatar
                                     src={me.avatar || undefined}
-                                    sx={{ width: 28, height: 28, fontSize: "0.85rem", bgcolor: "rgba(155,123,247,0.4)" }}
+                                    sx={{
+                                        width: 28,
+                                        height: 28,
+                                        fontSize: "0.85rem",
+                                        bgcolor: "rgba(155,123,247,0.4)",
+                                    }}
                                 >
-                                    {(me.displayName || me.email || "?").charAt(0).toUpperCase()}
+                                    {(me.displayName || me.email || "?")
+                                        .charAt(0)
+                                        .toUpperCase()}
                                 </Avatar>
-                                <Stack sx={{ display: { xs: "none", sm: "flex" }, alignItems: "flex-start", lineHeight: 1.1 }}>
-                                    <Typography sx={{ fontSize: "0.82rem", fontWeight: 600, color: "#f5f5f4", maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                <Stack
+                                    sx={{
+                                        display: { xs: "none", sm: "flex" },
+                                        alignItems: "flex-start",
+                                        lineHeight: 1.1,
+                                    }}
+                                >
+                                    <Typography
+                                        sx={{
+                                            fontSize: "0.82rem",
+                                            fontWeight: 600,
+                                            color: "#f5f5f4",
+                                            maxWidth: 150,
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                            whiteSpace: "nowrap",
+                                        }}
+                                    >
                                         {me.displayName || me.email}
                                     </Typography>
-                                    <Typography sx={{ fontSize: "0.7rem", color: "rgba(245,245,244,0.45)", maxWidth: 150, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                    <Typography
+                                        sx={{
+                                            fontSize: "0.7rem",
+                                            color: "rgba(245,245,244,0.45)",
+                                            maxWidth: 150,
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                            whiteSpace: "nowrap",
+                                        }}
+                                    >
                                         {me.email}
                                     </Typography>
                                 </Stack>
-                                <KeyboardArrowDownIcon sx={{ fontSize: 18, color: "rgba(245,245,244,0.5)", display: { xs: "none", sm: "block" } }} />
+                                <KeyboardArrowDownIcon
+                                    sx={{
+                                        fontSize: 18,
+                                        color: "rgba(245,245,244,0.5)",
+                                        display: { xs: "none", sm: "block" },
+                                    }}
+                                />
                             </Box>
                         ) : (
                             <Button
@@ -337,14 +410,18 @@ const Navbar = () => {
                                     fontWeight: 600,
                                     fontSize: "0.9rem",
                                     color: "#fff",
-                                    background: "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
+                                    background:
+                                        "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
                                     borderRadius: "10px",
                                     px: 2.2,
                                     py: 0.8,
-                                    boxShadow: "0 4px 14px rgba(155,123,247,0.32)",
+                                    boxShadow:
+                                        "0 4px 14px rgba(155,123,247,0.32)",
                                     "&:hover": {
-                                        background: "linear-gradient(135deg, #b094ff 0%, #8a6dff 100%)",
-                                        boxShadow: "0 6px 20px rgba(155,123,247,0.45)",
+                                        background:
+                                            "linear-gradient(135deg, #b094ff 0%, #8a6dff 100%)",
+                                        boxShadow:
+                                            "0 6px 20px rgba(155,123,247,0.45)",
                                     },
                                 }}
                             >
@@ -356,7 +433,10 @@ const Navbar = () => {
                         <IconButton
                             onClick={() => setDrawerOpen(true)}
                             aria-label="Open menu"
-                            sx={{ display: { xs: "inline-flex", md: "none" }, color: "rgba(244,244,246,0.85)" }}
+                            sx={{
+                                display: { xs: "inline-flex", md: "none" },
+                                color: "rgba(244,244,246,0.85)",
+                            }}
                         >
                             <MenuIcon />
                         </IconButton>
@@ -380,9 +460,19 @@ const Navbar = () => {
                     },
                 }}
             >
-                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2, px: 0.5 }}>
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    sx={{ mb: 2, px: 0.5 }}
+                >
                     <Stack direction="row" alignItems="center" spacing={1.1}>
-                        <Box component="img" src="/LOGO/logo.png" alt="Elixpo Accounts" sx={{ height: 26, width: 26, borderRadius: "7px" }} />
+                        <Box
+                            component="img"
+                            src="/LOGO/logo.png"
+                            alt="Elixpo Accounts"
+                            sx={{ height: 26, width: 26, borderRadius: "7px" }}
+                        />
                         <Typography sx={{ fontWeight: 700, fontSize: "1rem" }}>
                             Elixpo
                             <Box component="span" sx={{ color: ACCENT }}>
@@ -391,14 +481,21 @@ const Navbar = () => {
                             </Box>
                         </Typography>
                     </Stack>
-                    <IconButton onClick={() => setDrawerOpen(false)} aria-label="Close menu" sx={{ color: "rgba(245,245,244,0.6)" }}>
+                    <IconButton
+                        onClick={() => setDrawerOpen(false)}
+                        aria-label="Close menu"
+                        sx={{ color: "rgba(245,245,244,0.6)" }}
+                    >
                         <CloseIcon />
                     </IconButton>
                 </Stack>
 
                 {me ? (
                     // Signed in: the app routes (logout lives in the dashboard).
-                    <AppNavLinks orientation="vertical" onNavigate={() => setDrawerOpen(false)} />
+                    <AppNavLinks
+                        orientation="vertical"
+                        onNavigate={() => setDrawerOpen(false)}
+                    />
                 ) : (
                     <Stack spacing={0.5}>
                         {MARKETING_LINKS.map((l) => (
@@ -416,7 +513,10 @@ const Navbar = () => {
                                     px: 1.5,
                                     py: 1.1,
                                     borderRadius: "10px",
-                                    "&:hover": { color: "#fff", background: "rgba(255,255,255,0.05)" },
+                                    "&:hover": {
+                                        color: "#fff",
+                                        background: "rgba(255,255,255,0.05)",
+                                    },
                                 }}
                             >
                                 {l.label}
@@ -432,11 +532,15 @@ const Navbar = () => {
                                 fontWeight: 700,
                                 fontSize: "0.95rem",
                                 color: "#fff",
-                                background: "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
+                                background:
+                                    "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
                                 borderRadius: "10px",
                                 py: 1.1,
                                 boxShadow: "0 4px 14px rgba(155,123,247,0.32)",
-                                "&:hover": { background: "linear-gradient(135deg, #b094ff 0%, #8a6dff 100%)" },
+                                "&:hover": {
+                                    background:
+                                        "linear-gradient(135deg, #b094ff 0%, #8a6dff 100%)",
+                                },
                             }}
                         >
                             Sign in
