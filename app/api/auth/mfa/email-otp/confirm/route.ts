@@ -71,10 +71,7 @@ export async function POST(request: NextRequest) {
     }
     const supplied = await hashBackupCode(code.trim());
     if (supplied !== stored) {
-        return NextResponse.json(
-            { error: "Invalid code" },
-            { status: 400 },
-        );
+        return NextResponse.json({ error: "Invalid code" }, { status: 400 });
     }
 
     // Burn the OTP before flipping confirmed_at — if the D1 write fails

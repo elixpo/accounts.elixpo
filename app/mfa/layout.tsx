@@ -10,11 +10,7 @@ import BackgroundAurora from "../components/background-aurora";
  * Uses the same `variant="auth"` aurora as /login so the visual flow
  * from sign-in → 2FA stays continuous.
  */
-export default function MfaLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+export default function MfaLayout({ children }: { children: React.ReactNode }) {
     return (
         <Box sx={{ position: "relative", minHeight: "100vh" }}>
             <BackgroundAurora variant="auth" />

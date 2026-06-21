@@ -263,7 +263,10 @@ export default function SecurityPage() {
             });
             const data: any = await res.json();
             if (!res.ok) {
-                setMsg({ text: data.error || "Failed to start", type: "error" });
+                setMsg({
+                    text: data.error || "Failed to start",
+                    type: "error",
+                });
                 return;
             }
             // Already-confirmed short-circuit from the API.
@@ -1408,16 +1411,13 @@ export default function SecurityPage() {
                     Remove this 2FA method?
                 </DialogTitle>
                 <DialogContent>
-                    <Typography
-                        sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}
-                    >
+                    <Typography sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}>
                         You're about to remove{" "}
                         <strong style={{ color: "#f5f5f4" }}>
                             {removeTarget?.name ||
-                                (removeTarget &&
-                                    kindLabel[removeTarget.kind])}
-                        </strong>
-                        {" "}from your 2FA methods.
+                                (removeTarget && kindLabel[removeTarget.kind])}
+                        </strong>{" "}
+                        from your 2FA methods.
                     </Typography>
                     <Box
                         sx={{
@@ -1430,8 +1430,8 @@ export default function SecurityPage() {
                         }}
                     >
                         <strong>This can't be undone.</strong> If this is your
-                        last method, 2FA will be enforced and you must enroll
-                        a replacement before removing it.
+                        last method, 2FA will be enforced and you must enroll a
+                        replacement before removing it.
                     </Box>
                 </DialogContent>
                 <DialogActions
@@ -1451,7 +1451,9 @@ export default function SecurityPage() {
                         Cancel
                     </Button>
                     <Button
-                        onClick={() => removeTarget && removeFactor(removeTarget)}
+                        onClick={() =>
+                            removeTarget && removeFactor(removeTarget)
+                        }
                         disabled={removeBusy}
                         variant="contained"
                         sx={{

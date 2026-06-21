@@ -95,9 +95,12 @@ function ChallengeInner() {
                 const data: any = await res.json();
                 const real = (data.methods || []).filter(
                     (m: string): m is Method =>
-                        ["passkey", "totp", "email_otp", "backup_code"].includes(
-                            m,
-                        ),
+                        [
+                            "passkey",
+                            "totp",
+                            "email_otp",
+                            "backup_code",
+                        ].includes(m),
                 );
                 if (cancelled) return;
                 setMethods(real);
