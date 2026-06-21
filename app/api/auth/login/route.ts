@@ -249,6 +249,23 @@ export async function POST(request: NextRequest) {
             console.error("[Login] Database storage error:", dbError);
         }
 
+        // Fire the new-device alert after audit log success. Throttled in
+        // KV per (user, IP, UA) so stable-device logins stay quiet.
+        try {
+            const { notifyNewDeviceSignIn } = await import(
+                "@/lib/sign-in-alert"
+            );
+            await notifyNewDeviceSignIn({
+                userId: user.id,
+                email: user.email,
+                displayName: user.display_name || null,
+                ipAddress,
+                userAgent,
+            });
+        } catch {
+            /* non-fatal */
+        }
+
         const accessMaxAge =
             parseInt(process.env.JWT_EXPIRATION_MINUTES || "15", 10) * 60;
         const refreshMaxAge = refreshDays * 24 * 60 * 60;

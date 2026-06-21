@@ -415,6 +415,20 @@ async function buildSuccessResponse(
         console.error("Failed to store tokens/audit log:", dbError);
     }
 
+    // New-device alert (throttled per (user, IP, UA) in KV).
+    try {
+        const { notifyNewDeviceSignIn } = await import("@/lib/sign-in-alert");
+        await notifyNewDeviceSignIn({
+            userId: user.id,
+            email: user.email || email,
+            displayName: (user as any).display_name || null,
+            ipAddress: ipAddress || "unknown",
+            userAgent: userAgent || "unknown",
+        });
+    } catch {
+        /* non-fatal */
+    }
+
     // If there's a pending ?next= redirect (e.g. from OAuth authorize flow), use it
     const oauthNext = request.cookies.get("oauth_next")?.value;
     const intendedDest = oauthNext || "/dashboard/oauth-apps";

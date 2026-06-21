@@ -2,7 +2,7 @@ export const runtime = "edge";
 
 import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
-import { emailTemplates, sendEmail } from "@/lib/email";
+import { sendMail } from "@/lib/mails";
 import { createPasswordResetRateLimiter } from "@/lib/rate-limit";
 import { generateUUID } from "@/lib/webcrypto";
 
@@ -123,22 +123,11 @@ export async function POST(request: NextRequest) {
             )
             .run();
 
-        // Send password reset OTP email
         const recipientName = user.display_name || email.split("@")[0];
-        const APP_URL =
-            process.env.NEXT_PUBLIC_APP_URL || "https://accounts.elixpo.com";
-        const verifyLink = `${APP_URL}/forgot-password?token=${verificationToken}`;
-        const t = emailTemplates.passwordResetOtp(
-            recipientName,
-            otp,
-            verifyLink,
-            expiryMinutes,
-        );
-        await sendEmail({
-            to: email,
-            subject: t.subject,
-            html: t.html,
-            text: t.text,
+        await sendMail("password_reset", email, {
+            name: recipientName,
+            otp_code: otp,
+            expiry_minutes: expiryMinutes,
         });
 
         console.log(`[ForgotPassword] OTP sent to ${email}`);

@@ -2,8 +2,8 @@ export const runtime = "edge";
 
 import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
-import { sendOTPEmail } from "@/lib/email";
 import { verifyJWT } from "@/lib/jwt";
+import { sendMail } from "@/lib/mails";
 import { generateUUID } from "@/lib/webcrypto";
 
 function generateOTP(): string {
@@ -113,7 +113,12 @@ export async function POST(request: NextRequest) {
         const APP_URL =
             process.env.NEXT_PUBLIC_APP_URL || "https://accounts.elixpo.com";
         const verifyLink = `${APP_URL}/verify?token=${verificationToken}`;
-        await sendOTPEmail(user.email, recipientName, otp, verifyLink);
+        await sendMail("user_verify_otp", user.email, {
+            name: recipientName,
+            otp_code: otp,
+            expiry_minutes: expiryMinutes,
+            verify_link: verifyLink,
+        });
 
         console.log(`[Verification] OTP sent to ${user.email}`);
 
