@@ -9,7 +9,11 @@ import { hashBackupCode } from "@/lib/mfa-utils";
 import { generateNumericOtp, generateUUID } from "@/lib/webcrypto";
 
 const ENROLL_OTP_TTL_SECONDS = 10 * 60;
-const COOLDOWN_SECONDS = 30;
+// Cloudflare KV's minimum expirationTtl is 60 seconds — values below
+// that fail with HTTP 400. 60 is also a reasonable lower bound for a
+// resend cooldown (faster than that and we're just inviting accidental
+// double-clicks to spam the user's inbox).
+const COOLDOWN_SECONDS = 60;
 
 // Minimal UA summary just for the email body — same shape the sign-in
 // alert uses, but inlined here to keep this route self-contained.
