@@ -80,16 +80,11 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    // Generate an unbiased 6-digit OTP using rejection sampling.
-    // 2^24 = 16,777,216; accept only values < 16,000,000 so modulo 1,000,000 is uniform.
-    const OTP_SPACE = 1_000_000;
-    const MAX_UNBIASED = 16_000_000;
-    let value: number;
-    do {
-        const bytes = crypto.getRandomValues(new Uint8Array(3));
-        value = (bytes[0] << 16) | (bytes[1] << 8) | bytes[2];
-    } while (value >= MAX_UNBIASED);
-    const code = (value % OTP_SPACE).toString().padStart(6, "0");
+    // Shared unbiased OTP helper (rejection sampling, no modulo). See
+    // generateNumericOtp() for the math. Lazy-imported to avoid a hard
+    // dependency on lib/webcrypto from edge-runtime modules above.
+    const { generateNumericOtp } = await import("@/lib/webcrypto");
+    const code = generateNumericOtp();
 
     // Store the OTP keyed to this mfaToken so /verify can fetch + match it.
     // Last 32 chars of the token are enough entropy to namespace per-attempt.
