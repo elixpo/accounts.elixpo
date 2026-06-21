@@ -28,6 +28,9 @@ import {
 } from "@simplewebauthn/browser";
 import QRCode from "qrcode";
 import { useCallback, useEffect, useState } from "react";
+import { useCooldown } from "@/lib/hooks/useCooldown";
+
+const EMAIL_OTP_RESEND_COOLDOWN_S = 60;
 
 interface Factor {
     id: string;
@@ -142,6 +145,12 @@ export default function SecurityPage() {
     } | null>(null);
     const [emailEnrollCode, setEmailEnrollCode] = useState("");
     const [emailEnrollBusy, setEmailEnrollBusy] = useState(false);
+    // Shared cooldown between the in-dialog "Resend code" and the
+    // pending-factor-row "Resend & enter code" — both call
+    // startEmailEnroll which hits the same rate-limited KV cooldown
+    // server-side. Without this the user could double-click and get a
+    // confusing 429.
+    const emailResendCd = useCooldown();
 
     const refresh = useCallback(async () => {
         try {
@@ -328,6 +337,7 @@ export default function SecurityPage() {
             });
             setEmailEnrollCode("");
             setEmailEnrollDialog(true);
+            emailResendCd.start(EMAIL_OTP_RESEND_COOLDOWN_S);
         } finally {
             setEmailEnrollBusy(false);
         }
