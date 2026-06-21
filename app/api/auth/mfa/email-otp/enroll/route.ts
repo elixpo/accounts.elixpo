@@ -99,7 +99,25 @@ export async function POST(request: NextRequest) {
     }
 
     // Cooldown — keyed per user so two tabs / hot-reloads don't spam.
-    const kv = (getRequestContext().env as any).KV as KVNamespace;
+    // Guard the KV access: if the Pages project doesn't have a binding
+    // named `KV`, return a structured 503 instead of letting the
+    // undefined deref throw with a stack trace the client can't read.
+    let kv: KVNamespace;
+    try {
+        kv = (getRequestContext().env as any).KV as KVNamespace;
+        if (!kv) throw new Error("KV binding missing");
+    } catch (err) {
+        console.error(
+            "[mfa email enroll] KV unavailable: %s",
+            err instanceof Error ? err.message : String(err),
+        );
+        return NextResponse.json(
+            {
+                error: "Verification service unavailable. Please try again in a moment.",
+            },
+            { status: 503 },
+        );
+    }
     const cooldownKey = `mfa_email_enroll_cd:${auth.sub}`;
     const cooled = await kv.get(cooldownKey);
     if (cooled) {

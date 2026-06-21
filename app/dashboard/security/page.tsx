@@ -295,10 +295,20 @@ export default function SecurityPage() {
                 method: "POST",
                 credentials: "include",
             });
-            const data: any = await res.json();
+            // 500-without-JSON happens when the route crashes before
+            // serializing a response (e.g. KV binding missing on CF).
+            // Surface the HTTP status so the user sees something actionable.
+            let data: any = {};
+            try {
+                data = await res.json();
+            } catch {
+                /* not JSON */
+            }
             if (!res.ok) {
                 setMsg({
-                    text: data.error || "Failed to start",
+                    text:
+                        data.error ||
+                        `Couldn't start enrollment (HTTP ${res.status}). Check that the email-OTP route is deployed and KV is bound.`,
                     type: "error",
                 });
                 return;
