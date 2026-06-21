@@ -104,19 +104,33 @@ export default function SecurityPage() {
     // Freshly minted backup codes (revealed once).
     const [revealedCodes, setRevealedCodes] = useState<string[] | null>(null);
 
-    // Regenerate-backup-codes confirmation modal — replaces native
-    // confirm() so it matches the rest of the dashboard styling and
-    // can show enough context (current unused count, consequences)
-    // for the user to make an informed call.
-    const [regenDialog, setRegenDialog] = useState(false);
-    const [regenBusy, setRegenBusy] = useState(false);
-
-    // Remove-factor confirmation modal. We carry the target factor in
-    // state so the dialog body can name it ("Remove Passkey?") rather
-    // than a generic prompt — and so the busy state belongs to that
-    // specific row.
-    const [removeTarget, setRemoveTarget] = useState<Factor | null>(null);
-    const [removeBusy, setRemoveBusy] = useState(false);
+    // Shared confirm-dialog. One state object drives any
+    // "are-you-sure?" prompt on this page — every action that used to
+    // call native confirm() (disable 2FA, revoke device, revoke
+    // session, regenerate backup codes, remove factor) now goes through
+    // askConfirm() so we get consistent styling, a busy state, and a
+    // single place to evolve the visual.
+    interface ConfirmCfg {
+        title: string;
+        icon?: React.ReactNode;
+        body: React.ReactNode;
+        confirmLabel: string;
+        destructive?: boolean;
+        onConfirm: () => Promise<void> | void;
+    }
+    const [confirmCfg, setConfirmCfg] = useState<ConfirmCfg | null>(null);
+    const [confirmBusy, setConfirmBusy] = useState(false);
+    const askConfirm = (cfg: ConfirmCfg) => setConfirmCfg(cfg);
+    const runConfirm = async () => {
+        if (!confirmCfg) return;
+        setConfirmBusy(true);
+        try {
+            await confirmCfg.onConfirm();
+        } finally {
+            setConfirmBusy(false);
+            setConfirmCfg(null);
+        }
+    };
 
     // Email-OTP enrollment dialog. Verify-before-enable ceremony: enroll
     // sends a 6-digit code to the user's email; they type it here and
@@ -153,24 +167,15 @@ export default function SecurityPage() {
         }
     }, []);
 
-    const autoEnableIfNeeded = useCallback(async () => {
-        const res = await fetch("/api/auth/mfa/factors", {
+    const autoEnable = useCallback(async () => {
+        const res = await fetch("/api/auth/mfa/enable", {
+            method: "POST",
             credentials: "include",
         });
         if (!res.ok) return;
         const data: any = await res.json();
-        const hasConfirmed = (data.factors || []).some(
-            (f: Factor) => f.confirmed,
-        );
-        if (!hasConfirmed || data.mfa_enabled) return;
-        const enableRes = await fetch("/api/auth/mfa/enable", {
-            method: "POST",
-            credentials: "include",
-        });
-        if (!enableRes.ok) return;
-        const enableData: any = await enableRes.json();
-        if (enableData.backup_codes && !enableData.already_enabled) {
-            setRevealedCodes(enableData.backup_codes);
+        if (data.backup_codes && !data.already_enabled) {
+            setRevealedCodes(data.backup_codes);
             setMsg({
                 text: "2FA enabled — save these backup codes now, they won't be shown again.",
                 type: "success",
@@ -228,6 +233,9 @@ export default function SecurityPage() {
             setTotpDialog(false);
             setTotpData(null);
             setMsg({ text: "Authenticator app enrolled", type: "success" });
+            // First confirmed factor → idempotently flip mfa_enabled
+            // and surface backup codes. Re-confirms are silent no-ops.
+            await autoEnable();
             await refresh();
         } finally {
             setTotpBusy(false);
@@ -269,6 +277,7 @@ export default function SecurityPage() {
                 return;
             }
             setMsg({ text: "Passkey enrolled", type: "success" });
+            await autoEnable();
             await refresh();
         } catch (err: any) {
             setMsg({
@@ -338,6 +347,7 @@ export default function SecurityPage() {
                 text: "Email code enabled as a 2FA method",
                 type: "success",
             });
+            await autoEnable();
             await refresh();
         } finally {
             setEmailEnrollBusy(false);
@@ -350,30 +360,59 @@ export default function SecurityPage() {
         await startEmailEnroll();
     };
 
-    const removeFactor = async (target: Factor) => {
-        setRemoveBusy(true);
-        try {
-            const res = await fetch(`/api/auth/mfa/factors/${target.id}`, {
-                method: "DELETE",
-                credentials: "include",
-            });
-            // 404 means it's already gone (e.g., double-click race or the
-            // row was deleted from another tab). End-state matches what
-            // the user asked for, so treat as success: close the modal
-            // and refresh — don't leave the dialog open with a confusing
-            // "Not found" error.
-            if (res.ok || res.status === 404) {
-                setRemoveTarget(null);
-                setMsg({ text: "2FA method removed", type: "success" });
-                await refresh();
-                return;
-            }
-            const e: any = await res.json();
-            setMsg({ text: e.error || "Remove failed", type: "error" });
-        } finally {
-            setRemoveBusy(false);
-        }
-    };
+    const removeFactor = (target: Factor) =>
+        askConfirm({
+            title: "Remove this 2FA method?",
+            icon: <DeleteIcon sx={{ color: "#f87171" }} />,
+            body: (
+                <>
+                    <Typography sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}>
+                        You're about to remove{" "}
+                        <strong style={{ color: "#f5f5f4" }}>
+                            {target.name || kindLabel[target.kind]}
+                        </strong>{" "}
+                        from your 2FA methods.
+                    </Typography>
+                    <Box
+                        sx={{
+                            p: 1.5,
+                            borderRadius: "8px",
+                            bgcolor: "rgba(239,68,68,0.08)",
+                            border: "1px solid rgba(239,68,68,0.25)",
+                            color: "#fca5a5",
+                            fontSize: "0.85rem",
+                        }}
+                    >
+                        <strong>This can't be undone.</strong> If this is your
+                        last method, 2FA will refuse the removal — enroll a
+                        replacement first.
+                    </Box>
+                </>
+            ),
+            confirmLabel: "Remove",
+            destructive: true,
+            onConfirm: async () => {
+                const res = await fetch(`/api/auth/mfa/factors/${target.id}`, {
+                    method: "DELETE",
+                    credentials: "include",
+                });
+                // 404 means already gone (double-click race / other tab).
+                // End-state matches the user's intent, so treat as success.
+                if (res.ok || res.status === 404) {
+                    setMsg({
+                        text: "2FA method removed",
+                        type: "success",
+                    });
+                    await refresh();
+                    return;
+                }
+                const e: any = await res.json();
+                setMsg({
+                    text: e.error || "Remove failed",
+                    type: "error",
+                });
+            },
+        });
 
     const enableMfa = async () => {
         const res = await fetch("/api/auth/mfa/enable", {
@@ -393,66 +432,114 @@ export default function SecurityPage() {
         await refresh();
     };
 
-    const disableMfa = async () => {
-        if (
-            !confirm(
-                "Disable 2FA? Your enrolled methods stay but won't be required at login.",
-            )
-        )
-            return;
-        const res = await fetch("/api/auth/mfa/disable", {
-            method: "POST",
-            credentials: "include",
-        });
-        if (!res.ok) {
-            const e: any = await res.json();
-            setMsg({ text: e.error || "Disable failed", type: "error" });
-            return;
-        }
-        setMsg({ text: "2FA disabled", type: "success" });
-        await refresh();
-    };
-
-    const regenerateBackupCodes = async () => {
-        setRegenBusy(true);
-        try {
-            const res = await fetch("/api/auth/mfa/backup-codes/regenerate", {
-                method: "POST",
-                credentials: "include",
-            });
-            const data: any = await res.json();
-            if (!res.ok) {
-                setMsg({
-                    text: data.error || "Regenerate failed",
-                    type: "error",
+    const disableMfa = () =>
+        askConfirm({
+            title: "Disable 2FA?",
+            icon: <SecurityIcon sx={{ color: "#fbbf24" }} />,
+            body: (
+                <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
+                    Your enrolled methods stay enrolled, but they won't be
+                    required at login. You can re-enable 2FA at any time.
+                </Typography>
+            ),
+            confirmLabel: "Disable",
+            destructive: true,
+            onConfirm: async () => {
+                const res = await fetch("/api/auth/mfa/disable", {
+                    method: "POST",
+                    credentials: "include",
                 });
-                return;
-            }
-            setRevealedCodes(data.backup_codes);
-            setRegenDialog(false);
-            await refresh();
-        } finally {
-            setRegenBusy(false);
-        }
-    };
-
-    const revokeDevice = async (id: string) => {
-        if (
-            !confirm(
-                "Revoke this device? It will be asked for 2FA on next login.",
-            )
-        )
-            return;
-        const res = await fetch(`/api/auth/devices/${id}`, {
-            method: "DELETE",
-            credentials: "include",
+                if (!res.ok) {
+                    const e: any = await res.json();
+                    setMsg({
+                        text: e.error || "Disable failed",
+                        type: "error",
+                    });
+                    return;
+                }
+                setMsg({ text: "2FA disabled", type: "success" });
+                await refresh();
+            },
         });
-        if (!res.ok) {
-            setMsg({ text: "Revoke failed", type: "error" });
-            return;
-        }
-        await refresh();
-    };
+
+    const regenerateBackupCodes = () =>
+        askConfirm({
+            title: "Regenerate backup codes?",
+            icon: <SecurityIcon sx={{ color: "#fbbf24" }} />,
+            body: (
+                <>
+                    <Typography sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}>
+                        A fresh set of 8 codes will be generated. You'll see
+                        them once — make sure you save them.
+                    </Typography>
+                    <Box
+                        sx={{
+                            p: 1.5,
+                            borderRadius: "8px",
+                            bgcolor: "rgba(251,146,60,0.08)",
+                            border: "1px solid rgba(251,146,60,0.25)",
+                            color: "#fed7aa",
+                            fontSize: "0.85rem",
+                        }}
+                    >
+                        <strong>
+                            Your current codes will stop working immediately.
+                        </strong>
+                        {status?.unused_backup_codes ? (
+                            <>
+                                {" "}
+                                You have{" "}
+                                <strong>{status.unused_backup_codes}</strong>{" "}
+                                unused — these will be invalidated.
+                            </>
+                        ) : null}
+                    </Box>
+                </>
+            ),
+            confirmLabel: "Regenerate",
+            onConfirm: async () => {
+                const res = await fetch(
+                    "/api/auth/mfa/backup-codes/regenerate",
+                    { method: "POST", credentials: "include" },
+                );
+                const data: any = await res.json();
+                if (!res.ok) {
+                    setMsg({
+                        text: data.error || "Regenerate failed",
+                        type: "error",
+                    });
+                    return;
+                }
+                setRevealedCodes(data.backup_codes);
+                await refresh();
+            },
+        });
+
+    const revokeDevice = (id: string) =>
+        askConfirm({
+            title: "Revoke trusted device?",
+            icon: <LaptopIcon sx={{ color: "#fbbf24" }} />,
+            body: (
+                <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
+                    This device will be asked for 2FA on the next sign-in.
+                    Existing sessions on that device keep working until they
+                    expire.
+                </Typography>
+            ),
+            confirmLabel: "Revoke",
+            destructive: true,
+            onConfirm: async () => {
+                const res = await fetch(`/api/auth/devices/${id}`, {
+                    method: "DELETE",
+                    credentials: "include",
+                });
+                if (!res.ok) {
+                    setMsg({ text: "Revoke failed", type: "error" });
+                    return;
+                }
+                await refresh();
+            },
+        });
 
     // Build a plain-text dump of the codes with a short header so the
     // user opening the file later still knows what these are. ISO date
@@ -497,33 +584,42 @@ export default function SecurityPage() {
         }
     };
 
-    const revokeSession = async (s: Session) => {
-        const isCurrent = s.is_current;
-        const ok = confirm(
-            isCurrent
-                ? "Sign out from this device? You'll be returned to the login page."
-                : `Sign out the session on ${s.device}? That device will be signed out next time it tries to refresh.`,
-        );
-        if (!ok) return;
-        const res = await fetch(`/api/auth/sessions/${s.id}`, {
-            method: "DELETE",
-            credentials: "include",
+    const revokeSession = (s: Session) =>
+        askConfirm({
+            title: s.is_current
+                ? "Sign out from this device?"
+                : "Sign out other session?",
+            icon: <LaptopIcon sx={{ color: "#fbbf24" }} />,
+            body: (
+                <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
+                    {s.is_current
+                        ? "You'll be returned to the login page on this device."
+                        : `The session on ${s.device} will be signed out the next time it tries to refresh its token.`}
+                </Typography>
+            ),
+            confirmLabel: s.is_current ? "Sign out" : "Sign out session",
+            destructive: true,
+            onConfirm: async () => {
+                const res = await fetch(`/api/auth/sessions/${s.id}`, {
+                    method: "DELETE",
+                    credentials: "include",
+                });
+                if (!res.ok) {
+                    setMsg({ text: "Sign out failed", type: "error" });
+                    return;
+                }
+                if (s.is_current) {
+                    // Revoking the current session — clear cookies + bounce.
+                    await fetch("/api/auth/logout", {
+                        method: "POST",
+                        credentials: "include",
+                    }).catch(() => {});
+                    window.location.href = "/login";
+                    return;
+                }
+                await refresh();
+            },
         });
-        if (!res.ok) {
-            setMsg({ text: "Sign out failed", type: "error" });
-            return;
-        }
-        if (isCurrent) {
-            // Revoking the current session — clear cookies + bounce.
-            await fetch("/api/auth/logout", {
-                method: "POST",
-                credentials: "include",
-            }).catch(() => {});
-            window.location.href = "/login";
-            return;
-        }
-        await refresh();
-    };
 
     if (loading) {
         return (
@@ -675,7 +771,7 @@ export default function SecurityPage() {
                                 </Box>
                                 <IconButton
                                     size="small"
-                                    onClick={() => setRemoveTarget(f)}
+                                    onClick={() => removeFactor(f)}
                                     sx={{ color: "#ef4444" }}
                                 >
                                     <DeleteIcon fontSize="small" />
@@ -933,7 +1029,7 @@ export default function SecurityPage() {
 
                     <Button
                         variant="outlined"
-                        onClick={() => setRegenDialog(true)}
+                        onClick={regenerateBackupCodes}
                         sx={{
                             color: "#c8b6ff",
                             borderColor: "rgba(155,123,247,0.4)",
@@ -1309,10 +1405,13 @@ export default function SecurityPage() {
                 </DialogActions>
             </Dialog>
 
-            {/* Regenerate backup codes confirmation */}
+            {/* Shared confirmation dialog — replaces native confirm()
+                for every "are-you-sure" prompt on this page. Title +
+                body + cancel + confirm. Destructive flag swaps the
+                confirm button gradient red. */}
             <Dialog
-                open={regenDialog}
-                onClose={() => !regenBusy && setRegenDialog(false)}
+                open={!!confirmCfg}
+                onClose={() => !confirmBusy && setConfirmCfg(null)}
                 PaperProps={{
                     sx: {
                         bgcolor: "rgba(22,28,24,0.97)",
@@ -1332,51 +1431,10 @@ export default function SecurityPage() {
                         gap: 1.5,
                     }}
                 >
-                    <SecurityIcon sx={{ color: "#fbbf24" }} />
-                    Regenerate backup codes?
+                    {confirmCfg?.icon}
+                    {confirmCfg?.title}
                 </DialogTitle>
-                <DialogContent>
-                    <Typography
-                        sx={{
-                            color: "rgba(255,255,255,0.7)",
-                            fontSize: "0.95rem",
-                            mb: 2,
-                        }}
-                    >
-                        A fresh set of 8 codes will be generated. You'll see
-                        them once — make sure you save them.
-                    </Typography>
-                    <Box
-                        sx={{
-                            p: 1.5,
-                            borderRadius: "8px",
-                            bgcolor: "rgba(251,146,60,0.08)",
-                            border: "1px solid rgba(251,146,60,0.25)",
-                            color: "#fed7aa",
-                            fontSize: "0.85rem",
-                            display: "flex",
-                            alignItems: "flex-start",
-                            gap: 1,
-                        }}
-                    >
-                        <Box>
-                            <strong>
-                                Your current codes will stop working
-                                immediately.
-                            </strong>
-                            {status?.unused_backup_codes ? (
-                                <>
-                                    {" "}
-                                    You have{" "}
-                                    <strong>
-                                        {status.unused_backup_codes}
-                                    </strong>{" "}
-                                    unused — these will be invalidated.
-                                </>
-                            ) : null}
-                        </Box>
-                    </Box>
-                </DialogContent>
+                <DialogContent>{confirmCfg?.body}</DialogContent>
                 <DialogActions
                     sx={{
                         borderTop: "1px solid rgba(255,255,255,0.1)",
@@ -1384,8 +1442,8 @@ export default function SecurityPage() {
                     }}
                 >
                     <Button
-                        onClick={() => setRegenDialog(false)}
-                        disabled={regenBusy}
+                        onClick={() => setConfirmCfg(null)}
+                        disabled={confirmBusy}
                         sx={{
                             color: "rgba(255,255,255,0.6)",
                             textTransform: "none",
@@ -1394,101 +1452,18 @@ export default function SecurityPage() {
                         Cancel
                     </Button>
                     <Button
-                        onClick={regenerateBackupCodes}
-                        disabled={regenBusy}
+                        onClick={runConfirm}
+                        disabled={confirmBusy}
                         variant="contained"
                         sx={{
-                            background:
-                                "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
+                            background: confirmCfg?.destructive
+                                ? "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)"
+                                : "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
                             textTransform: "none",
                             fontWeight: 600,
                         }}
                     >
-                        {regenBusy ? "Generating…" : "Regenerate"}
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* Remove-factor confirmation */}
-            <Dialog
-                open={!!removeTarget}
-                onClose={() => !removeBusy && setRemoveTarget(null)}
-                PaperProps={{
-                    sx: {
-                        bgcolor: "rgba(22,28,24,0.97)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        borderRadius: "16px",
-                        backdropFilter: "blur(20px)",
-                        maxWidth: 440,
-                    },
-                }}
-            >
-                <DialogTitle
-                    sx={{
-                        color: "#f5f5f4",
-                        fontWeight: 700,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1.5,
-                    }}
-                >
-                    <DeleteIcon sx={{ color: "#f87171" }} />
-                    Remove this 2FA method?
-                </DialogTitle>
-                <DialogContent>
-                    <Typography sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}>
-                        You're about to remove{" "}
-                        <strong style={{ color: "#f5f5f4" }}>
-                            {removeTarget?.name ||
-                                (removeTarget && kindLabel[removeTarget.kind])}
-                        </strong>{" "}
-                        from your 2FA methods.
-                    </Typography>
-                    <Box
-                        sx={{
-                            p: 1.5,
-                            borderRadius: "8px",
-                            bgcolor: "rgba(239,68,68,0.08)",
-                            border: "1px solid rgba(239,68,68,0.25)",
-                            color: "#fca5a5",
-                            fontSize: "0.85rem",
-                        }}
-                    >
-                        <strong>This can't be undone.</strong> If this is your
-                        last method, 2FA will be enforced and you must enroll a
-                        replacement before removing it.
-                    </Box>
-                </DialogContent>
-                <DialogActions
-                    sx={{
-                        borderTop: "1px solid rgba(255,255,255,0.1)",
-                        p: 2,
-                    }}
-                >
-                    <Button
-                        onClick={() => setRemoveTarget(null)}
-                        disabled={removeBusy}
-                        sx={{
-                            color: "rgba(255,255,255,0.6)",
-                            textTransform: "none",
-                        }}
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={() =>
-                            removeTarget && removeFactor(removeTarget)
-                        }
-                        disabled={removeBusy}
-                        variant="contained"
-                        sx={{
-                            background:
-                                "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)",
-                            textTransform: "none",
-                            fontWeight: 600,
-                        }}
-                    >
-                        {removeBusy ? "Removing…" : "Remove"}
+                        {confirmBusy ? "Working…" : confirmCfg?.confirmLabel}
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -52,7 +52,9 @@ export async function POST(request: NextRequest) {
             .bind(auth.sub),
     ]);
 
-    const factorCount = ((factorCountRow.results || [])[0] as { n: number } | undefined)?.n ?? 0;
+    const factorCount =
+        ((factorCountRow.results || [])[0] as { n: number } | undefined)?.n ??
+        0;
     if (factorCount < 1) {
         return NextResponse.json(
             {
@@ -67,17 +69,16 @@ export async function POST(request: NextRequest) {
     // calls this on every confirm; without this short-circuit it would
     // invalidate the user's saved codes every time they enroll a second
     // method.
-    const alreadyEnabled =
-        !!((userRow.results || [])[0] as { mfa_enabled: number } | undefined)
-            ?.mfa_enabled;
+    const alreadyEnabled = !!(
+        (userRow.results || [])[0] as { mfa_enabled: number } | undefined
+    )?.mfa_enabled;
     if (alreadyEnabled) {
         return NextResponse.json({
             enabled: true,
             already_enabled: true,
             unused_backup_codes:
-                ((codeCountRow.results || [])[0] as
-                    | { n: number }
-                    | undefined)?.n ?? 0,
+                ((codeCountRow.results || [])[0] as { n: number } | undefined)
+                    ?.n ?? 0,
         });
     }
 
