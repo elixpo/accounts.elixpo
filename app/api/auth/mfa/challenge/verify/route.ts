@@ -2,16 +2,13 @@ export const runtime = "edge";
 
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { type NextRequest, NextResponse } from "next/server";
-import {
-    createRefreshToken as storeRefreshToken,
-    logAuditEvent,
-} from "@/lib/db";
 import { getDatabase } from "@/lib/d1-client";
-import { createAccessToken, createRefreshToken } from "@/lib/jwt";
 import {
-    kvChallengeStore,
-    verifyAuthentication,
-} from "@/lib/mfa-passkey";
+    logAuditEvent,
+    createRefreshToken as storeRefreshToken,
+} from "@/lib/db";
+import { createAccessToken, createRefreshToken } from "@/lib/jwt";
+import { kvChallengeStore, verifyAuthentication } from "@/lib/mfa-passkey";
 import { verifyTotpCode } from "@/lib/mfa-totp";
 import { hashBackupCode, verifyMfaChallengeToken } from "@/lib/mfa-utils";
 import {
@@ -67,10 +64,7 @@ export async function POST(request: NextRequest) {
         method !== "email_otp" &&
         method !== "backup_code"
     ) {
-        return NextResponse.json(
-            { error: "Unknown method" },
-            { status: 400 },
-        );
+        return NextResponse.json({ error: "Unknown method" }, { status: 400 });
     }
 
     const challenge = await verifyMfaChallengeToken(mfaToken);
@@ -136,9 +130,7 @@ export async function POST(request: NextRequest) {
                 { status: 400 },
             );
         }
-        const stored = await kv.get(
-            `mfa_email_otp:${mfaToken.slice(-32)}`,
-        );
+        const stored = await kv.get(`mfa_email_otp:${mfaToken.slice(-32)}`);
         if (stored && stored === code.trim()) {
             await kv.delete(`mfa_email_otp:${mfaToken.slice(-32)}`);
             const factor = (await db
@@ -267,10 +259,7 @@ export async function POST(request: NextRequest) {
         process.env.REFRESH_TOKEN_EXPIRATION_DAYS || "30",
         10,
     );
-    const accessMin = parseInt(
-        process.env.JWT_EXPIRATION_MINUTES || "15",
-        10,
-    );
+    const accessMin = parseInt(process.env.JWT_EXPIRATION_MINUTES || "15", 10);
 
     const accessToken = await createAccessToken(user.id, user.email);
     const refreshToken = await createRefreshToken(user.id);
@@ -284,9 +273,7 @@ export async function POST(request: NextRequest) {
             id: generateUUID(),
             userId: user.id,
             tokenHash: refreshTokenHash,
-            expiresAt: new Date(
-                Date.now() + refreshDays * 24 * 60 * 60 * 1000,
-            ),
+            expiresAt: new Date(Date.now() + refreshDays * 24 * 60 * 60 * 1000),
             ipHash: await hashIpForSession(ipAddress),
             uaShort: shortUaForSession(userAgent),
         });

@@ -32,9 +32,7 @@ export async function POST(request: NextRequest) {
 
     const db = await getDatabase();
     const user = (await db
-        .prepare(
-            "SELECT email, display_name FROM users WHERE id = ?",
-        )
+        .prepare("SELECT email, display_name FROM users WHERE id = ?")
         .bind(auth.sub)
         .first()) as { email: string; display_name: string | null } | null;
     if (!user)

@@ -46,9 +46,7 @@ export async function POST(request: NextRequest) {
 
     const db = await getDatabase();
     const user = (await db
-        .prepare(
-            "SELECT email, display_name FROM users WHERE id = ?",
-        )
+        .prepare("SELECT email, display_name FROM users WHERE id = ?")
         .bind(challenge.userId)
         .first()) as { email: string; display_name: string | null } | null;
     if (!user)
@@ -89,14 +87,13 @@ export async function POST(request: NextRequest) {
 
     // Store the OTP keyed to this mfaToken so /verify can fetch + match it.
     // Last 32 chars of the token are enough entropy to namespace per-attempt.
-    await kv.put(
-        `mfa_email_otp:${mfaToken.slice(-32)}`,
-        code,
-        { expirationTtl: OTP_TTL_SECONDS },
-    );
+    await kv.put(`mfa_email_otp:${mfaToken.slice(-32)}`, code, {
+        expirationTtl: OTP_TTL_SECONDS,
+    });
     await kv.put(cooldownKey, "1", { expirationTtl: COOLDOWN_SECONDS });
 
-    const device = typeof body?.device === "string" ? body.device : "Unknown device";
+    const device =
+        typeof body?.device === "string" ? body.device : "Unknown device";
     const ipAddress =
         typeof body?.ipAddress === "string" ? body.ipAddress : "unknown";
 

@@ -34,7 +34,6 @@ export async function DELETE(
     const { id } = await params;
     const db = await getDatabase();
     const ok = await revokeTrustedDeviceById(db, auth.sub, id);
-    if (!ok)
-        return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!ok) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ revoked: true });
 }

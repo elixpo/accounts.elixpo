@@ -12,12 +12,12 @@
  */
 
 import {
+    type AuthenticationResponseJSON,
     generateAuthenticationOptions,
     generateRegistrationOptions,
+    type RegistrationResponseJSON,
     verifyAuthenticationResponse,
     verifyRegistrationResponse,
-    type AuthenticationResponseJSON,
-    type RegistrationResponseJSON,
 } from "@simplewebauthn/server";
 
 const RP_NAME = "Elixpo Accounts";
@@ -27,8 +27,7 @@ function getRpId(): string {
     // Effective domain (no scheme, no path). Localhost is allowed by spec.
     try {
         const url = new URL(
-            process.env.NEXT_PUBLIC_APP_URL ||
-                "https://accounts.elixpo.com",
+            process.env.NEXT_PUBLIC_APP_URL || "https://accounts.elixpo.com",
         );
         return url.hostname;
     } catch {
@@ -53,7 +52,9 @@ export interface ChallengeStore {
 export function kvChallengeStore(kv: KVNamespace): ChallengeStore {
     return {
         put: (k, v) =>
-            kv.put(k, v, { expirationTtl: CHALLENGE_TTL_SECONDS }).then(() => {}),
+            kv
+                .put(k, v, { expirationTtl: CHALLENGE_TTL_SECONDS })
+                .then(() => {}),
         get: (k) => kv.get(k),
         del: (k) => kv.delete(k).then(() => {}),
     };
@@ -90,10 +91,7 @@ export async function buildRegistrationOptions(
         },
     });
 
-    await store.put(
-        `webauthn_reg:${args.userId}`,
-        options.challenge,
-    );
+    await store.put(`webauthn_reg:${args.userId}`, options.challenge);
     return options;
 }
 

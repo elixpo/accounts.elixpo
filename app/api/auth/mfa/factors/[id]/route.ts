@@ -41,9 +41,7 @@ export async function DELETE(
                 "SELECT id, user_id FROM user_mfa_factors WHERE id = ? AND user_id = ?",
             )
             .bind(id, auth.sub),
-        db
-            .prepare("SELECT mfa_enabled FROM users WHERE id = ?")
-            .bind(auth.sub),
+        db.prepare("SELECT mfa_enabled FROM users WHERE id = ?").bind(auth.sub),
         db
             .prepare(
                 `SELECT COUNT(*) AS n FROM user_mfa_factors
@@ -56,15 +54,13 @@ export async function DELETE(
     if (!factor)
         return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    const mfaEnabled =
-        !!((userRes.results || [])[0] as any)?.mfa_enabled;
+    const mfaEnabled = !!((userRes.results || [])[0] as any)?.mfa_enabled;
     const confirmedCount = ((countRes.results || [])[0] as any)?.n ?? 0;
 
     if (mfaEnabled && confirmedCount <= 1) {
         return NextResponse.json(
             {
-                error:
-                    "This is your last 2FA method. Disable 2FA first, then remove the factor.",
+                error: "This is your last 2FA method. Disable 2FA first, then remove the factor.",
             },
             { status: 409 },
         );

@@ -147,7 +147,10 @@ export default function SecurityPage() {
         });
         if (!res.ok) {
             const e: any = await res.json();
-            setMsg({ text: e.error || "Failed to start enrollment", type: "error" });
+            setMsg({
+                text: e.error || "Failed to start enrollment",
+                type: "error",
+            });
             return;
         }
         const data: any = await res.json();
@@ -216,7 +219,10 @@ export default function SecurityPage() {
             );
             if (!verifyRes.ok) {
                 const e: any = await verifyRes.json();
-                setMsg({ text: e.error || "Passkey verification failed", type: "error" });
+                setMsg({
+                    text: e.error || "Passkey verification failed",
+                    type: "error",
+                });
                 return;
             }
             setMsg({ text: "Passkey enrolled", type: "success" });
@@ -269,12 +275,20 @@ export default function SecurityPage() {
             return;
         }
         setRevealedCodes(data.backup_codes);
-        setMsg({ text: "2FA enabled — copy your backup codes below.", type: "success" });
+        setMsg({
+            text: "2FA enabled — copy your backup codes below.",
+            type: "success",
+        });
         await refresh();
     };
 
     const disableMfa = async () => {
-        if (!confirm("Disable 2FA? Your enrolled methods stay but won't be required at login.")) return;
+        if (
+            !confirm(
+                "Disable 2FA? Your enrolled methods stay but won't be required at login.",
+            )
+        )
+            return;
         const res = await fetch("/api/auth/mfa/disable", {
             method: "POST",
             credentials: "include",
@@ -297,7 +311,10 @@ export default function SecurityPage() {
             });
             const data: any = await res.json();
             if (!res.ok) {
-                setMsg({ text: data.error || "Regenerate failed", type: "error" });
+                setMsg({
+                    text: data.error || "Regenerate failed",
+                    type: "error",
+                });
                 return;
             }
             setRevealedCodes(data.backup_codes);
@@ -309,7 +326,12 @@ export default function SecurityPage() {
     };
 
     const revokeDevice = async (id: string) => {
-        if (!confirm("Revoke this device? It will be asked for 2FA on next login.")) return;
+        if (
+            !confirm(
+                "Revoke this device? It will be asked for 2FA on next login.",
+            )
+        )
+            return;
         const res = await fetch(`/api/auth/devices/${id}`, {
             method: "DELETE",
             credentials: "include",
@@ -326,19 +348,18 @@ export default function SecurityPage() {
     // in the filename lets them stay sortable next to older batches.
     const downloadBackupCodes = (codes: string[]) => {
         const stamp = new Date().toISOString().slice(0, 10);
-        const body =
-            [
-                "Elixpo Accounts — 2FA backup codes",
-                `Generated: ${new Date().toUTCString()}`,
-                "",
-                "Each code can be used ONCE to sign in if you lose access to",
-                "your authenticator. Keep this file somewhere safe (password",
-                "manager, encrypted drive). Regenerate from accounts.elixpo.com",
-                "→ Security if you suspect these have leaked.",
-                "",
-                ...codes,
-                "",
-            ].join("\n");
+        const body = [
+            "Elixpo Accounts — 2FA backup codes",
+            `Generated: ${new Date().toUTCString()}`,
+            "",
+            "Each code can be used ONCE to sign in if you lose access to",
+            "your authenticator. Keep this file somewhere safe (password",
+            "manager, encrypted drive). Regenerate from accounts.elixpo.com",
+            "→ Security if you suspect these have leaked.",
+            "",
+            ...codes,
+            "",
+        ].join("\n");
         const blob = new Blob([body], { type: "text/plain;charset=utf-8" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -353,9 +374,15 @@ export default function SecurityPage() {
     const copyBackupCodes = async (codes: string[]) => {
         try {
             await navigator.clipboard.writeText(codes.join("\n"));
-            setMsg({ text: "Backup codes copied to clipboard", type: "success" });
+            setMsg({
+                text: "Backup codes copied to clipboard",
+                type: "success",
+            });
         } catch {
-            setMsg({ text: "Couldn't copy — use Download instead", type: "error" });
+            setMsg({
+                text: "Couldn't copy — use Download instead",
+                type: "error",
+            });
         }
     };
 
@@ -400,7 +427,14 @@ export default function SecurityPage() {
             <Box sx={{ mb: 4 }}>
                 <Typography
                     variant="h4"
-                    sx={{ fontWeight: 700, color: "#f5f5f4", mb: 1, display: "flex", alignItems: "center", gap: 1.5 }}
+                    sx={{
+                        fontWeight: 700,
+                        color: "#f5f5f4",
+                        mb: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                    }}
                 >
                     <SecurityIcon sx={{ color: "#9b7bf7" }} /> Security
                 </Typography>
@@ -419,7 +453,9 @@ export default function SecurityPage() {
                         border: "1px solid rgba(251,146,60,0.3)",
                     }}
                 >
-                    You own {status.owned_apps_count} OAuth apps. 2FA is required to keep using the platform. Enroll a method below and click Enable 2FA.
+                    You own {status.owned_apps_count} OAuth apps. 2FA is
+                    required to keep using the platform. Enroll a method below
+                    and click Enable 2FA.
                 </Alert>
             )}
 
@@ -435,16 +471,35 @@ export default function SecurityPage() {
 
             {/* Factors */}
             <Box sx={{ ...cardSx, mb: 3 }}>
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
-                    <Typography sx={{ color: "#f5f5f4", fontWeight: 600, fontSize: "1.1rem" }}>
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        mb: 2,
+                    }}
+                >
+                    <Typography
+                        sx={{
+                            color: "#f5f5f4",
+                            fontWeight: 600,
+                            fontSize: "1.1rem",
+                        }}
+                    >
                         Two-factor methods
                     </Typography>
                     <Chip
-                        label={status?.mfa_enabled ? "2FA enabled" : "2FA disabled"}
+                        label={
+                            status?.mfa_enabled ? "2FA enabled" : "2FA disabled"
+                        }
                         size="small"
                         sx={{
-                            bgcolor: status?.mfa_enabled ? "rgba(134,239,172,0.1)" : "rgba(255,255,255,0.05)",
-                            color: status?.mfa_enabled ? "#86efac" : "rgba(255,255,255,0.5)",
+                            bgcolor: status?.mfa_enabled
+                                ? "rgba(134,239,172,0.1)"
+                                : "rgba(255,255,255,0.05)",
+                            color: status?.mfa_enabled
+                                ? "#86efac"
+                                : "rgba(255,255,255,0.5)",
                             border: `1px solid ${status?.mfa_enabled ? "rgba(134,239,172,0.3)" : "rgba(255,255,255,0.1)"}`,
                             fontWeight: 600,
                         }}
@@ -456,7 +511,14 @@ export default function SecurityPage() {
                         No methods enrolled yet. Pick one below to get started.
                     </Typography>
                 ) : (
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5, mb: 2 }}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 1.5,
+                            mb: 2,
+                        }}
+                    >
                         {(status?.factors || []).map((f) => (
                             <Box
                                 key={f.id}
@@ -473,16 +535,38 @@ export default function SecurityPage() {
                             >
                                 {kindIcon[f.kind]}
                                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                                    <Typography sx={{ color: "#f5f5f4", fontWeight: 600, fontSize: "0.9rem" }}>
+                                    <Typography
+                                        sx={{
+                                            color: "#f5f5f4",
+                                            fontWeight: 600,
+                                            fontSize: "0.9rem",
+                                        }}
+                                    >
                                         {f.name || kindLabel[f.kind]}
                                     </Typography>
-                                    <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.75rem" }}>
-                                        {kindLabel[f.kind]} · added {new Date(f.created_at).toLocaleDateString()}
-                                        {f.last_used_at ? ` · last used ${new Date(f.last_used_at).toLocaleDateString()}` : ""}
-                                        {!f.confirmed ? " · pending confirmation" : ""}
+                                    <Typography
+                                        sx={{
+                                            color: "rgba(255,255,255,0.45)",
+                                            fontSize: "0.75rem",
+                                        }}
+                                    >
+                                        {kindLabel[f.kind]} · added{" "}
+                                        {new Date(
+                                            f.created_at,
+                                        ).toLocaleDateString()}
+                                        {f.last_used_at
+                                            ? ` · last used ${new Date(f.last_used_at).toLocaleDateString()}`
+                                            : ""}
+                                        {!f.confirmed
+                                            ? " · pending confirmation"
+                                            : ""}
                                     </Typography>
                                 </Box>
-                                <IconButton size="small" onClick={() => removeFactor(f.id)} sx={{ color: "#ef4444" }}>
+                                <IconButton
+                                    size="small"
+                                    onClick={() => removeFactor(f.id)}
+                                    sx={{ color: "#ef4444" }}
+                                >
                                     <DeleteIcon fontSize="small" />
                                 </IconButton>
                             </Box>
@@ -499,7 +583,10 @@ export default function SecurityPage() {
                             color: "#c8b6ff",
                             borderColor: "rgba(155,123,247,0.4)",
                             textTransform: "none",
-                            "&:hover": { borderColor: "#9b7bf7", bgcolor: "rgba(155,123,247,0.06)" },
+                            "&:hover": {
+                                borderColor: "#9b7bf7",
+                                bgcolor: "rgba(155,123,247,0.06)",
+                            },
                         }}
                     >
                         Add authenticator app
@@ -512,7 +599,10 @@ export default function SecurityPage() {
                             color: "#c8b6ff",
                             borderColor: "rgba(155,123,247,0.4)",
                             textTransform: "none",
-                            "&:hover": { borderColor: "#9b7bf7", bgcolor: "rgba(155,123,247,0.06)" },
+                            "&:hover": {
+                                borderColor: "#9b7bf7",
+                                bgcolor: "rgba(155,123,247,0.06)",
+                            },
                         }}
                     >
                         Add passkey
@@ -525,21 +615,37 @@ export default function SecurityPage() {
                             color: "#c8b6ff",
                             borderColor: "rgba(155,123,247,0.4)",
                             textTransform: "none",
-                            "&:hover": { borderColor: "#9b7bf7", bgcolor: "rgba(155,123,247,0.06)" },
+                            "&:hover": {
+                                borderColor: "#9b7bf7",
+                                bgcolor: "rgba(155,123,247,0.06)",
+                            },
                         }}
                     >
                         Enable email code
                     </Button>
                 </Box>
 
-                <Box sx={{ mt: 3, pt: 3, borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", gap: 1.5 }}>
+                <Box
+                    sx={{
+                        mt: 3,
+                        pt: 3,
+                        borderTop: "1px solid rgba(255,255,255,0.06)",
+                        display: "flex",
+                        gap: 1.5,
+                    }}
+                >
                     {!status?.mfa_enabled ? (
                         <Button
                             variant="contained"
                             onClick={enableMfa}
-                            disabled={(status?.factors || []).filter((f) => f.confirmed).length === 0}
+                            disabled={
+                                (status?.factors || []).filter(
+                                    (f) => f.confirmed,
+                                ).length === 0
+                            }
                             sx={{
-                                background: "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
+                                background:
+                                    "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
                                 textTransform: "none",
                                 fontWeight: 600,
                             }}
@@ -565,12 +671,29 @@ export default function SecurityPage() {
             {/* Backup codes */}
             {status?.mfa_enabled && (
                 <Box sx={{ ...cardSx, mb: 3 }}>
-                    <Typography sx={{ color: "#f5f5f4", fontWeight: 600, fontSize: "1.1rem", mb: 0.5 }}>
+                    <Typography
+                        sx={{
+                            color: "#f5f5f4",
+                            fontWeight: 600,
+                            fontSize: "1.1rem",
+                            mb: 0.5,
+                        }}
+                    >
                         Backup codes
                     </Typography>
-                    <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.85rem", mb: 2 }}>
-                        Single-use codes for when you lose access to your other methods. You have{" "}
-                        <strong style={{ color: "#f5f5f4" }}>{status.unused_backup_codes}</strong> unused.
+                    <Typography
+                        sx={{
+                            color: "rgba(255,255,255,0.5)",
+                            fontSize: "0.85rem",
+                            mb: 2,
+                        }}
+                    >
+                        Single-use codes for when you lose access to your other
+                        methods. You have{" "}
+                        <strong style={{ color: "#f5f5f4" }}>
+                            {status.unused_backup_codes}
+                        </strong>{" "}
+                        unused.
                     </Typography>
 
                     {revealedCodes && (
@@ -579,20 +702,36 @@ export default function SecurityPage() {
                                 p: 2,
                                 mb: 2,
                                 borderRadius: "10px",
-                                background: "linear-gradient(135deg, rgba(155,123,247,0.12), rgba(95,182,255,0.05))",
+                                background:
+                                    "linear-gradient(135deg, rgba(155,123,247,0.12), rgba(95,182,255,0.05))",
                                 border: "1px solid rgba(155,123,247,0.35)",
                             }}
                         >
-                            <Typography sx={{ color: "#fde7a4", fontSize: "0.75rem", fontWeight: 700, mb: 1.5 }}>
-                                COPY THESE CODES NOW — THEY WILL NOT BE SHOWN AGAIN
+                            <Typography
+                                sx={{
+                                    color: "#fde7a4",
+                                    fontSize: "0.75rem",
+                                    fontWeight: 700,
+                                    mb: 1.5,
+                                }}
+                            >
+                                COPY THESE CODES NOW — THEY WILL NOT BE SHOWN
+                                AGAIN
                             </Typography>
-                            <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1 }}>
+                            <Box
+                                sx={{
+                                    display: "grid",
+                                    gridTemplateColumns: "1fr 1fr",
+                                    gap: 1,
+                                }}
+                            >
                                 {revealedCodes.map((c) => (
                                     <Box
                                         key={c}
                                         component="code"
                                         sx={{
-                                            fontFamily: "var(--font-geist-mono), monospace",
+                                            fontFamily:
+                                                "var(--font-geist-mono), monospace",
                                             color: "#e8e8ed",
                                             bgcolor: "rgba(0,0,0,0.25)",
                                             p: 1,
@@ -634,7 +773,9 @@ export default function SecurityPage() {
                                 <Button
                                     size="small"
                                     startIcon={<ContentCopyIcon />}
-                                    onClick={() => copyBackupCodes(revealedCodes)}
+                                    onClick={() =>
+                                        copyBackupCodes(revealedCodes)
+                                    }
                                     sx={{
                                         color: "rgba(255,255,255,0.7)",
                                         textTransform: "none",
@@ -677,18 +818,38 @@ export default function SecurityPage() {
 
             {/* Active sessions — every device currently signed in. */}
             <Box sx={{ ...cardSx, mb: 3 }}>
-                <Typography sx={{ color: "#f5f5f4", fontWeight: 600, fontSize: "1.1rem", mb: 0.5 }}>
+                <Typography
+                    sx={{
+                        color: "#f5f5f4",
+                        fontWeight: 600,
+                        fontSize: "1.1rem",
+                        mb: 0.5,
+                    }}
+                >
                     Active sessions
                 </Typography>
-                <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.85rem", mb: 2 }}>
-                    Devices currently signed in to your account. Sign out any you don't recognize.
+                <Typography
+                    sx={{
+                        color: "rgba(255,255,255,0.5)",
+                        fontSize: "0.85rem",
+                        mb: 2,
+                    }}
+                >
+                    Devices currently signed in to your account. Sign out any
+                    you don't recognize.
                 </Typography>
                 {sessions.length === 0 ? (
                     <Typography sx={{ color: "rgba(255,255,255,0.4)", py: 2 }}>
                         No active sessions.
                     </Typography>
                 ) : (
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 1,
+                        }}
+                    >
                         {sessions.map((s) => (
                             <Box
                                 key={s.id}
@@ -706,8 +867,21 @@ export default function SecurityPage() {
                             >
                                 <LaptopIcon sx={{ color: "#9b7bf7" }} />
                                 <Box sx={{ flex: 1, minWidth: 0 }}>
-                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
-                                        <Typography sx={{ color: "#f5f5f4", fontSize: "0.9rem", fontWeight: 600 }}>
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: 1,
+                                            flexWrap: "wrap",
+                                        }}
+                                    >
+                                        <Typography
+                                            sx={{
+                                                color: "#f5f5f4",
+                                                fontSize: "0.9rem",
+                                                fontWeight: 600,
+                                            }}
+                                        >
                                             {s.device}
                                         </Typography>
                                         {s.is_current && (
@@ -717,7 +891,8 @@ export default function SecurityPage() {
                                                 sx={{
                                                     height: 18,
                                                     fontSize: "0.65rem",
-                                                    bgcolor: "rgba(134,239,172,0.1)",
+                                                    bgcolor:
+                                                        "rgba(134,239,172,0.1)",
                                                     color: "#86efac",
                                                     border: "1px solid rgba(134,239,172,0.3)",
                                                     fontWeight: 600,
@@ -725,10 +900,20 @@ export default function SecurityPage() {
                                             />
                                         )}
                                     </Box>
-                                    <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.75rem" }}>
-                                        Signed in {new Date(s.created_at).toLocaleDateString()}
+                                    <Typography
+                                        sx={{
+                                            color: "rgba(255,255,255,0.45)",
+                                            fontSize: "0.75rem",
+                                        }}
+                                    >
+                                        Signed in{" "}
+                                        {new Date(
+                                            s.created_at,
+                                        ).toLocaleDateString()}
                                         {" · last active "}
-                                        {new Date(s.last_used_at).toLocaleString()}
+                                        {new Date(
+                                            s.last_used_at,
+                                        ).toLocaleString()}
                                     </Typography>
                                 </Box>
                                 <Button
@@ -754,18 +939,38 @@ export default function SecurityPage() {
 
             {/* Trusted devices */}
             <Box sx={cardSx}>
-                <Typography sx={{ color: "#f5f5f4", fontWeight: 600, fontSize: "1.1rem", mb: 0.5 }}>
+                <Typography
+                    sx={{
+                        color: "#f5f5f4",
+                        fontWeight: 600,
+                        fontSize: "1.1rem",
+                        mb: 0.5,
+                    }}
+                >
                     Trusted devices
                 </Typography>
-                <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.85rem", mb: 2 }}>
-                    Devices that skip the 2FA prompt for 30 days. Revoke any you don't recognize.
+                <Typography
+                    sx={{
+                        color: "rgba(255,255,255,0.5)",
+                        fontSize: "0.85rem",
+                        mb: 2,
+                    }}
+                >
+                    Devices that skip the 2FA prompt for 30 days. Revoke any you
+                    don't recognize.
                 </Typography>
                 {devices.length === 0 ? (
                     <Typography sx={{ color: "rgba(255,255,255,0.4)", py: 2 }}>
                         No trusted devices.
                     </Typography>
                 ) : (
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 1,
+                        }}
+                    >
                         {devices.map((d) => (
                             <Box
                                 key={d.id}
@@ -780,19 +985,42 @@ export default function SecurityPage() {
                                     opacity: d.is_active ? 1 : 0.4,
                                 }}
                             >
-                                <LaptopIcon sx={{ color: d.is_active ? "#9b7bf7" : "rgba(255,255,255,0.3)" }} />
+                                <LaptopIcon
+                                    sx={{
+                                        color: d.is_active
+                                            ? "#9b7bf7"
+                                            : "rgba(255,255,255,0.3)",
+                                    }}
+                                />
                                 <Box sx={{ flex: 1 }}>
-                                    <Typography sx={{ color: "#f5f5f4", fontSize: "0.9rem", fontWeight: 600 }}>
-                                        {d.name || d.ua_short || "Unknown device"}
+                                    <Typography
+                                        sx={{
+                                            color: "#f5f5f4",
+                                            fontSize: "0.9rem",
+                                            fontWeight: 600,
+                                        }}
+                                    >
+                                        {d.name ||
+                                            d.ua_short ||
+                                            "Unknown device"}
                                     </Typography>
-                                    <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.75rem" }}>
+                                    <Typography
+                                        sx={{
+                                            color: "rgba(255,255,255,0.45)",
+                                            fontSize: "0.75rem",
+                                        }}
+                                    >
                                         {d.is_active
                                             ? `Last seen ${new Date(d.last_seen_at).toLocaleString()}`
                                             : "Revoked"}
                                     </Typography>
                                 </Box>
                                 {d.is_active && (
-                                    <IconButton size="small" onClick={() => revokeDevice(d.id)} sx={{ color: "#ef4444" }}>
+                                    <IconButton
+                                        size="small"
+                                        onClick={() => revokeDevice(d.id)}
+                                        sx={{ color: "#ef4444" }}
+                                    >
                                         <DeleteIcon fontSize="small" />
                                     </IconButton>
                                 )}
@@ -821,25 +1049,51 @@ export default function SecurityPage() {
                 <DialogContent>
                     {totpData && (
                         <>
-                            <Typography sx={{ color: "rgba(255,255,255,0.7)", mb: 2, fontSize: "0.9rem" }}>
-                                1. Open your authenticator app (Google Authenticator, 1Password, Authy…) and scan this QR code.
+                            <Typography
+                                sx={{
+                                    color: "rgba(255,255,255,0.7)",
+                                    mb: 2,
+                                    fontSize: "0.9rem",
+                                }}
+                            >
+                                1. Open your authenticator app (Google
+                                Authenticator, 1Password, Authy…) and scan this
+                                QR code.
                             </Typography>
-                            <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    mb: 2,
+                                }}
+                            >
                                 <Box
                                     component="img"
                                     src={totpData.qr_dataurl}
                                     alt="TOTP QR"
-                                    sx={{ width: 200, height: 200, borderRadius: "8px" }}
+                                    sx={{
+                                        width: 200,
+                                        height: 200,
+                                        borderRadius: "8px",
+                                    }}
                                 />
                             </Box>
-                            <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.75rem", textAlign: "center", mb: 2 }}>
+                            <Typography
+                                sx={{
+                                    color: "rgba(255,255,255,0.5)",
+                                    fontSize: "0.75rem",
+                                    textAlign: "center",
+                                    mb: 2,
+                                }}
+                            >
                                 Or paste this secret:
                             </Typography>
                             <Box
                                 component="code"
                                 sx={{
                                     display: "block",
-                                    fontFamily: "var(--font-geist-mono), monospace",
+                                    fontFamily:
+                                        "var(--font-geist-mono), monospace",
                                     bgcolor: "rgba(0,0,0,0.25)",
                                     color: "#c8b6ff",
                                     p: 1,
@@ -852,32 +1106,62 @@ export default function SecurityPage() {
                             >
                                 {totpData.secret}
                             </Box>
-                            <Typography sx={{ color: "rgba(255,255,255,0.7)", mb: 1, fontSize: "0.9rem" }}>
+                            <Typography
+                                sx={{
+                                    color: "rgba(255,255,255,0.7)",
+                                    mb: 1,
+                                    fontSize: "0.9rem",
+                                }}
+                            >
                                 2. Enter the 6-digit code your app shows:
                             </Typography>
                             <TextField
                                 fullWidth
                                 value={totpCode}
-                                onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                                onChange={(e) =>
+                                    setTotpCode(
+                                        e.target.value
+                                            .replace(/\D/g, "")
+                                            .slice(0, 6),
+                                    )
+                                }
                                 placeholder="123456"
                                 inputProps={{
                                     inputMode: "numeric",
-                                    style: { textAlign: "center", fontSize: "1.5rem", letterSpacing: "8px", fontFamily: "monospace" },
+                                    style: {
+                                        textAlign: "center",
+                                        fontSize: "1.5rem",
+                                        letterSpacing: "8px",
+                                        fontFamily: "monospace",
+                                    },
                                 }}
                                 sx={{
                                     "& .MuiOutlinedInput-root": {
                                         color: "#f5f5f4",
-                                        "& fieldset": { borderColor: "rgba(255,255,255,0.15)" },
-                                        "&:hover fieldset": { borderColor: "rgba(155,123,247,0.4)" },
-                                        "&.Mui-focused fieldset": { borderColor: "#9b7bf7" },
+                                        "& fieldset": {
+                                            borderColor:
+                                                "rgba(255,255,255,0.15)",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor:
+                                                "rgba(155,123,247,0.4)",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "#9b7bf7",
+                                        },
                                     },
                                 }}
                             />
                         </>
                     )}
                 </DialogContent>
-                <DialogActions sx={{ borderTop: "1px solid rgba(255,255,255,0.1)", p: 2 }}>
-                    <Button onClick={() => setTotpDialog(false)} sx={{ color: "rgba(255,255,255,0.6)" }}>
+                <DialogActions
+                    sx={{ borderTop: "1px solid rgba(255,255,255,0.1)", p: 2 }}
+                >
+                    <Button
+                        onClick={() => setTotpDialog(false)}
+                        sx={{ color: "rgba(255,255,255,0.6)" }}
+                    >
                         Cancel
                     </Button>
                     <Button
@@ -885,7 +1169,8 @@ export default function SecurityPage() {
                         variant="contained"
                         disabled={totpBusy || totpCode.length !== 6}
                         sx={{
-                            background: "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
+                            background:
+                                "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
                             textTransform: "none",
                             fontWeight: 600,
                         }}
@@ -929,8 +1214,8 @@ export default function SecurityPage() {
                             mb: 2,
                         }}
                     >
-                        A fresh set of 8 codes will be generated. You'll see them
-                        once — make sure you save them.
+                        A fresh set of 8 codes will be generated. You'll see
+                        them once — make sure you save them.
                     </Typography>
                     <Box
                         sx={{
@@ -946,11 +1231,17 @@ export default function SecurityPage() {
                         }}
                     >
                         <Box>
-                            <strong>Your current codes will stop working immediately.</strong>
+                            <strong>
+                                Your current codes will stop working
+                                immediately.
+                            </strong>
                             {status?.unused_backup_codes ? (
                                 <>
-                                    {" "}You have{" "}
-                                    <strong>{status.unused_backup_codes}</strong>{" "}
+                                    {" "}
+                                    You have{" "}
+                                    <strong>
+                                        {status.unused_backup_codes}
+                                    </strong>{" "}
                                     unused — these will be invalidated.
                                 </>
                             ) : null}
@@ -978,7 +1269,8 @@ export default function SecurityPage() {
                         disabled={regenBusy}
                         variant="contained"
                         sx={{
-                            background: "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
+                            background:
+                                "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
                             textTransform: "none",
                             fontWeight: 600,
                         }}

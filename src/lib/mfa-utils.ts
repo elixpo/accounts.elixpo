@@ -12,8 +12,12 @@
  *   abandoned the flow.
  */
 
-import { type JWTPayload as BaseJWTPayload, getSigningKey, getVerifyingKey } from "./jwt";
 import * as jose from "jose";
+import {
+    type JWTPayload as BaseJWTPayload,
+    getSigningKey,
+    getVerifyingKey,
+} from "./jwt";
 
 // ── Backup codes ────────────────────────────────────────────────────────
 

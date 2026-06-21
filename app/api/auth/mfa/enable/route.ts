@@ -3,10 +3,7 @@ export const runtime = "edge";
 import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
 import { verifyJWT } from "@/lib/jwt";
-import {
-    generateBackupCodes,
-    hashBackupCode,
-} from "@/lib/mfa-utils";
+import { generateBackupCodes, hashBackupCode } from "@/lib/mfa-utils";
 import { generateUUID } from "@/lib/webcrypto";
 
 async function getAuth(request: NextRequest) {
@@ -64,9 +61,7 @@ export async function POST(request: NextRequest) {
             .prepare("UPDATE users SET mfa_enabled = 1 WHERE id = ?")
             .bind(auth.sub),
         db
-            .prepare(
-                "DELETE FROM user_mfa_backup_codes WHERE user_id = ?",
-            )
+            .prepare("DELETE FROM user_mfa_backup_codes WHERE user_id = ?")
             .bind(auth.sub),
         ...hashes.map((h) =>
             db

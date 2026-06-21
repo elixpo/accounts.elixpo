@@ -129,7 +129,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 window.location.assign("/login");
             });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [pathname]);
 
     const handleLogout = async () => {
         setAnchorEl(null);
@@ -393,9 +393,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     },
                                     {
                                         href: "/dashboard/services",
-                                        icon: (
-                                            <DevicesOther fontSize="small" />
-                                        ),
+                                        icon: <DevicesOther fontSize="small" />,
                                         label: "Connected services",
                                     },
                                 ].map((item) => (

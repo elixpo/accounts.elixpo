@@ -384,9 +384,7 @@ async function buildSuccessResponse(
             verifyTrustedDeviceCookie,
             isDeviceTrusted,
         } = await import("@/lib/trusted-devices");
-        const tdCookie = request.cookies.get(
-            TRUSTED_DEVICE_COOKIE_NAME,
-        )?.value;
+        const tdCookie = request.cookies.get(TRUSTED_DEVICE_COOKIE_NAME)?.value;
         let trustedSkip = false;
         if (tdCookie) {
             const decoded = await verifyTrustedDeviceCookie(tdCookie);
@@ -405,7 +403,10 @@ async function buildSuccessResponse(
             const next = oauthNext || "/dashboard/oauth-apps";
             const mfaToken = await mintMfaChallengeToken(user.id, next);
             return NextResponse.redirect(
-                new URL(`/mfa?token=${encodeURIComponent(mfaToken)}`, request.url),
+                new URL(
+                    `/mfa?token=${encodeURIComponent(mfaToken)}`,
+                    request.url,
+                ),
             );
         }
     }

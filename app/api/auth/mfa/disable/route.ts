@@ -42,8 +42,7 @@ export async function POST(request: NextRequest) {
     if (appCount && appCount.n >= 3) {
         return NextResponse.json(
             {
-                error:
-                    "2FA is required while you own 3 or more OAuth apps. Delete some apps first, then disable 2FA.",
+                error: "2FA is required while you own 3 or more OAuth apps. Delete some apps first, then disable 2FA.",
             },
             { status: 409 },
         );

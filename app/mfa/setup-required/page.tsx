@@ -34,12 +34,16 @@ export default function SetupRequiredPage() {
                 }}
             >
                 <LockIcon sx={{ color: "#fbbf24", fontSize: 48, mb: 2 }} />
-                <Typography variant="h5" sx={{ color: "#f5f5f4", fontWeight: 700, mb: 1 }}>
+                <Typography
+                    variant="h5"
+                    sx={{ color: "#f5f5f4", fontWeight: 700, mb: 1 }}
+                >
                     Two-factor authentication required
                 </Typography>
                 <Typography sx={{ color: "rgba(255,255,255,0.6)", mb: 3 }}>
-                    You're managing 3 or more OAuth apps on Elixpo. To protect those apps and
-                    the users who sign in with them, we now require 2FA on your account.
+                    You're managing 3 or more OAuth apps on Elixpo. To protect
+                    those apps and the users who sign in with them, we now
+                    require 2FA on your account.
                 </Typography>
 
                 <Alert
@@ -52,16 +56,20 @@ export default function SetupRequiredPage() {
                         border: "1px solid rgba(251,146,60,0.25)",
                     }}
                 >
-                    Until you enable 2FA you can't manage OAuth apps, webhooks, or sensitive
-                    profile actions. Enroll a method below to continue.
+                    Until you enable 2FA you can't manage OAuth apps, webhooks,
+                    or sensitive profile actions. Enroll a method below to
+                    continue.
                 </Alert>
 
-                <Box sx={{ display: "flex", gap: 1.5, justifyContent: "center" }}>
+                <Box
+                    sx={{ display: "flex", gap: 1.5, justifyContent: "center" }}
+                >
                     <Button
                         href="/dashboard/security"
                         variant="contained"
                         sx={{
-                            background: "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
+                            background:
+                                "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
                             textTransform: "none",
                             fontWeight: 600,
                             px: 3,

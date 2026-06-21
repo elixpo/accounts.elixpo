@@ -144,7 +144,14 @@ export async function recordTrustedDevice(
                 (id, user_id, device_uuid, name, ip_hash, ua_short)
              VALUES (?, ?, ?, ?, ?, ?)`,
         )
-        .bind(args.id, args.userId, args.deviceUuid, args.name ?? null, ipHash, ua)
+        .bind(
+            args.id,
+            args.userId,
+            args.deviceUuid,
+            args.name ?? null,
+            ipHash,
+            ua,
+        )
         .run();
 }
 

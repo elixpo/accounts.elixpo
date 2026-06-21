@@ -37,9 +37,7 @@ export async function GET(request: NextRequest) {
                  ORDER BY created_at ASC`,
             )
             .bind(auth.sub),
-        db
-            .prepare("SELECT mfa_enabled FROM users WHERE id = ?")
-            .bind(auth.sub),
+        db.prepare("SELECT mfa_enabled FROM users WHERE id = ?").bind(auth.sub),
         db
             .prepare(
                 `SELECT COUNT(*) AS n FROM user_mfa_backup_codes
@@ -62,10 +60,8 @@ export async function GET(request: NextRequest) {
         confirmed: !!f.confirmed_at,
         last_used_at: f.last_used_at,
     }));
-    const mfaEnabled =
-        !!((userRes.results || [])[0] as any)?.mfa_enabled;
-    const unusedBackupCodes =
-        ((backupRes.results || [])[0] as any)?.n ?? 0;
+    const mfaEnabled = !!((userRes.results || [])[0] as any)?.mfa_enabled;
+    const unusedBackupCodes = ((backupRes.results || [])[0] as any)?.n ?? 0;
     const ownedAppsCount = ((appsRes.results || [])[0] as any)?.n ?? 0;
 
     return NextResponse.json({
