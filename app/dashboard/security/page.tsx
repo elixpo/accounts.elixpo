@@ -111,6 +111,13 @@ export default function SecurityPage() {
     const [regenDialog, setRegenDialog] = useState(false);
     const [regenBusy, setRegenBusy] = useState(false);
 
+    // Remove-factor confirmation modal. We carry the target factor in
+    // state so the dialog body can name it ("Remove Passkey?") rather
+    // than a generic prompt — and so the busy state belongs to that
+    // specific row.
+    const [removeTarget, setRemoveTarget] = useState<Factor | null>(null);
+    const [removeBusy, setRemoveBusy] = useState(false);
+
     const refresh = useCallback(async () => {
         try {
             const [factorsRes, devicesRes, sessionsRes] = await Promise.all([
@@ -250,18 +257,24 @@ export default function SecurityPage() {
         await refresh();
     };
 
-    const removeFactor = async (id: string) => {
-        if (!confirm("Remove this 2FA method?")) return;
-        const res = await fetch(`/api/auth/mfa/factors/${id}`, {
-            method: "DELETE",
-            credentials: "include",
-        });
-        if (!res.ok) {
-            const e: any = await res.json();
-            setMsg({ text: e.error || "Remove failed", type: "error" });
-            return;
+    const removeFactor = async (target: Factor) => {
+        setRemoveBusy(true);
+        try {
+            const res = await fetch(`/api/auth/mfa/factors/${target.id}`, {
+                method: "DELETE",
+                credentials: "include",
+            });
+            if (!res.ok) {
+                const e: any = await res.json();
+                setMsg({ text: e.error || "Remove failed", type: "error" });
+                return;
+            }
+            setRemoveTarget(null);
+            setMsg({ text: "2FA method removed", type: "success" });
+            await refresh();
+        } finally {
+            setRemoveBusy(false);
         }
-        await refresh();
     };
 
     const enableMfa = async () => {

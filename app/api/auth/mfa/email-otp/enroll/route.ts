@@ -1,0 +1,141 @@
+export const runtime = "edge";
+
+import { getRequestContext } from "@cloudflare/next-on-pages";
+import { type NextRequest, NextResponse } from "next/server";
+import { getDatabase } from "@/lib/d1-client";
+import { verifyJWT } from "@/lib/jwt";
+import { sendMail } from "@/lib/mails";
+import { hashBackupCode } from "@/lib/mfa-utils";
+import { generateNumericOtp, generateUUID } from "@/lib/webcrypto";
+
+const ENROLL_OTP_TTL_SECONDS = 10 * 60;
+const COOLDOWN_SECONDS = 30;
+
+async function getAuth(request: NextRequest) {
+    const token =
+        request.cookies.get("access_token")?.value ||
+        request.headers.get("authorization")?.replace("Bearer ", "");
+    if (!token) return null;
+    const payload = await verifyJWT(token);
+    if (payload?.type !== "access") return null;
+    return payload;
+}
+
+/**
+ * POST /api/auth/mfa/email-otp/enroll
+ *
+ * Start email-OTP enrollment. Creates an UNCONFIRMED factor row + mails
+ * a 6-digit verification code to the user's account email. The factor
+ * becomes usable only after /api/auth/mfa/email-otp/confirm validates
+ * the code — same two-step ceremony as TOTP, so we prove the user
+ * actually receives email at the registered address before treating it
+ * as a 2FA method.
+ *
+ * Idempotent: a second call within the cooldown returns 429; outside
+ * the cooldown it overwrites the pending OTP. Existing CONFIRMED rows
+ * short-circuit to 200 — re-enrolling a confirmed email factor is a
+ * no-op.
+ */
+export async function POST(request: NextRequest) {
+    const auth = await getAuth(request);
+    if (!auth)
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const db = await getDatabase();
+    const user = (await db
+        .prepare(
+            "SELECT email, display_name, email_verified FROM users WHERE id = ?",
+        )
+        .bind(auth.sub)
+        .first()) as {
+        email: string;
+        display_name: string | null;
+        email_verified: number;
+    } | null;
+    if (!user)
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+    if (!user.email_verified) {
+        return NextResponse.json(
+            {
+                error: "Verify your account email before enabling email OTP as a 2FA method.",
+            },
+            { status: 400 },
+        );
+    }
+
+    // Already confirmed? Treat as success — UI will reflect the existing factor.
+    const existingConfirmed = (await db
+        .prepare(
+            `SELECT id FROM user_mfa_factors
+             WHERE user_id = ? AND kind = 'email_otp'
+                AND confirmed_at IS NOT NULL`,
+        )
+        .bind(auth.sub)
+        .first()) as { id: string } | null;
+    if (existingConfirmed) {
+        return NextResponse.json({
+            factor_id: existingConfirmed.id,
+            already_confirmed: true,
+        });
+    }
+
+    // Cooldown — keyed per user so two tabs / hot-reloads don't spam.
+    const kv = (getRequestContext().env as any).KV as KVNamespace;
+    const cooldownKey = `mfa_email_enroll_cd:${auth.sub}`;
+    const cooled = await kv.get(cooldownKey);
+    if (cooled) {
+        return NextResponse.json(
+            {
+                error: `Wait a moment before requesting another code (cooldown ${COOLDOWN_SECONDS}s).`,
+            },
+            { status: 429 },
+        );
+    }
+
+    // Reuse an existing unconfirmed row if present so the user can
+    // safely re-trigger enroll (e.g. didn't get the first email).
+    let factorId: string;
+    const existingPending = (await db
+        .prepare(
+            `SELECT id FROM user_mfa_factors
+             WHERE user_id = ? AND kind = 'email_otp'
+                AND confirmed_at IS NULL`,
+        )
+        .bind(auth.sub)
+        .first()) as { id: string } | null;
+    if (existingPending) {
+        factorId = existingPending.id;
+    } else {
+        factorId = generateUUID();
+        await db
+            .prepare(
+                `INSERT INTO user_mfa_factors
+                    (id, user_id, kind, name)
+                 VALUES (?, ?, 'email_otp', 'Email code')`,
+            )
+            .bind(factorId, auth.sub)
+            .run();
+    }
+
+    // Generate + send. The plaintext OTP never touches D1 — only its
+    // hash sits in KV so /confirm can match without storing the code.
+    const otp = generateNumericOtp();
+    const otpHash = await hashBackupCode(otp);
+    await kv.put(`mfa_email_enroll:${auth.sub}`, otpHash, {
+        expirationTtl: ENROLL_OTP_TTL_SECONDS,
+    });
+    await kv.put(cooldownKey, "1", { expirationTtl: COOLDOWN_SECONDS });
+
+    await sendMail("user_verify_otp", user.email, {
+        name: user.display_name || user.email.split("@")[0],
+        otp_code: otp,
+        expiry_minutes: Math.ceil(ENROLL_OTP_TTL_SECONDS / 60),
+        verify_link: "",
+    });
+
+    return NextResponse.json({
+        factor_id: factorId,
+        expires_in: ENROLL_OTP_TTL_SECONDS,
+        sent_to: user.email,
+    });
+}
