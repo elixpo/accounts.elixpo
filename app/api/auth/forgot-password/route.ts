@@ -4,13 +4,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
 import { sendMail } from "@/lib/mails";
 import { createPasswordResetRateLimiter } from "@/lib/rate-limit";
-import { generateUUID } from "@/lib/webcrypto";
-
-function generateOTP(): string {
-    const bytes = crypto.getRandomValues(new Uint8Array(3));
-    const num = ((bytes[0] << 16) | (bytes[1] << 8) | bytes[2]) % 1000000;
-    return num.toString().padStart(6, "0");
-}
+import { generateNumericOtp, generateUUID } from "@/lib/webcrypto";
 
 /**
  * POST /api/auth/forgot-password
@@ -92,7 +86,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        const otp = generateOTP();
+        const otp = generateNumericOtp();
         const tokenId = generateUUID();
         const verificationToken = generateUUID();
         const expiryMinutes = 10;
@@ -130,7 +124,7 @@ export async function POST(request: NextRequest) {
             expiry_minutes: expiryMinutes,
         });
 
-        console.log(`[ForgotPassword] OTP sent to ${email}`);
+        console.log("[ForgotPassword] OTP sent to %s", email);
 
         return NextResponse.json({
             message: "If that email is registered, a reset code has been sent.",

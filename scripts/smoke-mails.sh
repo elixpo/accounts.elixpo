@@ -73,6 +73,10 @@ PAYLOADS_password_reset=$(cat <<JSON
 {"to":"${TO}","variables":{"name":"Ayush","otp_code":"715240","expiry_minutes":10}}
 JSON
 )
+PAYLOADS_login_otp=$(cat <<JSON
+{"to":"${TO}","variables":{"name":"Ayush","otp_code":"841726","expiry_minutes":5,"device":"Chrome on macOS","ip_address":"203.0.113.42"}}
+JSON
+)
 PAYLOADS_oauth_app_register=$(cat <<JSON
 {"to":"${TO}","variables":{"name":"Ayush","app_name":"Smoke Test App","client_id_short":"cli_18663415f00aed03bea1","dashboard_url":"https://accounts.elixpo.com/dashboard/oauth-apps/cli_smoke"}}
 JSON
@@ -94,7 +98,7 @@ PAYLOADS_webhook_fail=$(cat <<JSON
 JSON
 )
 
-ALL=(user_verify_otp password_reset oauth_app_register oauth_app_delete account_suspended sign_in_device webhook_fail)
+ALL=(user_verify_otp password_reset login_otp oauth_app_register oauth_app_delete account_suspended sign_in_device webhook_fail)
 
 if [[ $# -gt 0 ]]; then
   TARGETS=("$@")

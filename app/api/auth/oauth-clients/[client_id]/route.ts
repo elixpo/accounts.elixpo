@@ -204,7 +204,7 @@ export async function PATCH(
             clientSecretHash: newSecretHash,
         });
 
-        console.log(`[OAuth Client] Secret regenerated for: ${client_id}`);
+        console.log("[OAuth Client] Secret regenerated for: %s", client_id);
 
         return NextResponse.json({
             client_id,
@@ -278,7 +278,7 @@ export async function DELETE(
             );
         }
 
-        console.log(`[OAuth Client] Deactivated: ${client_id}`);
+        console.log("[OAuth Client] Deactivated: %s", client_id);
 
         // Notify owner via email (fire-and-forget)
         try {

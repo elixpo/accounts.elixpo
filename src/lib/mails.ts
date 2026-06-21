@@ -23,6 +23,7 @@ const TIMEOUT_MS = 5_000;
 export type MailTemplate =
     | "user_verify_otp"
     | "password_reset"
+    | "login_otp"
     | "oauth_app_register"
     | "oauth_app_delete"
     | "account_suspended"
@@ -32,6 +33,7 @@ export type MailTemplate =
 const HOOK_ENV: Record<MailTemplate, string> = {
     user_verify_otp: "MAILS_HOOK_USER_VERIFY_OTP",
     password_reset: "MAILS_HOOK_PASSWORD_RESET",
+    login_otp: "MAILS_HOOK_LOGIN_OTP",
     oauth_app_register: "MAILS_HOOK_OAUTH_APP_REGISTER",
     oauth_app_delete: "MAILS_HOOK_OAUTH_APP_DELETE",
     account_suspended: "MAILS_HOOK_ACCOUNT_SUSPENDED",
@@ -57,15 +59,23 @@ export async function sendMail(
 ): Promise<void> {
     const secret = process.env.MAILS_SHARED_SECRET;
     if (!secret) {
+        // Use printf-style placeholders so user-controlled values
+        // (template/to) can't smuggle format specifiers into the log
+        // sink — flagged by CodeQL js/format-string-injection.
         console.warn(
-            `[mails] MAILS_SHARED_SECRET not set — skipping ${template} to ${to}`,
+            "[mails] MAILS_SHARED_SECRET not set — skipping %s to %s",
+            template,
+            to,
         );
         return;
     }
     const endpointKey = process.env[HOOK_ENV[template]];
     if (!endpointKey) {
         console.warn(
-            `[mails] ${HOOK_ENV[template]} not set — skipping ${template} to ${to}`,
+            "[mails] %s not set — skipping %s to %s",
+            HOOK_ENV[template],
+            template,
+            to,
         );
         return;
     }
@@ -99,7 +109,11 @@ export async function sendMail(
         if (!res.ok) {
             const text = await res.text().catch(() => "");
             console.error(
-                `[mails] ${template} to ${to} failed: HTTP ${res.status} ${text.slice(0, 200)}`,
+                "[mails] %s to %s failed: HTTP %s %s",
+                template,
+                to,
+                String(res.status),
+                text.slice(0, 200),
             );
             return;
         }
@@ -112,7 +126,9 @@ export async function sendMail(
             const j: any = await res.json();
             if (j && j.ok === false && j.status === "suppressed") {
                 console.warn(
-                    `[mails] ${template} to ${to} suppressed (recipient unsubscribed)`,
+                    "[mails] %s to %s suppressed (recipient unsubscribed)",
+                    template,
+                    to,
                 );
             }
         } catch {
@@ -120,8 +136,10 @@ export async function sendMail(
         }
     } catch (err) {
         console.error(
-            `[mails] ${template} to ${to} delivery error:`,
-            err instanceof Error ? err.message : err,
+            "[mails] %s to %s delivery error: %s",
+            template,
+            to,
+            err instanceof Error ? err.message : String(err),
         );
     } finally {
         clearTimeout(tm);

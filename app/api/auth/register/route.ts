@@ -163,13 +163,10 @@ export async function POST(request: NextRequest) {
 
                 // Send verification OTP email (fire-and-forget)
                 try {
-                    const otp = crypto.getRandomValues(new Uint8Array(3));
-                    const otpCode = (
-                        ((otp[0] << 16) | (otp[1] << 8) | otp[2]) %
-                        1000000
-                    )
-                        .toString()
-                        .padStart(6, "0");
+                    const { generateNumericOtp } = await import(
+                        "@/lib/webcrypto"
+                    );
+                    const otpCode = generateNumericOtp();
                     const expiryMinutes = parseInt(
                         process.env.EMAIL_VERIFICATION_OTP_EXPIRY_MINUTES ||
                             "10",
@@ -204,7 +201,10 @@ export async function POST(request: NextRequest) {
                         expiry_minutes: 10,
                         verify_link: verifyLink,
                     });
-                    console.log(`[Register] Verification OTP sent to ${email}`);
+                    console.log(
+                        "[Register] Verification OTP sent to %s",
+                        email,
+                    );
                 } catch (otpError) {
                     console.error(
                         "[Register] Failed to send verification email:",

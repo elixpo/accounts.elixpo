@@ -4,13 +4,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
 import { verifyJWT } from "@/lib/jwt";
 import { sendMail } from "@/lib/mails";
-import { generateUUID } from "@/lib/webcrypto";
-
-function generateOTP(): string {
-    const bytes = crypto.getRandomValues(new Uint8Array(3));
-    const num = ((bytes[0] << 16) | (bytes[1] << 8) | bytes[2]) % 1000000;
-    return num.toString().padStart(6, "0");
-}
+import { generateNumericOtp, generateUUID } from "@/lib/webcrypto";
 
 /**
  * POST /api/auth/send-verification
@@ -77,7 +71,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Generate OTP and verification token
-        const otp = generateOTP();
+        const otp = generateNumericOtp();
         const verificationToken = generateUUID();
         const expiryMinutes = parseInt(
             process.env.EMAIL_VERIFICATION_OTP_EXPIRY_MINUTES || "10",
@@ -120,7 +114,7 @@ export async function POST(request: NextRequest) {
             verify_link: verifyLink,
         });
 
-        console.log(`[Verification] OTP sent to ${user.email}`);
+        console.log("[Verification] OTP sent to %s", user.email);
 
         return NextResponse.json({
             message: "Verification code sent to your email",
