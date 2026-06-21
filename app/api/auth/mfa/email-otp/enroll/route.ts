@@ -82,7 +82,12 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    // Already confirmed? Treat as success — UI will reflect the existing factor.
+    // Already confirmed? Treat as success — but also clean up any
+    // pending duplicate rows for this kind. The dashboard's factor list
+    // would otherwise show a stale "pending confirmation" row alongside
+    // the real confirmed factor, leaving the user stuck (clicking
+    // Resend hits this branch and silently bails, never opening the
+    // dialog). Sweeping the dupes here closes that loop.
     const existingConfirmed = (await db
         .prepare(
             `SELECT id FROM user_mfa_factors
@@ -92,6 +97,15 @@ export async function POST(request: NextRequest) {
         .bind(auth.sub)
         .first()) as { id: string } | null;
     if (existingConfirmed) {
+        await db
+            .prepare(
+                `DELETE FROM user_mfa_factors
+                 WHERE user_id = ? AND kind = 'email_otp'
+                    AND confirmed_at IS NULL`,
+            )
+            .bind(auth.sub)
+            .run()
+            .catch(() => {});
         return NextResponse.json({
             factor_id: existingConfirmed.id,
             already_confirmed: true,
