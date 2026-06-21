@@ -11,6 +11,25 @@ import { generateNumericOtp, generateUUID } from "@/lib/webcrypto";
 const ENROLL_OTP_TTL_SECONDS = 10 * 60;
 const COOLDOWN_SECONDS = 30;
 
+// Minimal UA summary just for the email body — same shape the sign-in
+// alert uses, but inlined here to keep this route self-contained.
+function shortUaForDisplay(ua: string): string {
+    if (!ua) return "Account settings";
+    let browser = "Unknown browser";
+    if (ua.includes("Edg/")) browser = "Edge";
+    else if (ua.includes("OPR/")) browser = "Opera";
+    else if (ua.includes("Chrome/")) browser = "Chrome";
+    else if (ua.includes("Firefox/")) browser = "Firefox";
+    else if (ua.includes("Safari/")) browser = "Safari";
+    let os = "Unknown OS";
+    if (/iPhone|iPad/.test(ua)) os = "iOS";
+    else if (/Android/.test(ua)) os = "Android";
+    else if (/Mac OS X/.test(ua)) os = "macOS";
+    else if (/Windows/.test(ua)) os = "Windows";
+    else if (/Linux/.test(ua)) os = "Linux";
+    return `${browser} on ${os}`;
+}
+
 async function getAuth(request: NextRequest) {
     const token =
         request.cookies.get("access_token")?.value ||
@@ -126,11 +145,23 @@ export async function POST(request: NextRequest) {
     });
     await kv.put(cooldownKey, "1", { expirationTtl: COOLDOWN_SECONDS });
 
-    await sendMail("user_verify_otp", user.email, {
+    // Dedicated mfa_email template — distinct from login_otp so the
+    // messaging matches the actual intent ("you're enabling email as a
+    // 2FA method", not "complete your sign-in"). Variables match what
+    // the template declares: name, otp_code, expiry_minutes, device,
+    // ip_address.
+    const ipAddress =
+        request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+        request.headers.get("cf-connecting-ip") ||
+        "unknown";
+    const userAgent = request.headers.get("user-agent") || "";
+    const device = shortUaForDisplay(userAgent);
+    await sendMail("mfa_email", user.email, {
         name: user.display_name || user.email.split("@")[0],
         otp_code: otp,
         expiry_minutes: Math.ceil(ENROLL_OTP_TTL_SECONDS / 60),
-        verify_link: "",
+        device,
+        ip_address: ipAddress,
     });
 
     return NextResponse.json({
