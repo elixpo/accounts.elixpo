@@ -216,17 +216,30 @@ async function enrollImpl(request: NextRequest) {
         "unknown";
     const userAgent = request.headers.get("user-agent") || "";
     const device = shortUaForDisplay(userAgent);
-    await sendMail("mfa_email", user.email, {
+    // Surface delivery failures so the user knows the inbox is empty —
+    // the previous fire-and-forget pattern returned 200 even when mails
+    // .elixpo rejected the request (bad hook key, bad signature, etc.),
+    // leaving the user staring at a dialog with no email coming.
+    const mailResult = await sendMail("mfa_email", user.email, {
         name: user.display_name || user.email.split("@")[0],
         otp_code: otp,
         expiry_minutes: Math.ceil(ENROLL_OTP_TTL_SECONDS / 60),
         device,
         ip_address: ipAddress,
     });
+    if (!mailResult.ok) {
+        return NextResponse.json(
+            {
+                error: `Couldn't send the verification email: ${mailResult.error ?? "unknown"}`,
+            },
+            { status: 502 },
+        );
+    }
 
     return NextResponse.json({
         factor_id: factorId,
         expires_in: ENROLL_OTP_TTL_SECONDS,
         sent_to: user.email,
+        delivery_id: mailResult.delivery_id,
     });
 }

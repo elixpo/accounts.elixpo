@@ -802,6 +802,7 @@ export default function SecurityPage() {
                                     <Button
                                         size="small"
                                         onClick={startEmailEnroll}
+                                        disabled={emailResendCd.active}
                                         sx={{
                                             color: "#c8b6ff",
                                             textTransform: "none",
@@ -811,9 +812,14 @@ export default function SecurityPage() {
                                                 bgcolor:
                                                     "rgba(155,123,247,0.08)",
                                             },
+                                            "&.Mui-disabled": {
+                                                color: "rgba(255,255,255,0.35)",
+                                            },
                                         }}
                                     >
-                                        Resend & enter code
+                                        {emailResendCd.active
+                                            ? `Resend in ${emailResendCd.secondsLeft}s`
+                                            : "Resend & enter code"}
                                     </Button>
                                 )}
                                 {!f.confirmed && f.kind === "totp" && (
@@ -1610,15 +1616,20 @@ export default function SecurityPage() {
                     <Button
                         size="small"
                         onClick={resendEmailEnroll}
-                        disabled={emailEnrollBusy}
+                        disabled={emailEnrollBusy || emailResendCd.active}
                         sx={{
                             mt: 1,
                             color: "rgba(255,255,255,0.5)",
                             textTransform: "none",
                             fontSize: "0.8rem",
+                            "&.Mui-disabled": {
+                                color: "rgba(255,255,255,0.3)",
+                            },
                         }}
                     >
-                        Resend code
+                        {emailResendCd.active
+                            ? `Resend in ${emailResendCd.secondsLeft}s`
+                            : "Resend code"}
                     </Button>
                 </DialogContent>
                 <DialogActions
