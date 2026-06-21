@@ -56,6 +56,30 @@ async function getAuth(request: NextRequest) {
  * no-op.
  */
 export async function POST(request: NextRequest) {
+    try {
+        return await enrollImpl(request);
+    } catch (err) {
+        // Catch-all so unhandled throws (D1 schema drift, KV outage,
+        // WebCrypto edge cases) surface as a readable JSON error instead
+        // of an HTML 500 page. The client's toast can then show what
+        // actually broke instead of a generic "HTTP 500".
+        console.error(
+            "[mfa email enroll] unhandled: %s",
+            err instanceof Error ? err.stack || err.message : String(err),
+        );
+        return NextResponse.json(
+            {
+                error:
+                    err instanceof Error
+                        ? `Enrollment failed: ${err.message}`
+                        : "Enrollment failed (unknown error)",
+            },
+            { status: 500 },
+        );
+    }
+}
+
+async function enrollImpl(request: NextRequest) {
     const auth = await getAuth(request);
     if (!auth)
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
