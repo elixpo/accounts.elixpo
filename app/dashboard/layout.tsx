@@ -107,6 +107,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     window.location.replace("/setup-name");
                     return;
                 }
+                // 2FA hard wall: users with ≥3 OAuth apps must have MFA
+                // enabled to keep using the dashboard. `mfa_setup_required`
+                // is set server-side in /api/auth/me. /dashboard/security
+                // is the ONE page allowed past the wall — that's where
+                // they enroll a factor and flip the flag. Without this
+                // exception we'd infinite-loop the redirect.
+                if (
+                    data.mfa_setup_required &&
+                    pathname !== "/dashboard/security"
+                ) {
+                    window.location.replace("/mfa/setup-required");
+                    return;
+                }
                 if (data.email) setUserEmail(data.email);
                 if (data.displayName) setDisplayName(data.displayName);
                 if (data.avatar) setUserAvatar(data.avatar);
@@ -115,6 +128,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             .catch(() => {
                 window.location.assign("/login");
             });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleLogout = async () => {
