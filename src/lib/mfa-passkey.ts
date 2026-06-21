@@ -110,7 +110,10 @@ export async function verifyRegistration(
     const expectedChallenge = await store.get(`webauthn_reg:${userId}`);
     if (!expectedChallenge) return null;
 
-    let verification;
+    // Derive the type from the function instead of importing it — keeps
+    // the file decoupled from @simplewebauthn/server's type exports
+    // (they've shifted between versions).
+    let verification: Awaited<ReturnType<typeof verifyRegistrationResponse>>;
     try {
         verification = await verifyRegistrationResponse({
             response,
@@ -179,7 +182,7 @@ export async function verifyAuthentication(
     const expectedChallenge = await store.get(`webauthn_auth:${challengeId}`);
     if (!expectedChallenge) return null;
 
-    let verification;
+    let verification: Awaited<ReturnType<typeof verifyAuthenticationResponse>>;
     try {
         verification = await verifyAuthenticationResponse({
             response,
