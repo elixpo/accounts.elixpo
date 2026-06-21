@@ -3,7 +3,7 @@ export const runtime = "edge";
 import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
 import { createOAuthClient, getOAuthClientById, getUserById } from "@/lib/db";
-import { sendAppRegisteredEmail } from "@/lib/email";
+import { sendMail } from "@/lib/mails";
 import { verifyJWT } from "@/lib/jwt";
 import { generateRandomString, hashString } from "@/lib/webcrypto";
 
@@ -170,12 +170,15 @@ export async function POST(request: NextRequest) {
                 if (owner?.email) {
                     const ownerName =
                         owner.display_name || owner.email.split("@")[0];
-                    await sendAppRegisteredEmail(
-                        owner.email,
-                        ownerName,
-                        name,
-                        clientId,
-                    );
+                    const APP_URL =
+                        process.env.NEXT_PUBLIC_APP_URL ||
+                        "https://accounts.elixpo.com";
+                    await sendMail("oauth_app_register", owner.email, {
+                        name: ownerName,
+                        app_name: name,
+                        client_id_short: clientId.slice(0, 20),
+                        dashboard_url: `${APP_URL}/dashboard/oauth-apps/${clientId}`,
+                    });
                 }
             } catch (emailError) {
                 console.error(

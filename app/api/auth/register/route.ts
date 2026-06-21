@@ -10,7 +10,7 @@ import {
     logAuditEvent,
     createRefreshToken as storeRefreshToken,
 } from "@/lib/db";
-import { sendOTPEmail } from "@/lib/email";
+import { sendMail } from "@/lib/mails";
 import { createAccessToken, createRefreshToken } from "@/lib/jwt";
 import { hashPassword } from "@/lib/password";
 import { generateRandomDisplayName } from "@/lib/random-name";
@@ -198,7 +198,12 @@ export async function POST(request: NextRequest) {
                         process.env.NEXT_PUBLIC_APP_URL ||
                         "https://accounts.elixpo.com";
                     const verifyLink = `${APP_URL}/verify?token=${verificationToken}`;
-                    await sendOTPEmail(email, displayName, otpCode, verifyLink);
+                    await sendMail("user_verify_otp", email, {
+                        name: displayName,
+                        otp_code: otpCode,
+                        expiry_minutes: 10,
+                        verify_link: verifyLink,
+                    });
                     console.log(`[Register] Verification OTP sent to ${email}`);
                 } catch (otpError) {
                     console.error(

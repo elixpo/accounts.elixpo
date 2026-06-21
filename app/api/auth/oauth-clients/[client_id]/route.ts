@@ -8,7 +8,7 @@ import {
     getUserById,
     updateOAuthClient,
 } from "@/lib/db";
-import { sendAppDeletedEmail } from "@/lib/email";
+import { sendMail } from "@/lib/mails";
 import { verifyJWT } from "@/lib/jwt";
 import { generateRandomString, hashString } from "@/lib/webcrypto";
 
@@ -286,12 +286,15 @@ export async function DELETE(
             if (owner?.email) {
                 const ownerName =
                     owner.display_name || owner.email.split("@")[0];
-                await sendAppDeletedEmail(
-                    owner.email,
-                    ownerName,
-                    app.name,
-                    client_id,
-                );
+                const APP_URL =
+                    process.env.NEXT_PUBLIC_APP_URL ||
+                    "https://accounts.elixpo.com";
+                await sendMail("oauth_app_delete", owner.email, {
+                    name: ownerName,
+                    app_name: app.name,
+                    client_id_short: client_id.slice(0, 20),
+                    dashboard_url: `${APP_URL}/dashboard/oauth-apps`,
+                });
             }
         } catch (emailError) {
             console.error(
