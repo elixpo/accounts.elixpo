@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
             verify_link: verifyLink,
         });
 
-        console.log(`[Verification] OTP sent to ${user.email}`);
+        console.log("[Verification] OTP sent to %s", user.email);
 
         return NextResponse.json({
             message: "Verification code sent to your email",

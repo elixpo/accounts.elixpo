@@ -333,7 +333,11 @@ export async function GET(
             userAgent,
         );
     } catch (err) {
-        console.error(`OAuth callback error for ${provider}:`, err);
+        console.error(
+            "OAuth callback error for %s: %s",
+            provider,
+            err instanceof Error ? err.message : String(err),
+        );
         return NextResponse.redirect(
             new URL(
                 "/error?error=server_error&description=An+unexpected+error+occurred+during+authentication",

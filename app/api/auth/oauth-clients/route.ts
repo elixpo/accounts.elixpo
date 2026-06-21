@@ -162,7 +162,11 @@ export async function POST(request: NextRequest) {
                 webhookSecretHash: null,
                 webhookEvents: null,
             });
-            console.log(`[OAuth Client] Registered: ${name} (${clientId})`);
+            console.log(
+                "[OAuth Client] Registered: %s (%s)",
+                name,
+                clientId,
+            );
 
             // Notify owner via email (fire-and-forget)
             try {

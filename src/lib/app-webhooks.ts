@@ -296,7 +296,11 @@ async function deliverOne(
         };
     } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        console.warn(`[app-webhooks] delivery to ${target.url} failed:`, msg);
+        console.warn(
+            "[app-webhooks] delivery to %s failed: %s",
+            target.url,
+            msg,
+        );
         return { ok: false, statusCode: null, error: msg.slice(0, 500) };
     } finally {
         clearTimeout(tm);

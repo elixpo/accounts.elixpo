@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
             expiry_minutes: expiryMinutes,
         });
 
-        console.log(`[ForgotPassword] OTP sent to ${email}`);
+        console.log("[ForgotPassword] OTP sent to %s", email);
 
         return NextResponse.json({
             message: "If that email is registered, a reset code has been sent.",

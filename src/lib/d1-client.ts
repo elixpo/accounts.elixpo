@@ -174,15 +174,15 @@ function createInMemoryMockDb(): D1Database {
     const makeMockStatement = (sql: string): any => ({
         bind: (..._args: any[]) => makeMockStatement(sql),
         run: async () => {
-            console.warn(`[Mock DB] run: ${sql.substring(0, 50)}`);
+            console.warn("[Mock DB] run: %s", sql.substring(0, 50));
             return { success: true };
         },
         first: async () => {
-            console.warn(`[Mock DB] first: ${sql.substring(0, 50)}`);
+            console.warn("[Mock DB] first: %s", sql.substring(0, 50));
             return null;
         },
         all: async () => {
-            console.warn(`[Mock DB] all: ${sql.substring(0, 50)}`);
+            console.warn("[Mock DB] all: %s", sql.substring(0, 50));
             return { results: [], success: true };
         },
     });

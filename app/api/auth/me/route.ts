@@ -133,7 +133,7 @@ async function tryAutoRefresh(_request: NextRequest, refreshToken: string) {
             path: "/",
         });
 
-        console.log(`[Me] Auto-refreshed session for user ${payload.sub}`);
+        console.log("[Me] Auto-refreshed session for user %s", payload.sub);
         return response;
     } catch (err) {
         console.error("[Me] Auto-refresh failed:", err);

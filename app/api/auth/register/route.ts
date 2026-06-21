@@ -204,7 +204,10 @@ export async function POST(request: NextRequest) {
                         expiry_minutes: 10,
                         verify_link: verifyLink,
                     });
-                    console.log(`[Register] Verification OTP sent to ${email}`);
+                    console.log(
+                        "[Register] Verification OTP sent to %s",
+                        email,
+                    );
                 } catch (otpError) {
                     console.error(
                         "[Register] Failed to send verification email:",
