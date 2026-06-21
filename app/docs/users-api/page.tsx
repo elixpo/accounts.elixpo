@@ -19,7 +19,6 @@ const USER_API_RES = `{
   "id": "u_9b7bf7c2-866e-ee9d-3e48-ee9d3e488297",
   "email": "developer@elixpo.com",
   "displayName": "swift-falcon",
-  "isAdmin": false,
   "provider": "email",
   "emailVerified": true
 }`;
