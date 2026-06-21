@@ -195,6 +195,23 @@ export async function GET(request: NextRequest) {
 
             const identity = await getUserIdentity(db, payload.sub);
 
+            // MFA status + setup-required signal. mfa_setup_required is
+            // true when the user owns ≥3 OAuth apps but hasn't enabled
+            // 2FA — the dashboard layout uses this flag to redirect to
+            // /mfa/setup-required (hard wall per the platform policy).
+            const mfaEnabled =
+                (dbUser as any).mfa_enabled === 1 ||
+                (dbUser as any).mfa_enabled === true;
+            const appsCountRow = await db
+                .prepare(
+                    `SELECT COUNT(*) AS n FROM oauth_clients
+                     WHERE owner_id = ? AND is_active = 1`,
+                )
+                .bind(payload.sub)
+                .first<{ n: number }>();
+            const ownedAppsCount = appsCountRow?.n ?? 0;
+            const mfaSetupRequired = ownedAppsCount >= 3 && !mfaEnabled;
+
             return NextResponse.json({
                 id: payload.sub,
                 userId: payload.sub,
@@ -211,6 +228,9 @@ export async function GET(request: NextRequest) {
                 location: (dbUser as any).freeform_location || null,
                 locale: (dbUser as any).locale || null,
                 timezone: (dbUser as any).timezone || null,
+                mfa_enabled: mfaEnabled,
+                mfa_setup_required: mfaSetupRequired,
+                owned_apps_count: ownedAppsCount,
                 expiresAt: new Date(payload.exp * 1000),
             });
         } catch (dbError) {

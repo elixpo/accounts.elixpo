@@ -23,6 +23,7 @@ const TIMEOUT_MS = 5_000;
 export type MailTemplate =
     | "user_verify_otp"
     | "password_reset"
+    | "login_otp"
     | "oauth_app_register"
     | "oauth_app_delete"
     | "account_suspended"
@@ -32,6 +33,7 @@ export type MailTemplate =
 const HOOK_ENV: Record<MailTemplate, string> = {
     user_verify_otp: "MAILS_HOOK_USER_VERIFY_OTP",
     password_reset: "MAILS_HOOK_PASSWORD_RESET",
+    login_otp: "MAILS_HOOK_LOGIN_OTP",
     oauth_app_register: "MAILS_HOOK_OAUTH_APP_REGISTER",
     oauth_app_delete: "MAILS_HOOK_OAUTH_APP_DELETE",
     account_suspended: "MAILS_HOOK_ACCOUNT_SUSPENDED",

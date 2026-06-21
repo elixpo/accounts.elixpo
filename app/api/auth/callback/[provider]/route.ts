@@ -373,6 +373,43 @@ async function buildSuccessResponse(
         /* non-critical */
     }
 
+    // ── MFA gate (mirrors /api/auth/login) ─────────────────────────────
+    // If the user has MFA enabled and this device isn't trusted, do NOT
+    // mint tokens. Instead, redirect the browser to /mfa?mfaToken=...
+    // The challenge page POSTs to /api/auth/mfa/challenge/verify which
+    // issues the real tokens after the second factor succeeds.
+    if ((user as any).mfa_enabled === 1) {
+        const {
+            TRUSTED_DEVICE_COOKIE_NAME,
+            verifyTrustedDeviceCookie,
+            isDeviceTrusted,
+        } = await import("@/lib/trusted-devices");
+        const tdCookie = request.cookies.get(
+            TRUSTED_DEVICE_COOKIE_NAME,
+        )?.value;
+        let trustedSkip = false;
+        if (tdCookie) {
+            const decoded = await verifyTrustedDeviceCookie(tdCookie);
+            if (
+                decoded &&
+                decoded.userId === user.id &&
+                (await isDeviceTrusted(db, user.id, decoded.deviceUuid))
+            ) {
+                trustedSkip = true;
+            }
+        }
+
+        if (!trustedSkip) {
+            const { mintMfaChallengeToken } = await import("@/lib/mfa-utils");
+            const oauthNext = request.cookies.get("oauth_next")?.value;
+            const next = oauthNext || "/dashboard/oauth-apps";
+            const mfaToken = await mintMfaChallengeToken(user.id, next);
+            return NextResponse.redirect(
+                new URL(`/mfa?token=${encodeURIComponent(mfaToken)}`, request.url),
+            );
+        }
+    }
+
     const accessToken = await createAccessToken(
         user.id,
         email,

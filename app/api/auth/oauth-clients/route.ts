@@ -52,7 +52,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     try {
-        // Enforce email verification
         const db = await getDatabase();
         const user = (await getUserById(db, auth.sub)) as any;
         if (user && !user.email_verified) {
@@ -62,6 +61,31 @@ export async function POST(request: NextRequest) {
                 },
                 { status: 403 },
             );
+        }
+
+        // 2FA gate. The platform policy mandates 2FA for any account
+        // owning ≥3 OAuth apps. We enforce at creation time of the 3rd
+        // app: if the user has 2 apps and !mfa_enabled, block here with
+        // a hint that points them to /dashboard/security.
+        if (user && !user.mfa_enabled) {
+            const countRow = (await db
+                .prepare(
+                    `SELECT COUNT(*) AS n FROM oauth_clients
+                     WHERE owner_id = ? AND is_active = 1`,
+                )
+                .bind(auth.sub)
+                .first()) as { n: number } | null;
+            const activeCount = countRow?.n ?? 0;
+            if (activeCount >= 2) {
+                return NextResponse.json(
+                    {
+                        error: "Enable 2FA before registering a 3rd OAuth app.",
+                        mfa_required: true,
+                        setup_url: "/dashboard/security",
+                    },
+                    { status: 403 },
+                );
+            }
         }
 
         const body: any = await request.json();
