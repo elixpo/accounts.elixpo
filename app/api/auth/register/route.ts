@@ -10,8 +10,8 @@ import {
     logAuditEvent,
     createRefreshToken as storeRefreshToken,
 } from "@/lib/db";
-import { sendMail } from "@/lib/mails";
 import { createAccessToken, createRefreshToken } from "@/lib/jwt";
+import { sendMail } from "@/lib/mails";
 import { hashPassword } from "@/lib/password";
 import { generateRandomDisplayName } from "@/lib/random-name";
 import { createRegisterRateLimiter } from "@/lib/rate-limit";

@@ -2,8 +2,8 @@ export const runtime = "edge";
 
 import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
-import { sendMail } from "@/lib/mails";
 import { verifyJWT } from "@/lib/jwt";
+import { sendMail } from "@/lib/mails";
 import { generateUUID } from "@/lib/webcrypto";
 
 function generateOTP(): string {

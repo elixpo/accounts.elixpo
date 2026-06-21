@@ -8,8 +8,8 @@ import {
     getUserById,
     updateOAuthClient,
 } from "@/lib/db";
-import { sendMail } from "@/lib/mails";
 import { verifyJWT } from "@/lib/jwt";
+import { sendMail } from "@/lib/mails";
 import { generateRandomString, hashString } from "@/lib/webcrypto";
 
 /**

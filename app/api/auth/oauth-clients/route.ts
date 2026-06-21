@@ -3,8 +3,8 @@ export const runtime = "edge";
 import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
 import { createOAuthClient, getOAuthClientById, getUserById } from "@/lib/db";
-import { sendMail } from "@/lib/mails";
 import { verifyJWT } from "@/lib/jwt";
+import { sendMail } from "@/lib/mails";
 import { generateRandomString, hashString } from "@/lib/webcrypto";
 
 async function getAuth(request: NextRequest) {

@@ -18,8 +18,7 @@ const FAIL_THRESHOLD = 5; // consecutive failures before we alert
 const ALERT_COOLDOWN_SECONDS = 24 * 60 * 60; // once per day per endpoint
 const COUNTER_TTL_SECONDS = 7 * 24 * 60 * 60; // entries auto-expire
 
-const counterKey = (endpointId: string) =>
-    `wh_fail_count:${endpointId}`;
+const counterKey = (endpointId: string) => `wh_fail_count:${endpointId}`;
 const alertKey = (endpointId: string) => `wh_fail_alert:${endpointId}`;
 
 function getKv(): KVNamespace | null {
