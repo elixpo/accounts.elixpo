@@ -153,6 +153,31 @@ export default function SecurityPage() {
         }
     }, []);
 
+    const autoEnableIfNeeded = useCallback(async () => {
+        const res = await fetch("/api/auth/mfa/factors", {
+            credentials: "include",
+        });
+        if (!res.ok) return;
+        const data: any = await res.json();
+        const hasConfirmed = (data.factors || []).some(
+            (f: Factor) => f.confirmed,
+        );
+        if (!hasConfirmed || data.mfa_enabled) return;
+        const enableRes = await fetch("/api/auth/mfa/enable", {
+            method: "POST",
+            credentials: "include",
+        });
+        if (!enableRes.ok) return;
+        const enableData: any = await enableRes.json();
+        if (enableData.backup_codes && !enableData.already_enabled) {
+            setRevealedCodes(enableData.backup_codes);
+            setMsg({
+                text: "2FA enabled — save these backup codes now, they won't be shown again.",
+                type: "success",
+            });
+        }
+    }, []);
+
     useEffect(() => {
         refresh();
     }, [refresh]);
