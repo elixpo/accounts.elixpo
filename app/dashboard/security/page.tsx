@@ -104,6 +104,13 @@ export default function SecurityPage() {
     // Freshly minted backup codes (revealed once).
     const [revealedCodes, setRevealedCodes] = useState<string[] | null>(null);
 
+    // Regenerate-backup-codes confirmation modal — replaces native
+    // confirm() so it matches the rest of the dashboard styling and
+    // can show enough context (current unused count, consequences)
+    // for the user to make an informed call.
+    const [regenDialog, setRegenDialog] = useState(false);
+    const [regenBusy, setRegenBusy] = useState(false);
+
     const refresh = useCallback(async () => {
         try {
             const [factorsRes, devicesRes, sessionsRes] = await Promise.all([
@@ -282,18 +289,23 @@ export default function SecurityPage() {
     };
 
     const regenerateBackupCodes = async () => {
-        if (!confirm("Regenerate backup codes? Your current codes will stop working.")) return;
-        const res = await fetch("/api/auth/mfa/backup-codes/regenerate", {
-            method: "POST",
-            credentials: "include",
-        });
-        const data: any = await res.json();
-        if (!res.ok) {
-            setMsg({ text: data.error || "Regenerate failed", type: "error" });
-            return;
+        setRegenBusy(true);
+        try {
+            const res = await fetch("/api/auth/mfa/backup-codes/regenerate", {
+                method: "POST",
+                credentials: "include",
+            });
+            const data: any = await res.json();
+            if (!res.ok) {
+                setMsg({ text: data.error || "Regenerate failed", type: "error" });
+                return;
+            }
+            setRevealedCodes(data.backup_codes);
+            setRegenDialog(false);
+            await refresh();
+        } finally {
+            setRegenBusy(false);
         }
-        setRevealedCodes(data.backup_codes);
-        await refresh();
     };
 
     const revokeDevice = async (id: string) => {
@@ -651,7 +663,7 @@ export default function SecurityPage() {
 
                     <Button
                         variant="outlined"
-                        onClick={regenerateBackupCodes}
+                        onClick={() => setRegenDialog(true)}
                         sx={{
                             color: "#c8b6ff",
                             borderColor: "rgba(155,123,247,0.4)",
@@ -879,6 +891,99 @@ export default function SecurityPage() {
                         }}
                     >
                         {totpBusy ? "Verifying…" : "Confirm"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Regenerate backup codes confirmation */}
+            <Dialog
+                open={regenDialog}
+                onClose={() => !regenBusy && setRegenDialog(false)}
+                PaperProps={{
+                    sx: {
+                        bgcolor: "rgba(22,28,24,0.97)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: "16px",
+                        backdropFilter: "blur(20px)",
+                        maxWidth: 440,
+                    },
+                }}
+            >
+                <DialogTitle
+                    sx={{
+                        color: "#f5f5f4",
+                        fontWeight: 700,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                    }}
+                >
+                    <SecurityIcon sx={{ color: "#fbbf24" }} />
+                    Regenerate backup codes?
+                </DialogTitle>
+                <DialogContent>
+                    <Typography
+                        sx={{
+                            color: "rgba(255,255,255,0.7)",
+                            fontSize: "0.95rem",
+                            mb: 2,
+                        }}
+                    >
+                        A fresh set of 8 codes will be generated. You'll see them
+                        once — make sure you save them.
+                    </Typography>
+                    <Box
+                        sx={{
+                            p: 1.5,
+                            borderRadius: "8px",
+                            bgcolor: "rgba(251,146,60,0.08)",
+                            border: "1px solid rgba(251,146,60,0.25)",
+                            color: "#fed7aa",
+                            fontSize: "0.85rem",
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: 1,
+                        }}
+                    >
+                        <Box>
+                            <strong>Your current codes will stop working immediately.</strong>
+                            {status?.unused_backup_codes ? (
+                                <>
+                                    {" "}You have{" "}
+                                    <strong>{status.unused_backup_codes}</strong>{" "}
+                                    unused — these will be invalidated.
+                                </>
+                            ) : null}
+                        </Box>
+                    </Box>
+                </DialogContent>
+                <DialogActions
+                    sx={{
+                        borderTop: "1px solid rgba(255,255,255,0.1)",
+                        p: 2,
+                    }}
+                >
+                    <Button
+                        onClick={() => setRegenDialog(false)}
+                        disabled={regenBusy}
+                        sx={{
+                            color: "rgba(255,255,255,0.6)",
+                            textTransform: "none",
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={regenerateBackupCodes}
+                        disabled={regenBusy}
+                        variant="contained"
+                        sx={{
+                            background: "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
+                            textTransform: "none",
+                            fontWeight: 600,
+                        }}
+                    >
+                        {regenBusy ? "Generating…" : "Regenerate"}
                     </Button>
                 </DialogActions>
             </Dialog>
