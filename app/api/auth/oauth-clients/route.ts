@@ -73,6 +73,11 @@ export async function POST(request: NextRequest) {
             homepage_url,
             scopes,
         } = body;
+        // Webhooks are no longer set at registration time. Use
+        // POST /api/auth/oauth-clients/:client_id/webhooks to add one or
+        // more endpoints after the app is created. An app can now have
+        // multiple endpoints (e.g. localhost + production), each with its
+        // own secret and event subscription.
 
         // Validate required fields
         if (
@@ -143,7 +148,6 @@ export async function POST(request: NextRequest) {
 
         const now = new Date().toISOString();
 
-        // Store in D1
         try {
             await createOAuthClient(db, {
                 clientId,
@@ -154,6 +158,9 @@ export async function POST(request: NextRequest) {
                 ownerId: auth.sub,
                 description,
                 homepageUrl: homepage_url,
+                webhookUrl: null,
+                webhookSecretHash: null,
+                webhookEvents: null,
             });
             console.log(`[OAuth Client] Registered: ${name} (${clientId})`);
 
@@ -197,7 +204,9 @@ export async function POST(request: NextRequest) {
                 scopes: scopes || validScopes,
                 created_at: now,
                 _notice:
-                    "Store client_secret securely. It will NOT be retrievable after this response.",
+                    "Store client_secret securely. It will NOT be retrievable. To register webhook endpoints, POST to /api/auth/oauth-clients/" +
+                    clientId +
+                    "/webhooks.",
             },
             { status: 201 },
         );
