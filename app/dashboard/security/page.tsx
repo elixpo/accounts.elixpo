@@ -179,7 +179,7 @@ export default function SecurityPage() {
                 { method: "POST", credentials: "include" },
             );
             if (!optsRes.ok) throw new Error("Failed to get options");
-            const opts = await optsRes.json();
+            const opts: any = await optsRes.json();
             const attResp = await startRegistration({ optionsJSON: opts });
             const verifyRes = await fetch(
                 "/api/auth/mfa/passkey/register/verify",

@@ -125,7 +125,7 @@ function ChallengeInner() {
                 },
             );
             if (!optsRes.ok) throw new Error("Failed to start passkey challenge");
-            const opts = await optsRes.json();
+            const opts: any = await optsRes.json();
             const assertion = await startAuthentication({ optionsJSON: opts });
             const verifyRes = await fetch(
                 "/api/auth/mfa/challenge/verify",
