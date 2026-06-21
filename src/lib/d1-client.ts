@@ -101,7 +101,13 @@ function createLocalD1Client(
         return response.json();
     };
 
+    // `sql` and `params` are exposed on the returned statement so the
+    // batch() shim below can read them after .bind(). Without this they
+    // were captured in closure only and the batch payload sent
+    // `{sql: undefined}` to the API.
     const makeStatement = (sql: string, params: any[] = []): any => ({
+        sql,
+        params,
         bind: (...args: any[]) => makeStatement(sql, args),
         run: async () => {
             const result = await query(sql, params);
@@ -122,27 +128,19 @@ function createLocalD1Client(
 
     return {
         prepare: (sql: string) => makeStatement(sql),
+        // Dev-mode batch: the CF D1 REST API doesn't expose true atomic
+        // batched calls (only the Worker binding does). We fall back to
+        // sequential execution so the surface matches what production
+        // sees. Production via the bound D1 object gets real
+        // transactional batch semantics — losing them in dev is
+        // acceptable since dev never sees concurrent traffic.
         batch: async (statements: any[]) => {
-            const response = await fetch(`${baseUrl}/query`, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${apiToken}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    statements: statements.map((stmt) => ({
-                        sql: stmt.sql,
-                        params: stmt.params || [],
-                    })),
-                }),
-            });
-            if (!response.ok) {
-                const error: any = await response.json();
-                throw new Error(
-                    `D1 Batch Error: ${error.errors?.[0]?.message || response.statusText}`,
-                );
+            const results: any[] = [];
+            for (const stmt of statements) {
+                const r = await query(stmt.sql, stmt.params || []);
+                results.push(r.result?.[0] || { success: true });
             }
-            return response.json();
+            return results;
         },
         exec: async (sql: string) => {
             const response = await fetch(`${baseUrl}/query`, {
