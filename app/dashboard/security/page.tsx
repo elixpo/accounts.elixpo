@@ -118,6 +118,17 @@ export default function SecurityPage() {
     const [removeTarget, setRemoveTarget] = useState<Factor | null>(null);
     const [removeBusy, setRemoveBusy] = useState(false);
 
+    // Email-OTP enrollment dialog. Verify-before-enable ceremony: enroll
+    // sends a 6-digit code to the user's email; they type it here and
+    // we only flip confirmed_at once it matches.
+    const [emailEnrollDialog, setEmailEnrollDialog] = useState(false);
+    const [emailEnrollData, setEmailEnrollData] = useState<{
+        factor_id: string;
+        sent_to: string;
+    } | null>(null);
+    const [emailEnrollCode, setEmailEnrollCode] = useState("");
+    const [emailEnrollBusy, setEmailEnrollBusy] = useState(false);
+
     const refresh = useCallback(async () => {
         try {
             const [factorsRes, devicesRes, sessionsRes] = await Promise.all([
@@ -242,19 +253,73 @@ export default function SecurityPage() {
         }
     };
 
-    const enrollEmailOtp = async () => {
+    const startEmailEnroll = async () => {
         setMsg(null);
-        const res = await fetch("/api/auth/mfa/email-otp/enable", {
-            method: "POST",
-            credentials: "include",
-        });
-        if (!res.ok) {
-            const e: any = await res.json();
-            setMsg({ text: e.error || "Failed to enable", type: "error" });
-            return;
+        setEmailEnrollBusy(true);
+        try {
+            const res = await fetch("/api/auth/mfa/email-otp/enroll", {
+                method: "POST",
+                credentials: "include",
+            });
+            const data: any = await res.json();
+            if (!res.ok) {
+                setMsg({ text: data.error || "Failed to start", type: "error" });
+                return;
+            }
+            // Already-confirmed short-circuit from the API.
+            if (data.already_confirmed) {
+                setMsg({
+                    text: "Email code is already enabled.",
+                    type: "success",
+                });
+                await refresh();
+                return;
+            }
+            setEmailEnrollData({
+                factor_id: data.factor_id,
+                sent_to: data.sent_to,
+            });
+            setEmailEnrollCode("");
+            setEmailEnrollDialog(true);
+        } finally {
+            setEmailEnrollBusy(false);
         }
-        setMsg({ text: "Email OTP enabled as a 2FA method", type: "success" });
-        await refresh();
+    };
+
+    const confirmEmailEnroll = async () => {
+        if (!emailEnrollData) return;
+        setEmailEnrollBusy(true);
+        try {
+            const res = await fetch("/api/auth/mfa/email-otp/confirm", {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    factor_id: emailEnrollData.factor_id,
+                    code: emailEnrollCode,
+                }),
+            });
+            const data: any = await res.json();
+            if (!res.ok) {
+                setMsg({ text: data.error || "Invalid code", type: "error" });
+                return;
+            }
+            setEmailEnrollDialog(false);
+            setEmailEnrollData(null);
+            setMsg({
+                text: "Email code enabled as a 2FA method",
+                type: "success",
+            });
+            await refresh();
+        } finally {
+            setEmailEnrollBusy(false);
+        }
+    };
+
+    const resendEmailEnroll = async () => {
+        // Same call as start — server side dedupes and reuses the
+        // pending factor id, so we don't accidentally orphan rows.
+        await startEmailEnroll();
     };
 
     const removeFactor = async (target: Factor) => {
@@ -264,14 +329,19 @@ export default function SecurityPage() {
                 method: "DELETE",
                 credentials: "include",
             });
-            if (!res.ok) {
-                const e: any = await res.json();
-                setMsg({ text: e.error || "Remove failed", type: "error" });
+            // 404 means it's already gone (e.g., double-click race or the
+            // row was deleted from another tab). End-state matches what
+            // the user asked for, so treat as success: close the modal
+            // and refresh — don't leave the dialog open with a confusing
+            // "Not found" error.
+            if (res.ok || res.status === 404) {
+                setRemoveTarget(null);
+                setMsg({ text: "2FA method removed", type: "success" });
+                await refresh();
                 return;
             }
-            setRemoveTarget(null);
-            setMsg({ text: "2FA method removed", type: "success" });
-            await refresh();
+            const e: any = await res.json();
+            setMsg({ text: e.error || "Remove failed", type: "error" });
         } finally {
             setRemoveBusy(false);
         }
@@ -577,7 +647,7 @@ export default function SecurityPage() {
                                 </Box>
                                 <IconButton
                                     size="small"
-                                    onClick={() => removeFactor(f.id)}
+                                    onClick={() => setRemoveTarget(f)}
                                     sx={{ color: "#ef4444" }}
                                 >
                                     <DeleteIcon fontSize="small" />
@@ -587,56 +657,74 @@ export default function SecurityPage() {
                     </Box>
                 )}
 
-                <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap" }}>
-                    <Button
-                        variant="outlined"
-                        startIcon={<PhoneAndroidIcon />}
-                        onClick={startTotp}
-                        sx={{
-                            color: "#c8b6ff",
-                            borderColor: "rgba(155,123,247,0.4)",
-                            textTransform: "none",
-                            "&:hover": {
-                                borderColor: "#9b7bf7",
-                                bgcolor: "rgba(155,123,247,0.06)",
-                            },
-                        }}
-                    >
-                        Add authenticator app
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        startIcon={<KeyIcon />}
-                        onClick={enrollPasskey}
-                        sx={{
-                            color: "#c8b6ff",
-                            borderColor: "rgba(155,123,247,0.4)",
-                            textTransform: "none",
-                            "&:hover": {
-                                borderColor: "#9b7bf7",
-                                bgcolor: "rgba(155,123,247,0.06)",
-                            },
-                        }}
-                    >
-                        Add passkey
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        startIcon={<MailOutlineIcon />}
-                        onClick={enrollEmailOtp}
-                        sx={{
-                            color: "#c8b6ff",
-                            borderColor: "rgba(155,123,247,0.4)",
-                            textTransform: "none",
-                            "&:hover": {
-                                borderColor: "#9b7bf7",
-                                bgcolor: "rgba(155,123,247,0.06)",
-                            },
-                        }}
-                    >
-                        Enable email code
-                    </Button>
-                </Box>
+                {(() => {
+                    // Derive per-kind enrollment state so we can grey out
+                    // buttons that point at factors the user already has.
+                    // TOTP and Email-OTP are single-row-per-user factors;
+                    // Passkey users can have multiple, so its button
+                    // stays enabled.
+                    const hasTotp = (status?.factors || []).some(
+                        (f) => f.kind === "totp" && f.confirmed,
+                    );
+                    const hasEmailOtp = (status?.factors || []).some(
+                        (f) => f.kind === "email_otp" && f.confirmed,
+                    );
+                    const enrollSx = {
+                        color: "#c8b6ff",
+                        borderColor: "rgba(155,123,247,0.4)",
+                        textTransform: "none" as const,
+                        "&:hover": {
+                            borderColor: "#9b7bf7",
+                            bgcolor: "rgba(155,123,247,0.06)",
+                        },
+                        "&.Mui-disabled": {
+                            color: "rgba(255,255,255,0.3)",
+                            borderColor: "rgba(255,255,255,0.08)",
+                        },
+                    };
+                    return (
+                        <Box
+                            sx={{
+                                display: "flex",
+                                gap: 1.5,
+                                flexWrap: "wrap",
+                            }}
+                        >
+                            <Button
+                                variant="outlined"
+                                startIcon={<PhoneAndroidIcon />}
+                                onClick={startTotp}
+                                disabled={hasTotp}
+                                sx={enrollSx}
+                            >
+                                {hasTotp
+                                    ? "Authenticator added"
+                                    : "Add authenticator app"}
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                startIcon={<KeyIcon />}
+                                onClick={enrollPasskey}
+                                sx={enrollSx}
+                            >
+                                Add passkey
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                startIcon={<MailOutlineIcon />}
+                                onClick={startEmailEnroll}
+                                disabled={hasEmailOtp || emailEnrollBusy}
+                                sx={enrollSx}
+                            >
+                                {hasEmailOtp
+                                    ? "Email code enabled"
+                                    : emailEnrollBusy
+                                      ? "Sending code…"
+                                      : "Enable email code"}
+                            </Button>
+                        </Box>
+                    );
+                })()}
 
                 <Box
                     sx={{
@@ -1289,6 +1377,213 @@ export default function SecurityPage() {
                         }}
                     >
                         {regenBusy ? "Generating…" : "Regenerate"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Remove-factor confirmation */}
+            <Dialog
+                open={!!removeTarget}
+                onClose={() => !removeBusy && setRemoveTarget(null)}
+                PaperProps={{
+                    sx: {
+                        bgcolor: "rgba(22,28,24,0.97)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: "16px",
+                        backdropFilter: "blur(20px)",
+                        maxWidth: 440,
+                    },
+                }}
+            >
+                <DialogTitle
+                    sx={{
+                        color: "#f5f5f4",
+                        fontWeight: 700,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                    }}
+                >
+                    <DeleteIcon sx={{ color: "#f87171" }} />
+                    Remove this 2FA method?
+                </DialogTitle>
+                <DialogContent>
+                    <Typography
+                        sx={{ color: "rgba(255,255,255,0.7)", mb: 2 }}
+                    >
+                        You're about to remove{" "}
+                        <strong style={{ color: "#f5f5f4" }}>
+                            {removeTarget?.name ||
+                                (removeTarget &&
+                                    kindLabel[removeTarget.kind])}
+                        </strong>
+                        {" "}from your 2FA methods.
+                    </Typography>
+                    <Box
+                        sx={{
+                            p: 1.5,
+                            borderRadius: "8px",
+                            bgcolor: "rgba(239,68,68,0.08)",
+                            border: "1px solid rgba(239,68,68,0.25)",
+                            color: "#fca5a5",
+                            fontSize: "0.85rem",
+                        }}
+                    >
+                        <strong>This can't be undone.</strong> If this is your
+                        last method, 2FA will be enforced and you must enroll
+                        a replacement before removing it.
+                    </Box>
+                </DialogContent>
+                <DialogActions
+                    sx={{
+                        borderTop: "1px solid rgba(255,255,255,0.1)",
+                        p: 2,
+                    }}
+                >
+                    <Button
+                        onClick={() => setRemoveTarget(null)}
+                        disabled={removeBusy}
+                        sx={{
+                            color: "rgba(255,255,255,0.6)",
+                            textTransform: "none",
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={() => removeTarget && removeFactor(removeTarget)}
+                        disabled={removeBusy}
+                        variant="contained"
+                        sx={{
+                            background:
+                                "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)",
+                            textTransform: "none",
+                            fontWeight: 600,
+                        }}
+                    >
+                        {removeBusy ? "Removing…" : "Remove"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Email-OTP enrollment dialog */}
+            <Dialog
+                open={emailEnrollDialog}
+                onClose={() => !emailEnrollBusy && setEmailEnrollDialog(false)}
+                PaperProps={{
+                    sx: {
+                        bgcolor: "rgba(22,28,24,0.97)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: "16px",
+                        backdropFilter: "blur(20px)",
+                        maxWidth: 440,
+                    },
+                }}
+            >
+                <DialogTitle
+                    sx={{
+                        color: "#f5f5f4",
+                        fontWeight: 700,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5,
+                    }}
+                >
+                    <MailOutlineIcon sx={{ color: "#9b7bf7" }} />
+                    Enable email code
+                </DialogTitle>
+                <DialogContent>
+                    <Typography
+                        sx={{
+                            color: "rgba(255,255,255,0.7)",
+                            fontSize: "0.9rem",
+                            mb: 2,
+                        }}
+                    >
+                        We sent a 6-digit verification code to{" "}
+                        <strong style={{ color: "#f5f5f4" }}>
+                            {emailEnrollData?.sent_to}
+                        </strong>
+                        . Enter it below to confirm you control this address.
+                    </Typography>
+                    <TextField
+                        autoFocus
+                        fullWidth
+                        value={emailEnrollCode}
+                        onChange={(e) =>
+                            setEmailEnrollCode(
+                                e.target.value.replace(/\D/g, "").slice(0, 6),
+                            )
+                        }
+                        placeholder="123456"
+                        inputProps={{
+                            inputMode: "numeric",
+                            style: {
+                                textAlign: "center",
+                                fontSize: "1.5rem",
+                                letterSpacing: "8px",
+                                fontFamily: "monospace",
+                            },
+                        }}
+                        sx={{
+                            "& .MuiOutlinedInput-root": {
+                                color: "#f5f5f4",
+                                "& fieldset": {
+                                    borderColor: "rgba(255,255,255,0.15)",
+                                },
+                                "&:hover fieldset": {
+                                    borderColor: "rgba(155,123,247,0.4)",
+                                },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#9b7bf7",
+                                },
+                            },
+                        }}
+                    />
+                    <Button
+                        size="small"
+                        onClick={resendEmailEnroll}
+                        disabled={emailEnrollBusy}
+                        sx={{
+                            mt: 1,
+                            color: "rgba(255,255,255,0.5)",
+                            textTransform: "none",
+                            fontSize: "0.8rem",
+                        }}
+                    >
+                        Resend code
+                    </Button>
+                </DialogContent>
+                <DialogActions
+                    sx={{
+                        borderTop: "1px solid rgba(255,255,255,0.1)",
+                        p: 2,
+                    }}
+                >
+                    <Button
+                        onClick={() => setEmailEnrollDialog(false)}
+                        disabled={emailEnrollBusy}
+                        sx={{
+                            color: "rgba(255,255,255,0.6)",
+                            textTransform: "none",
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={confirmEmailEnroll}
+                        disabled={
+                            emailEnrollBusy || emailEnrollCode.length !== 6
+                        }
+                        variant="contained"
+                        sx={{
+                            background:
+                                "linear-gradient(135deg, #9b7bf7 0%, #7c5cff 100%)",
+                            textTransform: "none",
+                            fontWeight: 600,
+                        }}
+                    >
+                        {emailEnrollBusy ? "Verifying…" : "Verify & enable"}
                     </Button>
                 </DialogActions>
             </Dialog>
