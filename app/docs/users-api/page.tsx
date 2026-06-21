@@ -241,36 +241,6 @@ export default function UsersApiPage() {
                                         "1px solid rgba(255, 255, 255, 0.08)",
                                 }}
                             >
-                                <code>isAdmin</code>
-                            </TableCell>
-                            <TableCell
-                                sx={{
-                                    color: "#9b7bf7",
-                                    borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
-                                }}
-                            >
-                                Boolean
-                            </TableCell>
-                            <TableCell
-                                sx={{
-                                    color: "rgba(255, 255, 255, 0.7)",
-                                    borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
-                                }}
-                            >
-                                Indicates if the user has administrator
-                                privileges on the platform.
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell
-                                sx={{
-                                    color: "#fff",
-                                    borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
-                                }}
-                            >
                                 <code>provider</code>
                             </TableCell>
                             <TableCell
