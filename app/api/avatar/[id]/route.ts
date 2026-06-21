@@ -2,12 +2,6 @@ export const runtime = "edge";
 
 import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
-
-// Provider avatars come from a small known set of CDNs. New providers
-// must be added here explicitly — this is a tiny allowlist, not a general
-// URL validator. Without it, a write to identities.provider_profile_url
-// (e.g. via DB compromise or a future bug in the callback) could turn
-// /api/avatar into an open redirect.
 const SAFE_AVATAR_HOSTS = [
     "lh3.googleusercontent.com", // Google
     "avatars.githubusercontent.com", // GitHub
