@@ -769,6 +769,51 @@ export default function SecurityPage() {
                                             : ""}
                                     </Typography>
                                 </Box>
+                                {/* Pending factors need a resume action.
+                                    Without this the user is stuck — a
+                                    half-enrolled email_otp / totp row sits
+                                    in the list with no way to re-enter the
+                                    OTP. Reusing the same start handler
+                                    funnels back through the existing
+                                    enrollment flow (which is idempotent for
+                                    email_otp — resends the code and reuses
+                                    the row — and resets for totp). */}
+                                {!f.confirmed && f.kind === "email_otp" && (
+                                    <Button
+                                        size="small"
+                                        onClick={startEmailEnroll}
+                                        sx={{
+                                            color: "#c8b6ff",
+                                            textTransform: "none",
+                                            fontSize: "0.8rem",
+                                            mr: 0.5,
+                                            "&:hover": {
+                                                bgcolor:
+                                                    "rgba(155,123,247,0.08)",
+                                            },
+                                        }}
+                                    >
+                                        Resend & enter code
+                                    </Button>
+                                )}
+                                {!f.confirmed && f.kind === "totp" && (
+                                    <Button
+                                        size="small"
+                                        onClick={startTotp}
+                                        sx={{
+                                            color: "#c8b6ff",
+                                            textTransform: "none",
+                                            fontSize: "0.8rem",
+                                            mr: 0.5,
+                                            "&:hover": {
+                                                bgcolor:
+                                                    "rgba(155,123,247,0.08)",
+                                            },
+                                        }}
+                                    >
+                                        Continue setup
+                                    </Button>
+                                )}
                                 <IconButton
                                     size="small"
                                     onClick={() => removeFactor(f)}
