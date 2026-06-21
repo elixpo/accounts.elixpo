@@ -32,7 +32,7 @@ async function getUserIdentity(db: D1Database, userId: string) {
  * Auto-refresh: verify the refresh token, issue new access + refresh tokens,
  * set cookies, and return the user profile in one round-trip.
  */
-async function tryAutoRefresh(_request: NextRequest, refreshToken: string) {
+async function tryAutoRefresh(request: NextRequest, refreshToken: string) {
     try {
         const payload = await verifyJWT(refreshToken);
         if (payload?.type !== "refresh") {
@@ -87,13 +87,33 @@ async function tryAutoRefresh(_request: NextRequest, refreshToken: string) {
         );
         const newRefreshTokenHash = await hashString(newRefreshToken);
 
-        // Rotate refresh token
+        // Rotate refresh token. Carry the device fingerprint from the
+        // request through to the new row so the "Active sessions" list
+        // keeps showing the same device after rotation (otherwise every
+        // token refresh would create a row with NULL metadata).
+        const ipAddress =
+            request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+            request.headers.get("cf-connecting-ip") ||
+            "";
+        const userAgent = request.headers.get("user-agent") || "";
+        const { hashIpForSession, shortUaForSession } = await import(
+            "@/lib/db"
+        );
+
         await revokeRefreshToken(db, refreshTokenHash);
         await storeRefreshToken(db, {
             id: generateUUID(),
             userId: payload.sub,
             tokenHash: newRefreshTokenHash,
             expiresAt: new Date(Date.now() + refreshDays * 24 * 60 * 60 * 1000),
+            ipHash:
+                (await hashIpForSession(ipAddress)) ||
+                (tokenRecord as any).ip_hash ||
+                null,
+            uaShort:
+                shortUaForSession(userAgent) ||
+                (tokenRecord as any).ua_short ||
+                null,
         });
 
         const identity = await getUserIdentity(db, payload.sub);

@@ -424,6 +424,9 @@ async function buildSuccessResponse(
 
     try {
         const refreshTokenHash = await hashString(refreshToken);
+        const { hashIpForSession, shortUaForSession } = await import(
+            "@/lib/db"
+        );
         await createRefreshToken(db, {
             id: generateUUID(),
             userId: user.id,
@@ -439,6 +442,8 @@ async function buildSuccessResponse(
                         60 *
                         1000,
             ),
+            ipHash: await hashIpForSession(ipAddress || ""),
+            uaShort: shortUaForSession(userAgent || ""),
         });
 
         await updateUserLastLogin(db, user.id);

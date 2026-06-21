@@ -43,6 +43,15 @@ interface TrustedDevice {
     created_at: string;
     is_active: boolean;
 }
+interface Session {
+    id: string;
+    device: string;
+    ip_hash: string | null;
+    created_at: string;
+    last_used_at: string;
+    expires_at: string;
+    is_current: boolean;
+}
 interface MeStatus {
     mfa_enabled: boolean;
     unused_backup_codes: number;
@@ -72,6 +81,7 @@ const kindIcon: Record<Factor["kind"], React.ReactNode> = {
 export default function SecurityPage() {
     const [status, setStatus] = useState<MeStatus | null>(null);
     const [devices, setDevices] = useState<TrustedDevice[]>([]);
+    const [sessions, setSessions] = useState<Session[]>([]);
     const [loading, setLoading] = useState(true);
     const [msg, setMsg] = useState<{
         text: string;
@@ -94,9 +104,10 @@ export default function SecurityPage() {
 
     const refresh = useCallback(async () => {
         try {
-            const [factorsRes, devicesRes] = await Promise.all([
+            const [factorsRes, devicesRes, sessionsRes] = await Promise.all([
                 fetch("/api/auth/mfa/factors", { credentials: "include" }),
                 fetch("/api/auth/devices", { credentials: "include" }),
+                fetch("/api/auth/sessions", { credentials: "include" }),
             ]);
             if (factorsRes.ok) {
                 const data: any = await factorsRes.json();
@@ -105,6 +116,10 @@ export default function SecurityPage() {
             if (devicesRes.ok) {
                 const data: any = await devicesRes.json();
                 setDevices(data.devices || []);
+            }
+            if (sessionsRes.ok) {
+                const data: any = await sessionsRes.json();
+                setSessions(data.sessions || []);
             }
         } finally {
             setLoading(false);
@@ -287,6 +302,34 @@ export default function SecurityPage() {
         });
         if (!res.ok) {
             setMsg({ text: "Revoke failed", type: "error" });
+            return;
+        }
+        await refresh();
+    };
+
+    const revokeSession = async (s: Session) => {
+        const isCurrent = s.is_current;
+        const ok = confirm(
+            isCurrent
+                ? "Sign out from this device? You'll be returned to the login page."
+                : `Sign out the session on ${s.device}? That device will be signed out next time it tries to refresh.`,
+        );
+        if (!ok) return;
+        const res = await fetch(`/api/auth/sessions/${s.id}`, {
+            method: "DELETE",
+            credentials: "include",
+        });
+        if (!res.ok) {
+            setMsg({ text: "Sign out failed", type: "error" });
+            return;
+        }
+        if (isCurrent) {
+            // Revoking the current session — clear cookies + bounce.
+            await fetch("/api/auth/logout", {
+                method: "POST",
+                credentials: "include",
+            }).catch(() => {});
+            window.location.href = "/login";
             return;
         }
         await refresh();
@@ -533,6 +576,83 @@ export default function SecurityPage() {
                     </Button>
                 </Box>
             )}
+
+            {/* Active sessions — every device currently signed in. */}
+            <Box sx={{ ...cardSx, mb: 3 }}>
+                <Typography sx={{ color: "#f5f5f4", fontWeight: 600, fontSize: "1.1rem", mb: 0.5 }}>
+                    Active sessions
+                </Typography>
+                <Typography sx={{ color: "rgba(255,255,255,0.5)", fontSize: "0.85rem", mb: 2 }}>
+                    Devices currently signed in to your account. Sign out any you don't recognize.
+                </Typography>
+                {sessions.length === 0 ? (
+                    <Typography sx={{ color: "rgba(255,255,255,0.4)", py: 2 }}>
+                        No active sessions.
+                    </Typography>
+                ) : (
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                        {sessions.map((s) => (
+                            <Box
+                                key={s.id}
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1.5,
+                                    p: 1.5,
+                                    borderRadius: "10px",
+                                    bgcolor: s.is_current
+                                        ? "rgba(155,123,247,0.06)"
+                                        : "rgba(255,255,255,0.025)",
+                                    border: `1px solid ${s.is_current ? "rgba(155,123,247,0.3)" : "rgba(255,255,255,0.06)"}`,
+                                }}
+                            >
+                                <LaptopIcon sx={{ color: "#9b7bf7" }} />
+                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+                                        <Typography sx={{ color: "#f5f5f4", fontSize: "0.9rem", fontWeight: 600 }}>
+                                            {s.device}
+                                        </Typography>
+                                        {s.is_current && (
+                                            <Chip
+                                                label="This device"
+                                                size="small"
+                                                sx={{
+                                                    height: 18,
+                                                    fontSize: "0.65rem",
+                                                    bgcolor: "rgba(134,239,172,0.1)",
+                                                    color: "#86efac",
+                                                    border: "1px solid rgba(134,239,172,0.3)",
+                                                    fontWeight: 600,
+                                                }}
+                                            />
+                                        )}
+                                    </Box>
+                                    <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.75rem" }}>
+                                        Signed in {new Date(s.created_at).toLocaleDateString()}
+                                        {" · last active "}
+                                        {new Date(s.last_used_at).toLocaleString()}
+                                    </Typography>
+                                </Box>
+                                <Button
+                                    size="small"
+                                    onClick={() => revokeSession(s)}
+                                    sx={{
+                                        color: "rgba(255,255,255,0.5)",
+                                        textTransform: "none",
+                                        fontSize: "0.8rem",
+                                        "&:hover": {
+                                            color: "#f87171",
+                                            bgcolor: "rgba(239,68,68,0.08)",
+                                        },
+                                    }}
+                                >
+                                    Sign out
+                                </Button>
+                            </Box>
+                        ))}
+                    </Box>
+                )}
+            </Box>
 
             {/* Trusted devices */}
             <Box sx={cardSx}>

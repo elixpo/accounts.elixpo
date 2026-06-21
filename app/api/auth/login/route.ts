@@ -283,6 +283,9 @@ export async function POST(request: NextRequest) {
         // Store refresh token and log success
         try {
             const refreshTokenHash = await hashString(refreshTokenJWT);
+            const { hashIpForSession, shortUaForSession } = await import(
+                "@/lib/db"
+            );
             await storeRefreshToken(db, {
                 id: generateUUID(),
                 userId: user.id,
@@ -290,6 +293,8 @@ export async function POST(request: NextRequest) {
                 expiresAt: new Date(
                     Date.now() + refreshDays * 24 * 60 * 60 * 1000,
                 ),
+                ipHash: await hashIpForSession(ipAddress),
+                uaShort: shortUaForSession(userAgent),
             });
 
             await updateUserLastLogin(db, user.id);
