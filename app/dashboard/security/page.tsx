@@ -1,6 +1,8 @@
 "use client";
 
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DownloadIcon from "@mui/icons-material/Download";
 import KeyIcon from "@mui/icons-material/Key";
 import LaptopIcon from "@mui/icons-material/Laptop";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
@@ -307,6 +309,44 @@ export default function SecurityPage() {
         await refresh();
     };
 
+    // Build a plain-text dump of the codes with a short header so the
+    // user opening the file later still knows what these are. ISO date
+    // in the filename lets them stay sortable next to older batches.
+    const downloadBackupCodes = (codes: string[]) => {
+        const stamp = new Date().toISOString().slice(0, 10);
+        const body =
+            [
+                "Elixpo Accounts — 2FA backup codes",
+                `Generated: ${new Date().toUTCString()}`,
+                "",
+                "Each code can be used ONCE to sign in if you lose access to",
+                "your authenticator. Keep this file somewhere safe (password",
+                "manager, encrypted drive). Regenerate from accounts.elixpo.com",
+                "→ Security if you suspect these have leaked.",
+                "",
+                ...codes,
+                "",
+            ].join("\n");
+        const blob = new Blob([body], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `elixpo-backup-codes-${stamp}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    };
+
+    const copyBackupCodes = async (codes: string[]) => {
+        try {
+            await navigator.clipboard.writeText(codes.join("\n"));
+            setMsg({ text: "Backup codes copied to clipboard", type: "success" });
+        } catch {
+            setMsg({ text: "Couldn't copy — use Download instead", type: "error" });
+        }
+    };
+
     const revokeSession = async (s: Session) => {
         const isCurrent = s.is_current;
         const ok = confirm(
@@ -553,13 +593,59 @@ export default function SecurityPage() {
                                     </Box>
                                 ))}
                             </Box>
-                            <Button
-                                size="small"
-                                onClick={() => setRevealedCodes(null)}
-                                sx={{ mt: 1.5, color: "rgba(255,255,255,0.5)", textTransform: "none" }}
+                            <Box
+                                sx={{
+                                    mt: 1.5,
+                                    display: "flex",
+                                    gap: 1,
+                                    flexWrap: "wrap",
+                                }}
                             >
-                                I've saved them
-                            </Button>
+                                <Button
+                                    size="small"
+                                    startIcon={<DownloadIcon />}
+                                    onClick={() =>
+                                        downloadBackupCodes(revealedCodes)
+                                    }
+                                    sx={{
+                                        color: "#c8b6ff",
+                                        textTransform: "none",
+                                        bgcolor: "rgba(155,123,247,0.1)",
+                                        border: "1px solid rgba(155,123,247,0.3)",
+                                        "&:hover": {
+                                            bgcolor: "rgba(155,123,247,0.18)",
+                                        },
+                                    }}
+                                >
+                                    Download .txt
+                                </Button>
+                                <Button
+                                    size="small"
+                                    startIcon={<ContentCopyIcon />}
+                                    onClick={() => copyBackupCodes(revealedCodes)}
+                                    sx={{
+                                        color: "rgba(255,255,255,0.7)",
+                                        textTransform: "none",
+                                        border: "1px solid rgba(255,255,255,0.15)",
+                                        "&:hover": {
+                                            bgcolor: "rgba(255,255,255,0.05)",
+                                        },
+                                    }}
+                                >
+                                    Copy
+                                </Button>
+                                <Button
+                                    size="small"
+                                    onClick={() => setRevealedCodes(null)}
+                                    sx={{
+                                        color: "rgba(255,255,255,0.4)",
+                                        textTransform: "none",
+                                        ml: "auto",
+                                    }}
+                                >
+                                    I've saved them
+                                </Button>
+                            </Box>
                         </Box>
                     )}
 
