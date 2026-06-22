@@ -189,8 +189,13 @@ const PIXELS = [
     "#7c5cff",
 ];
 
-/* The Elixpo suite — one identity signs you into all of these. Wordmarks
- * (no boxes) reinforce that Elixpo Accounts is the shared SSO hub. */
+/* The Elixpo suite — one identity signs you into all of these.
+ *
+ * Each entry renders the product's favicon next to its name. Favicons are
+ * fetched directly from the source domain so they stay in sync without us
+ * mirroring assets — when a product redesigns its logo, we get the new
+ * one for free on next page load.
+ */
 const wordmark: CSSProperties = {
     fontFamily: "var(--font-geist-sans), sans-serif",
     fontWeight: 800,
@@ -199,40 +204,54 @@ const wordmark: CSSProperties = {
     whiteSpace: "nowrap",
     display: "inline-flex",
     alignItems: "center",
+    gap: 8,
     opacity: 0.95,
     lineHeight: 1,
 };
-const tint = (color: string): CSSProperties => ({ ...wordmark, color });
+
+const faviconStyle: CSSProperties = {
+    width: 22,
+    height: 22,
+    borderRadius: 5,
+    flexShrink: 0,
+    objectFit: "contain",
+    background: "rgba(255,255,255,0.06)",
+};
+
+const productEntry = (
+    label: string,
+    favicon: string,
+    color: string,
+): { name: string; node: ReactNode } => ({
+    name: label,
+    node: (
+        <span style={{ ...wordmark, color }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+                src={favicon}
+                alt=""
+                aria-hidden="true"
+                style={faviconStyle}
+                loading="lazy"
+                referrerPolicy="no-referrer"
+            />
+            {label}
+        </span>
+    ),
+});
 
 const ELIXPO_PRODUCTS: { name: string; node: ReactNode }[] = [
-    {
-        name: "Elixpo",
-        node: (
-            <span style={wordmark}>
-                <b style={{ color: "#f5f5f4" }}>Elix</b>
-                <b style={{ color: "#9b7bf7" }}>po</b>
-            </span>
-        ),
-    },
-    { name: "Blogs", node: <span style={tint("#5fb6ff")}>Blogs</span> },
-    { name: "Sketch", node: <span style={tint("#86efac")}>Sketch</span> },
-    {
-        name: "URL",
-        node: (
-            <span
-                style={{
-                    ...tint("rgba(245,245,244,0.85)"),
-                    letterSpacing: "0.04em",
-                }}
-            >
-                URL
-            </span>
-        ),
-    },
-    { name: "Payouts", node: <span style={tint("#fbbf24")}>Payouts</span> },
-    { name: "Mails", node: <span style={tint("#9b7bf7")}>Mails</span> },
-    { name: "Me", node: <span style={tint("#ff6a8a")}>Me</span> },
-    { name: "Art", node: <span style={tint("#5ac8fa")}>Art</span> },
+    productEntry("Elixpo", "https://elixpo.com/favicon.ico", "#f5f5f4"),
+    productEntry("Blogs", "https://blogs.elixpo.com/favicon.ico", "#5fb6ff"),
+    productEntry("Sketch", "https://sketch.elixpo.com/favicon.ico", "#86efac"),
+    productEntry(
+        "URL",
+        "https://url.elixpo.com/favicon.ico",
+        "rgba(245,245,244,0.85)",
+    ),
+    productEntry("Mails", "https://mails.elixpo.com/favicon.ico", "#9b7bf7"),
+    productEntry("Me", "https://me.elixpo.com/favicon.ico", "#ff6a8a"),
+    productEntry("Admin", "https://admin.elixpo.com/favicon.ico", "#fbbf24"),
 ];
 
 const ArrowRight = () => (
