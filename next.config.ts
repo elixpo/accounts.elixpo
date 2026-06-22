@@ -29,20 +29,6 @@ const nextConfig: NextConfig = {
     eslint: {
         ignoreDuringBuilds: true,
     },
-    // Microsoft Entra (Azure AD) reads /.well-known/microsoft-identity-
-    // association.json to verify the publisher domain. Next.js ignores
-    // folders starting with `.` in app/, and next-on-pages doesn't
-    // reliably serve dot-prefixed dirs from public/ — so we serve the
-    // JSON from a normal route handler and rewrite the canonical URL
-    // onto it.
-    async rewrites() {
-        return [
-            {
-                source: "/.well-known/microsoft-identity-association.json",
-                destination: "/api/well-known/microsoft-identity-association",
-            },
-        ];
-    },
     webpack: (config, { isServer }) => {
         // Prevent webpack from trying to bundle nodemailer (Node.js-only)
         // into edge runtime chunks. It's dynamically imported at runtime only
