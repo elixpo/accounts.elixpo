@@ -130,53 +130,21 @@ flowchart TB
     U -- "OAuth flow: /api/auth/token" --> AAPI
     AAPI -- "recordMauHit(client_id, user_id)" --> AD1
 
-    classDef external fill:#ff6b6b,stroke:#c92a2a,color:#fff
-    classDef account fill:#9b7bf7,stroke:#7c5cff,color:#fff
-    classDef payment fill:#fbbf24,stroke:#d97706,color:#000
-    classDef mail fill:#5fb6ff,stroke:#0c8ce9,color:#fff
-    class RZP external
-    class AUI,AAPI,AD1,AKV account
-    class PAPI,PCHECKOUT,PWEBHOOK,POUTBOUND,PD1 payment
-    class MAILSAPI mail
+    classDef bw fill:#ffffff,stroke:#000000,stroke-width:1px,color:#000000
+    classDef bwStore fill:#f5f5f5,stroke:#000000,stroke-width:1px,color:#000000
+    class U,AUI,AAPI,PAPI,PCHECKOUT,PWEBHOOK,POUTBOUND,MAILSAPI,RZP bw
+    class AD1,AKV,PD1,GH bwStore
 ```
-
-### Secrets and where they live
-
-| Secret | Set on | What it authenticates |
-|---|---|---|
-| `ELIXPO_ACCOUNTS_PAYOUT_CLIENT_SECRET` (`lix_pay_…`) | accounts CF env + GitHub repo secrets | accounts → payouts `/v1/*` Bearer; also gates inbound `/api/cron/sync-tiers` from the GH workflow |
-| `PAYOUTS_WEBHOOK_SECRET` (`whsec_…`) | accounts CF env | Inbound `entitlement.updated` from payouts — verified by HMAC-SHA256 on `X-Elixpo-Pay-Signature` |
-| `MAILS_SHARED_SECRET` | accounts CF env | Outbound calls to mails.elixpo — HMAC-SHA256 on `X-Elixpo-Signature: t=…,v1=…` over `${t}.${rawBody}` |
-| `MAILS_HOOK_*` (12 keys) | accounts CF env | Per-template endpoint id on mails.elixpo (one per template: `user_verify_otp`, `billing_subscription_activated`, etc.) |
-| `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` / `RAZORPAY_WEBHOOK_SECRET` | **payouts only** | Razorpay HTTP Basic auth + webhook signature |
-| `JWT_PRIVATE_KEY` / `JWT_PUBLIC_KEY` (EdDSA PEM) | accounts CF env | Signing access + refresh tokens (cookie `access_token`) |
-| `MFA_JWT_SECRET` | accounts CF env | Short-lived MFA challenge tokens |
-| `TRUSTED_DEVICE_SECRET` | accounts CF env | 30-day trusted-device cookie JWT |
-
----
-
-## Want to help build it?
-
-This is open source. Pull requests are welcome.
-
-If you want to run it on your machine or send a change, here's the short version:
-
-```bash
-git clone https://github.com/elixpo/accounts.elixpo.git
-cd accounts.elixpo
-npm install
-cp .env.example .env.local       # fill in the blanks
-npm run db:migrate:local         # set up the local database
-npm run dev                      # open http://localhost:3000
-```
-
-For the full developer manual — architecture, conventions, what to do and what to avoid — read **[AGENTS.md](AGENTS.md)**.
 
 ---
 
 ## Found a bug? Have an idea?
 
-Open an issue → **[github.com/elixpo/accounts.elixpo/issues](https://github.com/elixpo/accounts.elixpo/issues)**.
+<div align="center">
+
+<a href="https://github.com/elixpo/accounts.elixpo/issues/new"><img src="https://img.shields.io/badge/Open%20an%20issue-000000?style=for-the-badge&logo=github&logoColor=white" alt="Open an issue" /></a>
+
+</div>
 
 For security issues, please email us privately instead of opening a public issue.
 
