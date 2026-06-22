@@ -230,13 +230,39 @@ export default function SubscriptionsPage() {
                             gap: 1.5,
                         }}
                     >
-                        <Row label="Renews on" value={renewsAt} />
-                        <Row label="Billing cycle" value="Monthly" />
+                        <Row
+                            label={isCancelled ? "Access until" : "Renews on"}
+                            value={renewsAt}
+                        />
+                        <Row
+                            label="Billing cycle"
+                            value={isCancelled ? "Ending after this" : "Monthly"}
+                        />
+                    </Box>
+                )}
+                {isCancelled && (
+                    <Box
+                        sx={{
+                            mt: 2.5,
+                            p: 1.5,
+                            borderRadius: "10px",
+                            background: "rgba(248,113,113,0.06)",
+                            border: "1px solid rgba(248,113,113,0.2)",
+                            color: "rgba(252,165,165,0.95)",
+                            fontSize: "0.88rem",
+                        }}
+                    >
+                        Subscription cancelled. You keep paid access until{" "}
+                        <strong>{renewsAt ?? "the end of your period"}</strong>,
+                        then your account moves to the free Hobby tier.
                     </Box>
                 )}
             </Box>
 
-            {isPaid && !me?.is_internal && (
+            {/* Show the in-period Cancel block ONLY while still active —
+                a cancelled-but-pending sub has nothing left to do, and the
+                "Resubscribe" CTA up top handles the inverse action. */}
+            {isPaid && !isCancelled && !me?.is_internal && (
                 <CancelSection renewsAt={renewsAt} onCancelled={() => location.reload()} />
             )}
 
