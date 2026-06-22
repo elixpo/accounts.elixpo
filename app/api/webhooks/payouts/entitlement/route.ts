@@ -206,6 +206,22 @@ async function fireBillingEmail(
         return;
     }
 
+    // Graceful cancel — fire the cancellation email IMMEDIATELY when Pay
+    // signals status='cancelled' (still active through period_end). This
+    // way the buyer gets confirmation right after clicking Cancel; no
+    // second email is sent when the entitlement finally expires (the
+    // active=false webhook arrives with the same status flag and we
+    // short-circuit on the no-tier-change path).
+    if (data.status === "cancelled") {
+        await sendMail("billing_subscription_cancelled", user.email, {
+            name,
+            plan_name: planName,
+            access_until: expiresAt ?? "the end of your current period",
+            restart_url: "https://accounts.elixpo.com/pricing",
+        });
+        return;
+    }
+
     // hobby → paid: welcome email.
     if (result.previousTier === "hobby" && result.nextTier !== "hobby") {
         await sendMail("billing_subscription_activated", user.email, {

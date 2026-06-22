@@ -213,35 +213,7 @@ export default function SubscriptionsPage() {
             </Box>
 
             {isPaid && !me?.is_internal && (
-                <Box sx={{ mt: 3 }}>
-                    <Typography
-                        sx={{
-                            fontWeight: 700,
-                            fontSize: "1rem",
-                            mb: 0.5,
-                            color: "#f5f5f4",
-                        }}
-                    >
-                        Cancel subscription
-                    </Typography>
-                    <Typography
-                        sx={{
-                            color: "rgba(245,245,244,0.55)",
-                            fontSize: "0.88rem",
-                            mb: 1.5,
-                        }}
-                    >
-                        Self-serve cancellation isn't live yet. Email{" "}
-                        <a
-                            href="mailto:support@elixpo.com"
-                            style={{ color: "#9b7bf7" }}
-                        >
-                            support@elixpo.com
-                        </a>{" "}
-                        and we'll cancel within one business day; you keep
-                        access until the end of your current period.
-                    </Typography>
-                </Box>
+                <CancelSection renewsAt={renewsAt} onCancelled={() => location.reload()} />
             )}
 
             {me?.is_internal && (
@@ -254,6 +226,183 @@ export default function SubscriptionsPage() {
                 >
                     Your account is marked internal — billing is bypassed.
                 </Typography>
+            )}
+        </Box>
+    );
+}
+
+/**
+ * Cancel-subscription block. Confirms intent in a two-step (button → confirm)
+ * pattern so a misclick can't take down the user's paid plan. Graceful cancel
+ * by default — POSTs to /api/billing/cancel which calls payouts.elixpo with
+ * cancel_at_cycle_end=true. The webhook back from payouts fires the
+ * confirmation email; the user keeps access until renewsAt.
+ */
+function CancelSection({
+    renewsAt,
+    onCancelled,
+}: {
+    renewsAt: string | null;
+    onCancelled: () => void;
+}) {
+    const [confirming, setConfirming] = useState(false);
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [done, setDone] = useState<string | null>(null);
+
+    const doCancel = async () => {
+        setBusy(true);
+        setError(null);
+        try {
+            const res = await fetch("/api/billing/cancel", {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({}),
+            });
+            const text = await res.text();
+            let data: any = {};
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch {
+                /* non-json */
+            }
+            if (!res.ok) {
+                setError(
+                    data.error ||
+                        `Couldn't cancel right now (HTTP ${res.status}). Try again.`,
+                );
+                return;
+            }
+            setDone(
+                data.access_until
+                    ? `Cancelled. You keep access until ${formatDate(data.access_until) ?? data.access_until}. We'll email you confirmation.`
+                    : "Cancelled. You keep access until the end of your current period.",
+            );
+            setTimeout(onCancelled, 2500);
+        } catch (err: any) {
+            setError(err?.message || "Network error — please try again.");
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    if (done) {
+        return (
+            <Box
+                sx={{
+                    mt: 3,
+                    p: 2,
+                    borderRadius: "12px",
+                    border: "1px solid rgba(134,239,172,0.3)",
+                    background: "rgba(134,239,172,0.06)",
+                    color: "#86efac",
+                    fontSize: "0.92rem",
+                }}
+            >
+                {done}
+            </Box>
+        );
+    }
+
+    return (
+        <Box sx={{ mt: 3 }}>
+            <Typography
+                sx={{
+                    fontWeight: 700,
+                    fontSize: "1rem",
+                    mb: 0.5,
+                    color: "#f5f5f4",
+                }}
+            >
+                Cancel subscription
+            </Typography>
+            <Typography
+                sx={{
+                    color: "rgba(245,245,244,0.55)",
+                    fontSize: "0.88rem",
+                    mb: 1.5,
+                }}
+            >
+                Cancel any time. You'll keep paid access until{" "}
+                <strong style={{ color: "#f5f5f4" }}>
+                    {renewsAt ?? "the end of your current period"}
+                </strong>
+                , then your account moves to the free Hobby tier. No further
+                charges after cancellation.
+            </Typography>
+
+            {error && (
+                <Typography
+                    sx={{
+                        color: "#fca5a5",
+                        fontSize: "0.85rem",
+                        mb: 1,
+                    }}
+                >
+                    {error}
+                </Typography>
+            )}
+
+            {!confirming ? (
+                <Button
+                    onClick={() => setConfirming(true)}
+                    sx={{
+                        textTransform: "none",
+                        fontWeight: 600,
+                        px: 2.2,
+                        py: 0.9,
+                        borderRadius: "10px",
+                        color: "#fca5a5",
+                        border: "1px solid rgba(248,113,113,0.3)",
+                        "&:hover": {
+                            background: "rgba(248,113,113,0.08)",
+                            borderColor: "rgba(248,113,113,0.5)",
+                        },
+                    }}
+                >
+                    Cancel subscription
+                </Button>
+            ) : (
+                <Stack direction="row" spacing={1}>
+                    <Button
+                        onClick={doCancel}
+                        disabled={busy}
+                        sx={{
+                            textTransform: "none",
+                            fontWeight: 700,
+                            px: 2.2,
+                            py: 0.9,
+                            borderRadius: "10px",
+                            color: "#fff",
+                            background: "rgba(239,68,68,0.85)",
+                            "&:hover": { background: "rgba(239,68,68,1)" },
+                            "&.Mui-disabled": { opacity: 0.6, color: "#fff" },
+                        }}
+                    >
+                        {busy ? (
+                            <CircularProgress size={18} sx={{ color: "#fff" }} />
+                        ) : (
+                            "Confirm cancel"
+                        )}
+                    </Button>
+                    <Button
+                        onClick={() => setConfirming(false)}
+                        disabled={busy}
+                        sx={{
+                            textTransform: "none",
+                            fontWeight: 600,
+                            px: 2.2,
+                            py: 0.9,
+                            borderRadius: "10px",
+                            color: "rgba(245,245,244,0.7)",
+                            border: "1px solid rgba(255,255,255,0.12)",
+                            "&:hover": { background: "rgba(255,255,255,0.04)" },
+                        }}
+                    >
+                        Keep my plan
+                    </Button>
+                </Stack>
             )}
         </Box>
     );
