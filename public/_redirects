@@ -1,0 +1,13 @@
+# Cloudflare Pages _redirects file.
+#
+# Format: <source> <destination> <status>
+# Status 200 = rewrite (URL stays the same, content from destination).
+# Status 301/302 = redirect (URL changes).
+#
+# This is processed by Cloudflare Pages at the edge BEFORE the Next.js
+# function runs — useful for serving paths Next.js can't handle natively
+# (e.g. dot-prefixed segments).
+
+# Microsoft Entra publisher-domain verification.
+# Microsoft Entra fetches this exact URL; we proxy to the route handler.
+/.well-known/microsoft-identity-association.json  /api/well-known/microsoft-identity-association  200
