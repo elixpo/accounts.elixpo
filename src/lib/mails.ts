@@ -18,7 +18,7 @@
  */
 
 const BASE_URL = "https://mails.elixpo.com";
-const TIMEOUT_MS = 5_000;
+const TIMEOUT_MS = 20_000;
 
 export type MailTemplate =
     | "user_verify_otp"
