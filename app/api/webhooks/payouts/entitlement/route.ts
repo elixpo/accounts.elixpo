@@ -139,6 +139,10 @@ export async function POST(request: NextRequest) {
             tier: nextTier,
             expiresAt,
             providerSubscriptionId,
+            // Pass through the raw status so the helper can manage the
+            // `tier_cancelled_at` marker — set on graceful-cancel events,
+            // cleared on fresh subscriptions and period-end downgrades.
+            eventStatus: typeof data?.status === "string" ? data.status : null,
         });
     } catch (err) {
         console.error(
