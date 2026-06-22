@@ -187,12 +187,21 @@ export async function applyEntitlementUpdate(
     }
 
     // Decide tier_cancelled_at:
-    //   - status='cancelled' from the inline cancel fire → mark now
+    //   - status='cancelled' (our cancel API, or Razorpay terminal cancel)
+    //     OR status='halted' (UPI mandate revoked from the buyer's GPay/
+    //     PhonePe app, or repeated charge failures — either way the
+    //     sub will not renew) → mark now. Treating halted the same
+    //     way bridges the "buyer cancelled in their UPI app, our site
+    //     never knew" gap: the dashboard reflects cancellation
+    //     immediately regardless of where the cancel was triggered.
     //   - hobby→paid (new sub starting) → clear (fresh cycle)
     //   - paid→hobby (period_end downgrade) → clear (cycle finished)
     //   - everything else (renewal, no-op) → preserve existing value
     let cancelledAtClause = "tier_cancelled_at = tier_cancelled_at"; // no-op
-    if (params.eventStatus === "cancelled") {
+    if (
+        params.eventStatus === "cancelled" ||
+        params.eventStatus === "halted"
+    ) {
         cancelledAtClause = "tier_cancelled_at = datetime('now')";
     } else if (previousTier === "hobby" && params.tier !== "hobby") {
         cancelledAtClause = "tier_cancelled_at = NULL";
