@@ -40,6 +40,7 @@ interface Me {
 // Marketing nav (signed-out).
 const MARKETING_LINKS = [
     { label: "Home", href: "/" },
+    { label: "Pricing", href: "/pricing" },
     { label: "Docs", href: "/docs" },
     { label: "About", href: "/about" },
 ];

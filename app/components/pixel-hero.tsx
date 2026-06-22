@@ -191,31 +191,32 @@ const PIXELS = [
 
 /* The Elixpo suite — one identity signs you into all of these.
  *
- * Each entry renders the product's favicon next to its name. Favicons are
- * fetched directly from the source domain so they stay in sync without us
- * mirroring assets — when a product redesigns its logo, we get the new
- * one for free on next page load.
+ * Logos-only marquee (no labels) — reads like a "brand assets" strip of
+ * trusted products. Favicons are fetched directly from each source
+ * domain so they auto-update whenever a product redesigns its mark.
+ *
+ * The tinted ring around each icon is purely decorative; the icon
+ * itself sits on a subtle dark plate so light + dark favicons both have
+ * enough contrast against the hero background.
  */
-const wordmark: CSSProperties = {
-    fontFamily: "var(--font-geist-sans), sans-serif",
-    fontWeight: 800,
-    fontSize: "1.35rem",
-    letterSpacing: "-0.01em",
-    whiteSpace: "nowrap",
+const brandTile = (color: string): CSSProperties => ({
+    width: 56,
+    height: 56,
+    borderRadius: 14,
+    flexShrink: 0,
     display: "inline-flex",
     alignItems: "center",
-    gap: 8,
-    opacity: 0.95,
-    lineHeight: 1,
-};
+    justifyContent: "center",
+    background: "rgba(20,18,28,0.55)",
+    border: `1px solid ${color}33`,
+    boxShadow: `0 0 24px -8px ${color}55`,
+    backdropFilter: "blur(6px)",
+});
 
-const faviconStyle: CSSProperties = {
-    width: 22,
-    height: 22,
-    borderRadius: 5,
-    flexShrink: 0,
+const brandIconStyle: CSSProperties = {
+    width: 36,
+    height: 36,
     objectFit: "contain",
-    background: "rgba(255,255,255,0.06)",
 };
 
 const productEntry = (
@@ -225,17 +226,19 @@ const productEntry = (
 ): { name: string; node: ReactNode } => ({
     name: label,
     node: (
-        <span style={{ ...wordmark, color }}>
+        <span
+            style={brandTile(color)}
+            aria-label={label}
+            title={label}
+        >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
                 src={favicon}
-                alt=""
-                aria-hidden="true"
-                style={faviconStyle}
+                alt={`${label} logo`}
+                style={brandIconStyle}
                 loading="lazy"
                 referrerPolicy="no-referrer"
             />
-            {label}
         </span>
     ),
 });
