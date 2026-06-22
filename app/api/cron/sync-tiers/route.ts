@@ -77,10 +77,10 @@ const TIER_CATALOG: ProductDef[] = [
 ];
 
 async function handle(request: NextRequest) {
-    const secret = process.env.CRON_SECRET;
+    const secret = process.env.ELIXPO_PAY_SESSION_SECRET;
     if (!secret) {
         return NextResponse.json(
-            { error: "cron_unconfigured", error_description: "CRON_SECRET not set" },
+            { error: "cron_unconfigured", error_description: "ELIXPO_PAY_SESSION_SECRET not set" },
             { status: 500 },
         );
     }

@@ -45,7 +45,7 @@ jobs:
           CRON_SECRET: ${{ secrets.ELIXPO_ACCOUNTS_PAYOUT_CLIENT_SECRET }}
         run: |
           if [ -z "$CRON_SECRET" ]; then
-            echo "::error::ACCOUNTS_CRON_SECRET is not set in repo secrets"
+            echo "::error::ELIXPO_PAY_SESSION_SECRET is not set in repo secrets"
             exit 1
           fi
 
