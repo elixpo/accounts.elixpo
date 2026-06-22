@@ -104,6 +104,7 @@ export default function SubscriptionsPage() {
                     fontSize: "1.7rem",
                     letterSpacing: "-0.02em",
                     mb: 0.5,
+                    color: "#fff"
                 }}
             >
                 Subscriptions
