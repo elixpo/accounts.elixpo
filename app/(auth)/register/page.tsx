@@ -97,7 +97,7 @@ const RegisterContent = () => {
         }
     };
 
-    const handleSSORegister = (provider: "google" | "github") => {
+    const handleSSORegister = (provider: "google" | "github" | "discord") => {
         // Redirect through our backend so state cookie is set correctly before going to provider
         const url = `/api/auth/oauth/${provider}?mode=register${next ? `&next=${encodeURIComponent(next)}` : ""}`;
         window.location.href = url;

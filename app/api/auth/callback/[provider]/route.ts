@@ -90,6 +90,8 @@ export async function GET(
                 GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
                 GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
                 GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+                DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
+                DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
             },
             origin,
         );
@@ -414,13 +416,13 @@ async function buildSuccessResponse(
     const accessToken = await createAccessToken(
         user.id,
         email,
-        provider.toLowerCase() as "google" | "github",
+        provider.toLowerCase() as "google" | "github" | "discord",
         parseInt(process.env.JWT_EXPIRATION_MINUTES || "15", 10),
     );
 
     const refreshToken = await createRefreshTokenJWT(
         user.id,
-        provider.toLowerCase() as "google" | "github",
+        provider.toLowerCase() as "google" | "github" | "discord",
     );
 
     try {
@@ -615,6 +617,39 @@ async function fetchUserInfoFromProvider(
                     name: data.name,
                     picture: data.picture,
                 };
+
+            case "discord": {
+                // Discord returns: id (snowflake), username, global_name,
+                // email, verified, avatar (hash or null). Refuse if the
+                // account doesn't have a verified email — same bar as
+                // Google/GitHub.
+                if (data.email && data.verified !== true) {
+                    console.error(
+                        "[discord] rejecting unverified email for user %s",
+                        String(data.id),
+                    );
+                    return null;
+                }
+                // Avatar: hash → CDN URL. Format auto: gif if animated
+                // (avatar starts with "a_"), else png. Null avatar means
+                // user is on the default avatar; we just leave picture
+                // undefined and the UI shows initials.
+                let avatarUrl: string | undefined;
+                if (data.avatar && typeof data.avatar === "string") {
+                    const ext = data.avatar.startsWith("a_") ? "gif" : "png";
+                    avatarUrl = `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.${ext}`;
+                }
+                return {
+                    sub: String(data.id),
+                    email: data.email || undefined,
+                    // global_name is the new display name (set 2023+);
+                    // username is the @handle. Prefer global_name; fall
+                    // back to username so older accounts still get a name.
+                    name: data.global_name || data.username,
+                    picture: avatarUrl,
+                    login: data.username,
+                };
+            }
 
             case "github": {
                 // The /user endpoint omits the email unless it's public. When it's

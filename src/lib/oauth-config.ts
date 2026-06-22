@@ -27,6 +27,8 @@ export function getOAuthConfig(
         GOOGLE_CLIENT_SECRET?: string;
         GITHUB_CLIENT_ID?: string;
         GITHUB_CLIENT_SECRET?: string;
+        DISCORD_CLIENT_ID?: string;
+        DISCORD_CLIENT_SECRET?: string;
     },
     /** Pass the request origin (e.g. https://accounts.elixpo.com) so the
      *  redirect_uri is always correct regardless of build-time env vars. */
@@ -60,6 +62,22 @@ export function getOAuthConfig(
                 tokenEndpoint: "https://github.com/login/oauth/access_token",
                 userInfoEndpoint: "https://api.github.com/user",
                 scopes: ["read:user", "user:email"],
+            };
+
+        case "discord":
+            return {
+                name: "discord",
+                clientId: env.DISCORD_CLIENT_ID || "",
+                clientSecret: env.DISCORD_CLIENT_SECRET || "",
+                redirectUri: `${baseUrl}/api/auth/callback/discord`,
+                authorizationEndpoint: "https://discord.com/oauth2/authorize",
+                tokenEndpoint: "https://discord.com/api/oauth2/token",
+                userInfoEndpoint: "https://discord.com/api/users/@me",
+                // `identify` gives id/username/global_name/avatar; `email`
+                // gives verified email. We require both — same contract as
+                // Google + GitHub: a verified email is mandatory for account
+                // creation.
+                scopes: ["identify", "email"],
             };
 
         default:
