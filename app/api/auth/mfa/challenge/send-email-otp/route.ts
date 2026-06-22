@@ -157,11 +157,15 @@ async function sendImpl(request: NextRequest) {
         // them.
         await kv.delete(`mfa_email_otp:${mfaToken.slice(-32)}`).catch(() => {});
         await kv.delete(cooldownKey).catch(() => {});
+        // 424 Failed Dependency — upstream mail provider failed. We
+        // return 4xx (not 5xx) because the elixpo.com Cloudflare zone
+        // intercepts 5xx responses and replaces the JSON body with its
+        // own HTML error page, which the client toast can't parse.
         return NextResponse.json(
             {
                 error: `Couldn't send the verification email: ${mailResult.error ?? "unknown"}`,
             },
-            { status: 502 },
+            { status: 424 },
         );
     }
 
