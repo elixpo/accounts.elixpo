@@ -25,6 +25,30 @@ const COOLDOWN_SECONDS = 60;
  * email body so the user can spot a phishing attempt).
  */
 export async function POST(request: NextRequest) {
+    try {
+        return await sendImpl(request);
+    } catch (err) {
+        // Catch-all so unhandled throws (KV outage, mails.elixpo network
+        // failure, getRequestContext misconfig) surface as a readable
+        // JSON error instead of a Cloudflare edge HTML 502 page that the
+        // client toast can't parse.
+        console.error(
+            "[mfa challenge send-email-otp] unhandled: %s",
+            err instanceof Error ? err.stack || err.message : String(err),
+        );
+        return NextResponse.json(
+            {
+                error:
+                    err instanceof Error
+                        ? `Couldn't send code: ${err.message}`
+                        : "Couldn't send code (unknown error)",
+            },
+            { status: 500 },
+        );
+    }
+}
+
+async function sendImpl(request: NextRequest) {
     let body: any;
     try {
         body = await request.json();
@@ -71,7 +95,22 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const kv = (getRequestContext().env as any).KV as KVNamespace;
+    let kv: KVNamespace;
+    try {
+        kv = (getRequestContext().env as any).KV as KVNamespace;
+        if (!kv) throw new Error("KV binding missing");
+    } catch (err) {
+        console.error(
+            "[mfa challenge send-email-otp] KV unavailable: %s",
+            err instanceof Error ? err.message : String(err),
+        );
+        return NextResponse.json(
+            {
+                error: "Verification service unavailable. Please try again in a moment.",
+            },
+            { status: 503 },
+        );
+    }
     const cooldownKey = `mfa_email_otp_cd:${mfaToken.slice(-32)}`;
     const cooled = await kv.get(cooldownKey);
     if (cooled) {
