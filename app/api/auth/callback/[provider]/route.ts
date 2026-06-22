@@ -92,6 +92,8 @@ export async function GET(
                 GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
                 DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
                 DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
+                MICROSOFT_CLIENT_ID: process.env.MICROSOFT_CLIENT_ID,
+                MICROSOFT_CLIENT_SECRET: process.env.MICROSOFT_CLIENT_SECRET,
             },
             origin,
         );
@@ -416,13 +418,13 @@ async function buildSuccessResponse(
     const accessToken = await createAccessToken(
         user.id,
         email,
-        provider.toLowerCase() as "google" | "github" | "discord",
+        provider.toLowerCase() as "google" | "github" | "discord" | "microsoft",
         parseInt(process.env.JWT_EXPIRATION_MINUTES || "15", 10),
     );
 
     const refreshToken = await createRefreshTokenJWT(
         user.id,
-        provider.toLowerCase() as "google" | "github" | "discord",
+        provider.toLowerCase() as "google" | "github" | "discord" | "microsoft",
     );
 
     try {
@@ -617,6 +619,26 @@ async function fetchUserInfoFromProvider(
                     name: data.name,
                     picture: data.picture,
                 };
+
+            case "microsoft": {
+                // Microsoft Graph OIDC userinfo returns sub/name/email/
+                // picture in standard shape. Work accounts sometimes
+                // omit `email` and put the address in `preferred_username`
+                // (or `upn`) instead — fall back through both.
+                const msEmail =
+                    data.email ||
+                    data.preferred_username ||
+                    data.upn ||
+                    undefined;
+                // `picture` from Graph is a URL that requires an
+                // Authorization header to fetch the binary — useless as
+                // an <img src>. Drop it; UI falls back to initials.
+                return {
+                    sub: String(data.sub),
+                    email: msEmail,
+                    name: data.name,
+                };
+            }
 
             case "discord": {
                 // Discord returns: id (snowflake), username, global_name,

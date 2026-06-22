@@ -30,6 +30,8 @@ export async function GET(
             GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
             DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
             DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
+            MICROSOFT_CLIENT_ID: process.env.MICROSOFT_CLIENT_ID,
+            MICROSOFT_CLIENT_SECRET: process.env.MICROSOFT_CLIENT_SECRET,
         },
         origin,
     );
