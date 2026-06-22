@@ -36,6 +36,8 @@ export async function POST(request: NextRequest) {
             "[mfa challenge send-email-otp] unhandled: %s",
             err instanceof Error ? err.stack || err.message : String(err),
         );
+        // 424 instead of 500 — see comment in the mail-failure branch
+        // about CF zone intercepting 5xx with an HTML error page.
         return NextResponse.json(
             {
                 error:
@@ -43,7 +45,7 @@ export async function POST(request: NextRequest) {
                         ? `Couldn't send code: ${err.message}`
                         : "Couldn't send code (unknown error)",
             },
-            { status: 500 },
+            { status: 424 },
         );
     }
 }
@@ -108,7 +110,7 @@ async function sendImpl(request: NextRequest) {
             {
                 error: "Verification service unavailable. Please try again in a moment.",
             },
-            { status: 503 },
+            { status: 424 },
         );
     }
     const cooldownKey = `mfa_email_otp_cd:${mfaToken.slice(-32)}`;
