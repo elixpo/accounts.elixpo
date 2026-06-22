@@ -54,15 +54,14 @@ export async function POST(request: NextRequest) {
     }
 
     const apiBase = process.env.PAYOUTS_API_BASE || "https://payouts.elixpo.com";
-    // Support both env names — `ELIXPO_ACCOUNTS_PAYOUT_CLIENT_SECRET` is
-    // the historical name on prod; `PAYOUTS_APP_CLIENT_SECRET` is the new
-    // convention. Either works.
-    const apiKey =
-        process.env.PAYOUTS_APP_CLIENT_SECRET ||
-        process.env.ELIXPO_ACCOUNTS_PAYOUT_CLIENT_SECRET ||
-        "";
+    // Single source of truth — the payouts.elixpo app client secret
+    // (lix_pay_…). Same env var name everywhere: .env.local, CF Pages
+    // Production env, and GH repo secrets.
+    const apiKey = process.env.ELIXPO_ACCOUNTS_PAYOUT_CLIENT_SECRET || "";
     if (!apiKey) {
-        console.error("[billing checkout] PAYOUTS_APP_CLIENT_SECRET not set");
+        console.error(
+            "[billing checkout] ELIXPO_ACCOUNTS_PAYOUT_CLIENT_SECRET not set",
+        );
         return NextResponse.json(
             { error: "Billing is not configured. Try again later." },
             { status: 503 },

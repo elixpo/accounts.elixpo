@@ -77,10 +77,19 @@ const TIER_CATALOG: ProductDef[] = [
 ];
 
 async function handle(request: NextRequest) {
-    const secret = process.env.ELIXPO_PAY_SESSION_SECRET;
+    // Single shared secret — the same value gates the inbound trigger
+    // (GH workflow Bearer → here) AND authenticates the outbound call to
+    // payouts.elixpo. See ELIXPO_ACCOUNTS_PAYOUT_CLIENT_SECRET in
+    // .env.local / CF Pages env / GH repo secrets — all three platforms
+    // hold the same string.
+    const secret = process.env.ELIXPO_ACCOUNTS_PAYOUT_CLIENT_SECRET;
     if (!secret) {
         return NextResponse.json(
-            { error: "cron_unconfigured", error_description: "ELIXPO_PAY_SESSION_SECRET not set" },
+            {
+                error: "cron_unconfigured",
+                error_description:
+                    "ELIXPO_ACCOUNTS_PAYOUT_CLIENT_SECRET not set",
+            },
             { status: 500 },
         );
     }
@@ -94,19 +103,11 @@ async function handle(request: NextRequest) {
 
     const apiBase =
         process.env.PAYOUTS_API_BASE || "https://payouts.elixpo.com";
-    const apiKey =
-        process.env.PAYOUTS_APP_CLIENT_SECRET ||
-        process.env.ELIXPO_ACCOUNTS_PAYOUT_CLIENT_SECRET ||
-        "";
-    if (!apiKey) {
-        return NextResponse.json(
-            {
-                error: "billing_unconfigured",
-                error_description: "PAYOUTS_APP_CLIENT_SECRET not set",
-            },
-            { status: 500 },
-        );
-    }
+    // Same secret used here as the outbound API key — it IS the payouts
+    // app client secret, so doubling it as the trigger gate is fine: any
+    // request that knows this string is allowed to talk to payouts on our
+    // behalf either way.
+    const apiKey = secret;
 
     // Sync each product one by one. /v1/sync takes a single product OR the
     // `{products: [...]}` wrapper. We use the wrapper form so the response
