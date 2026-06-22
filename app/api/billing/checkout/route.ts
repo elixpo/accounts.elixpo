@@ -101,7 +101,22 @@ export async function POST(request: NextRequest) {
     // Forward to payouts.elixpo. uid = our user id (becomes the
     // external_uid on Pay's side and comes back on every entitlement
     // webhook so we know which row to update).
-    const successUrl = `${new URL(request.url).origin}/dashboard/billing?welcome=1`;
+    //
+    // return_to: where payouts sends the user back — used for both
+    // cancel and success. The caller (typically /pricing) tells us
+    // where they came from so cancel feels like a real "back" button.
+    // Validate it's same-origin to prevent open-redirect smuggling.
+    const requestOrigin = new URL(request.url).origin;
+    let successUrl = `${requestOrigin}/pricing`;
+    const rawReturnTo = typeof body?.return_to === "string" ? body.return_to : "";
+    if (rawReturnTo) {
+        try {
+            const u = new URL(rawReturnTo, requestOrigin);
+            if (u.origin === requestOrigin) successUrl = u.toString();
+        } catch {
+            /* invalid URL — keep default */
+        }
+    }
 
     let payoutsResp: Response;
     try {

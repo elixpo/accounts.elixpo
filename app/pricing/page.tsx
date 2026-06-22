@@ -116,7 +116,15 @@ export default function PricingPage() {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tier: tierId }),
+                body: JSON.stringify({
+                    tier: tierId,
+                    // Where to send the user back from the payouts hosted
+                    // checkout — both on cancel (immediately) and on
+                    // success (after the mandate is set up). This page is
+                    // the natural landing spot: it reads /api/auth/me
+                    // and will show the new tier as "Current plan".
+                    return_to: `${window.location.origin}/pricing`,
+                }),
             });
             const text = await res.text();
             let data: any = {};
