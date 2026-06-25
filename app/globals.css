@@ -1,8 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-heading: 'Helvetica Now Display Bold', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --color-text: #192837;
+  --color-accent: #7342E2;
+  --color-login-bg: #F2F2EE;
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  
+  --font-heading: var(--font-heading);
+  --font-body: var(--font-body);
+  
+  --color-brand-text: var(--color-text);
+  --color-brand-accent: var(--color-accent);
+  --color-brand-login-bg: var(--color-login-bg);
 }
 
 @theme inline {

@@ -1,21 +1,9 @@
 "use client";
 
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import GitHubIcon from "@mui/icons-material/GitHub";
-import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import {
-    Box,
-    Button,
-    IconButton,
-    Snackbar,
-    Stack,
-    Tooltip,
-    Typography,
-} from "@mui/material";
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
+import { Mail, Copy, Check } from "lucide-react";
 
-const ACCENT = "#9b7bf7";
 const EMAIL = "hello@elixpo.com";
 const REPO_URL = "https://github.com/elixpo/accounts.elixpo";
 
@@ -26,15 +14,32 @@ const navLinks = [
     { label: "Integrator guide", href: "/docs" },
 ];
 
-const Footer = () => {
+const Github = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg
+        viewBox="0 0 24 24"
+        width="20"
+        height="20"
+        stroke="currentColor"
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        {...props}
+    >
+        <title>GitHub Logo</title>
+        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+    </svg>
+);
+
+export default function Footer() {
     const [copied, setCopied] = useState(false);
 
     const handleCopyEmail = async () => {
         try {
             await navigator.clipboard.writeText(EMAIL);
             setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
         } catch {
-            // Fallback for older browsers / non-secure contexts
             const ta = document.createElement("textarea");
             ta.value = EMAIL;
             document.body.appendChild(ta);
@@ -42,6 +47,7 @@ const Footer = () => {
             try {
                 document.execCommand("copy");
                 setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
             } catch {
                 window.location.href = `mailto:${EMAIL}`;
             }
@@ -50,227 +56,97 @@ const Footer = () => {
     };
 
     return (
-        <Box
-            component="footer"
-            sx={{
-                position: "relative",
-                zIndex: 1,
-                mt: { xs: 6, md: 10 },
-                borderTop: "1px solid rgba(255,255,255,0.08)",
-                background:
-                    "linear-gradient(180deg, rgba(11,13,18,0) 0%, rgba(11,13,18,0.4) 100%)",
-                backdropFilter: "blur(12px)",
-            }}
-        >
-            <Box
-                sx={{
-                    maxWidth: "1200px",
-                    mx: "auto",
-                    px: { xs: 2.5, md: 4 },
-                    py: { xs: 5, md: 6 },
-                }}
-            >
-                <Stack
-                    direction={{ xs: "column", md: "row" }}
-                    spacing={{ xs: 4, md: 6 }}
-                    justifyContent="space-between"
-                    alignItems={{ xs: "flex-start", md: "flex-start" }}
-                >
-                    <Box sx={{ maxWidth: 360 }}>
-                        <Stack
-                            direction="row"
-                            alignItems="center"
-                            spacing={1.2}
-                            sx={{ mb: 1.2 }}
-                        >
-                            <Box
-                                component="img"
+        <footer className="bg-[#F2F2EE] text-[#192837] border-t border-[#192837]/10 py-16 relative z-10 w-full font-body">
+            <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
+                <div className="flex flex-col md:flex-row justify-between gap-12 mb-12">
+                    <div className="max-w-sm">
+                        <div className="flex items-center gap-2.5 mb-4">
+                            <img
                                 src="/LOGO/logo.png"
-                                alt="Elixpo"
-                                sx={{
-                                    height: 28,
-                                    width: 28,
-                                    borderRadius: "8px",
-                                }}
+                                alt="Elixpo Mascot"
+                                className="w-8 h-8 rounded-lg object-contain bg-white/85 p-0.5"
                             />
-                            <Typography
-                                sx={{
-                                    fontWeight: 700,
-                                    fontSize: "1rem",
-                                    color: "#f4f4f6",
-                                    letterSpacing: "-0.01em",
-                                }}
-                            >
-                                Elixpo{" "}
-                                <Box component="span" sx={{ color: ACCENT }}>
-                                    Accounts
-                                </Box>
-                            </Typography>
-                        </Stack>
-                        <Typography
-                            sx={{
-                                color: "rgba(255,255,255,0.55)",
-                                fontSize: "0.88rem",
-                                lineHeight: 1.6,
-                            }}
-                        >
-                            Open OAuth 2.0 single sign-on, built on the edge.
-                            Drop it into any app — Elixpo or yours — and let
-                            users sign in with one account.
-                        </Typography>
-                    </Box>
+                            <span className="font-heading text-xl font-bold">
+                                Elixpo <span className="text-[#7342E2]">Accounts</span>
+                            </span>
+                        </div>
+                        <p className="text-sm opacity-80 leading-relaxed">
+                            Open OAuth 2.0 single sign-on, built on the edge. Drop it into any app
+                            — Elixpo or yours — and let users sign in with one account.
+                        </p>
+                    </div>
 
-                    <Stack
-                        direction={{ xs: "column", sm: "row" }}
-                        spacing={{ xs: 3, sm: 6 }}
-                    >
-                        <Box>
-                            <Typography
-                                sx={{
-                                    color: "rgba(255,255,255,0.45)",
-                                    fontSize: "0.72rem",
-                                    fontWeight: 700,
-                                    letterSpacing: "0.1em",
-                                    textTransform: "uppercase",
-                                    mb: 1.4,
-                                }}
-                            >
+                    <div className="flex flex-col sm:flex-row gap-12 sm:gap-16">
+                        <div>
+                            <h4 className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-4">
                                 Navigate
-                            </Typography>
-                            <Stack spacing={1.1}>
-                                {navLinks.map((l) => (
-                                    <Link
-                                        key={l.label}
-                                        href={l.href}
-                                        style={{
-                                            color: "rgba(255,255,255,0.75)",
-                                            textDecoration: "none",
-                                            fontSize: "0.88rem",
-                                        }}
-                                    >
-                                        {l.label}
-                                    </Link>
+                            </h4>
+                            <ul className="flex flex-col gap-3 text-sm font-semibold">
+                                {navLinks.map((link) => (
+                                    <li key={link.label}>
+                                        <Link
+                                            href={link.href}
+                                            className="hover:opacity-75 transition-opacity"
+                                        >
+                                            {link.label}
+                                        </Link>
+                                    </li>
                                 ))}
-                            </Stack>
-                        </Box>
+                            </ul>
+                        </div>
 
-                        <Box>
-                            <Typography
-                                sx={{
-                                    color: "rgba(255,255,255,0.45)",
-                                    fontSize: "0.72rem",
-                                    fontWeight: 700,
-                                    letterSpacing: "0.1em",
-                                    textTransform: "uppercase",
-                                    mb: 1.4,
-                                }}
-                            >
-                                Get in touch
-                            </Typography>
-                            <Stack spacing={1.5} alignItems="flex-start">
-                                <Tooltip
-                                    title={copied ? "Copied!" : "Click to copy"}
-                                    arrow
+                        <div>
+                            <h4 className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-4">
+                                Get in Touch
+                            </h4>
+                            <div className="flex flex-col gap-4 items-start">
+                                <button
+                                    onClick={handleCopyEmail}
+                                    className="flex items-center gap-2 border border-[#192837]/10 bg-white hover:bg-[#192837]/5 px-4 py-2 rounded-xl text-sm font-semibold transition-all relative overflow-hidden active:scale-[0.98]"
                                 >
-                                    <Button
-                                        onClick={handleCopyEmail}
-                                        startIcon={
-                                            <MailOutlineIcon
-                                                sx={{ fontSize: 18 }}
-                                            />
-                                        }
-                                        endIcon={
-                                            <ContentCopyIcon
-                                                sx={{
-                                                    fontSize: 14,
-                                                    color: "rgba(255,255,255,0.5)",
-                                                }}
-                                            />
-                                        }
-                                        sx={{
-                                            textTransform: "none",
-                                            color: "rgba(255,255,255,0.85)",
-                                            fontFamily:
-                                                "var(--font-geist-mono)",
-                                            fontSize: "0.85rem",
-                                            border: "1px solid rgba(255,255,255,0.12)",
-                                            borderRadius: "10px",
-                                            px: 1.5,
-                                            py: 0.6,
-                                            transition: "all 0.18s ease",
-                                            "&:hover": {
-                                                color: "#fff",
-                                                borderColor:
-                                                    "rgba(155,123,247,0.45)",
-                                                background:
-                                                    "rgba(155,123,247,0.08)",
-                                            },
-                                        }}
-                                    >
-                                        {EMAIL}
-                                    </Button>
-                                </Tooltip>
-                                <IconButton
-                                    component="a"
+                                    {copied ? (
+                                        <>
+                                            <Check className="w-4 h-4 text-green-600" />
+                                            <span className="text-green-600 font-medium">
+                                                Copied!
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Mail className="w-4 h-4 text-[#192837]" />
+                                            <span>{EMAIL}</span>
+                                            <Copy className="w-3.5 h-3.5 text-[#192837]/60 ml-2" />
+                                        </>
+                                    )}
+                                </button>
+                                <a
                                     href={REPO_URL}
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    className="p-2.5 border border-[#192837]/10 bg-white hover:bg-[#192837]/5 rounded-xl transition-all hover:scale-[1.04] active:scale-[0.96] text-[#192837]"
                                     aria-label="View on GitHub"
-                                    sx={{
-                                        color: "rgba(244,244,246,0.85)",
-                                        border: "1px solid rgba(255,255,255,0.1)",
-                                        borderRadius: "10px",
-                                        width: 36,
-                                        height: 36,
-                                        "&:hover": {
-                                            color: "#fff",
-                                            borderColor:
-                                                "rgba(155,123,247,0.45)",
-                                            background:
-                                                "rgba(155,123,247,0.08)",
-                                        },
-                                    }}
                                 >
-                                    <GitHubIcon sx={{ fontSize: 18 }} />
-                                </IconButton>
-                            </Stack>
-                        </Box>
-                    </Stack>
-                </Stack>
+                                    <Github className="w-5 h-5" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                <Box
-                    sx={{
-                        mt: { xs: 4, md: 5 },
-                        pt: 3,
-                        borderTop: "1px solid rgba(255,255,255,0.06)",
-                        display: "flex",
-                        flexDirection: { xs: "column", sm: "row" },
-                        justifyContent: "space-between",
-                        alignItems: { xs: "flex-start", sm: "center" },
-                        gap: 1.5,
-                        color: "rgba(255,255,255,0.4)",
-                        fontSize: "0.8rem",
-                    }}
-                >
-                    <Typography sx={{ fontSize: "inherit" }}>
-                        © {new Date().getFullYear()} Elixpo · Built on
-                        Cloudflare's edge
-                    </Typography>
-                    <Typography sx={{ fontSize: "inherit" }}>
-                        Open source · MIT
-                    </Typography>
-                </Box>
-            </Box>
-
-            <Snackbar
-                open={copied}
-                autoHideDuration={2200}
-                onClose={() => setCopied(false)}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-                message={`Copied ${EMAIL} to clipboard`}
-            />
-        </Box>
+                <div className="border-t border-[#192837]/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm opacity-60 font-medium">
+                    <div>
+                        © {new Date().getFullYear()} Elixpo · Built on Cloudflare's edge
+                    </div>
+                    <div className="flex gap-4">
+                        <Link href="/privacy" className="hover:underline">
+                            Privacy Policy
+                        </Link>
+                        <Link href="/terms" className="hover:underline">
+                            Terms of Service
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </footer>
     );
-};
-
-export default Footer;
+}

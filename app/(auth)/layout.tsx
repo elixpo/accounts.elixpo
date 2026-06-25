@@ -1,5 +1,3 @@
-import { Box } from "@mui/material";
-import BackgroundAurora from "../components/background-aurora";
 import Navbar from "../components/navbar";
 
 export default function AuthLayout({
@@ -8,12 +6,11 @@ export default function AuthLayout({
     children: React.ReactNode;
 }) {
     return (
-        <Box sx={{ position: "relative", minHeight: "100vh" }}>
-            <BackgroundAurora variant="auth" />
-            <Box sx={{ position: "relative", zIndex: 1 }}>
-                <Navbar />
+        <div className="relative min-h-screen bg-[#F2F2EE] text-[#192837] font-body selection:bg-[#7342E2] selection:text-white">
+            <Navbar />
+            <div className="relative z-10">
                 {children}
-            </Box>
-        </Box>
+            </div>
+        </div>
     );
 }
