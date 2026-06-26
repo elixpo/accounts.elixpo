@@ -1953,8 +1953,7 @@ const ProfilePage = () => {
                                         alignItems: "center",
                                         justifyContent: "space-between",
                                         py: 1.5,
-                                        borderBottom:
-                                            "1px solid var(--border)",
+                                        borderBottom: "1px solid var(--border)",
                                         "&:last-child": {
                                             borderBottom: "none",
                                         },

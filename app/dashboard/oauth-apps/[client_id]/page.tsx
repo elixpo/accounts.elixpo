@@ -1083,7 +1083,9 @@ export default function OAuthAppSettingsPage() {
 
             {/* Webhooks panel — multi-endpoint event subscription */}
             <Box sx={{ ...cardSx, mb: 3 }}>
-                <Typography sx={{ color: "var(--fg)", fontWeight: 600, mb: 0.5 }}>
+                <Typography
+                    sx={{ color: "var(--fg)", fontWeight: 600, mb: 0.5 }}
+                >
                     Webhook endpoints
                 </Typography>
                 <Typography
@@ -1366,7 +1368,9 @@ export default function OAuthAppSettingsPage() {
                     }}
                 >
                     <Box>
-                        <Typography sx={{ color: "var(--fg)", fontWeight: 500 }}>
+                        <Typography
+                            sx={{ color: "var(--fg)", fontWeight: 500 }}
+                        >
                             Delete application
                         </Typography>
                         <Typography

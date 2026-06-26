@@ -399,8 +399,7 @@ export default function WebhooksPage() {
                                                         "var(--border)",
                                                 },
                                                 "&:hover": {
-                                                    bgcolor:
-                                                        "var(--overlay)",
+                                                    bgcolor: "var(--overlay)",
                                                 },
                                             }}
                                         >

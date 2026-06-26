@@ -143,7 +143,11 @@ const RegisterContent = () => {
                     <Box sx={{ mb: 2, textAlign: "center" }}>
                         <Typography
                             variant="h4"
-                            sx={{ fontWeight: 700, color: "var(--fg)", mb: 0.5 }}
+                            sx={{
+                                fontWeight: 700,
+                                color: "var(--fg)",
+                                mb: 0.5,
+                            }}
                         >
                             Create Account
                         </Typography>
@@ -291,9 +295,7 @@ const RegisterContent = () => {
                             textAlign: "center",
                         }}
                     >
-                        <Typography
-                            sx={{ color: "var(--fg-muted)", mb: 1 }}
-                        >
+                        <Typography sx={{ color: "var(--fg-muted)", mb: 1 }}>
                             Already have an account?
                         </Typography>
                         <Link

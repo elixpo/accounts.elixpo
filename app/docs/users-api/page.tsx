@@ -114,8 +114,7 @@ export default function UsersApiPage() {
                                 sx={{
                                     color: "var(--fg-faint)",
                                     fontWeight: 600,
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Field
@@ -124,8 +123,7 @@ export default function UsersApiPage() {
                                 sx={{
                                     color: "var(--fg-faint)",
                                     fontWeight: 600,
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Type
@@ -134,8 +132,7 @@ export default function UsersApiPage() {
                                 sx={{
                                     color: "var(--fg-faint)",
                                     fontWeight: 600,
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Description
@@ -147,8 +144,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>id</code>
@@ -156,8 +152,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "#ff7759",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 String
@@ -165,8 +160,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 The stable, unique UUID representing the user
@@ -177,8 +171,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>email</code>
@@ -186,8 +179,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "#ff7759",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 String
@@ -195,8 +187,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 The user's registered email address.
@@ -206,8 +197,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>displayName</code>
@@ -215,8 +205,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "#ff7759",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 String
@@ -224,8 +213,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 The user's username/nickname (e.g.{" "}
@@ -236,8 +224,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>provider</code>
@@ -245,8 +232,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "#ff7759",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 String
@@ -254,8 +240,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Authentication provider (e.g. <code>email</code>
@@ -266,8 +251,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>emailVerified</code>
@@ -275,8 +259,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "#ff7759",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Boolean
@@ -284,8 +267,7 @@ export default function UsersApiPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Whether the user's email has been verified via

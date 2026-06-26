@@ -99,8 +99,7 @@ export default function ErrorsPage() {
                                 sx={{
                                     color: "var(--fg-faint)",
                                     fontWeight: 600,
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Error Code
@@ -109,8 +108,7 @@ export default function ErrorsPage() {
                                 sx={{
                                     color: "var(--fg-faint)",
                                     fontWeight: 600,
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 HTTP Status
@@ -119,8 +117,7 @@ export default function ErrorsPage() {
                                 sx={{
                                     color: "var(--fg-faint)",
                                     fontWeight: 600,
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Meaning
@@ -132,8 +129,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>invalid_request</code>
@@ -141,8 +137,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "#ff7759",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 400 Bad Request
@@ -150,8 +145,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 The request is missing a required parameter,
@@ -163,8 +157,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>invalid_client</code>
@@ -172,8 +165,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "#ff7759",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 401 Unauthorized
@@ -181,8 +173,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Client authentication failed (e.g. unknown
@@ -194,8 +185,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>invalid_grant</code>
@@ -203,8 +193,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "#ff7759",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 400 Bad Request
@@ -212,8 +201,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 The provided authorization code or refresh token
@@ -225,8 +213,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>access_denied</code>
@@ -234,8 +221,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "#ff7759",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 403 Forbidden
@@ -243,8 +229,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 The resource owner or authorization server
@@ -256,8 +241,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>unsupported_response_type</code>
@@ -265,8 +249,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "#ff7759",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 400 Bad Request
@@ -274,8 +257,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 The authorization server does not support
@@ -287,8 +269,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>server_error</code>
@@ -296,8 +277,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "#ff7759",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 500 Internal Error
@@ -305,8 +285,7 @@ export default function ErrorsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 The authorization server encountered an

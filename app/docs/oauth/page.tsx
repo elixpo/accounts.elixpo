@@ -129,8 +129,7 @@ export default function OAuthPage() {
                                 sx={{
                                     color: "var(--fg-faint)",
                                     fontWeight: 600,
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Parameter
@@ -139,8 +138,7 @@ export default function OAuthPage() {
                                 sx={{
                                     color: "var(--fg-faint)",
                                     fontWeight: 600,
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Required
@@ -149,8 +147,7 @@ export default function OAuthPage() {
                                 sx={{
                                     color: "var(--fg-faint)",
                                     fontWeight: 600,
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Description
@@ -162,8 +159,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>response_type</code>
@@ -171,8 +167,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "#b91c1c",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Yes
@@ -180,8 +175,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Must be set to <code>code</code>.
@@ -191,8 +185,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>client_id</code>
@@ -200,8 +193,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "#b91c1c",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Yes
@@ -209,8 +201,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Your application's Client ID.
@@ -220,8 +211,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>redirect_uri</code>
@@ -229,8 +219,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "#b91c1c",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Yes
@@ -238,8 +227,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Must exactly match one of your registered
@@ -250,8 +238,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>state</code>
@@ -259,8 +246,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "#b91c1c",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Yes
@@ -268,8 +254,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 A high-entropy random string to mitigate CSRF
@@ -280,8 +265,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>scope</code>
@@ -289,8 +273,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-faint)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 No
@@ -298,8 +281,7 @@ export default function OAuthPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Space-separated scopes. Defaults to{" "}

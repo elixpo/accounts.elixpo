@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import gsap from "gsap";
-import Footer from "./components/footer";
 import {
     ArrowRightCircle,
     Fingerprint,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import Footer from "./components/footer";
 
 // CSS Variables (from prompt specifications):
 // --font-heading: 'Helvetica Now Display Bold', sans-serif;

@@ -450,9 +450,7 @@ function ForgotPasswordContent() {
                             textAlign: "center",
                         }}
                     >
-                        <Typography
-                            sx={{ color: "var(--fg-muted)", mb: 1 }}
-                        >
+                        <Typography sx={{ color: "var(--fg-muted)", mb: 1 }}>
                             Back to login?
                         </Typography>
                         <Link

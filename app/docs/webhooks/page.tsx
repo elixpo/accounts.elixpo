@@ -122,8 +122,7 @@ export default function WebhooksPage() {
                                 sx={{
                                     color: "var(--fg-faint)",
                                     fontWeight: 600,
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Event Code
@@ -132,8 +131,7 @@ export default function WebhooksPage() {
                                 sx={{
                                     color: "var(--fg-faint)",
                                     fontWeight: 600,
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Description
@@ -145,8 +143,7 @@ export default function WebhooksPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>user.created</code>
@@ -154,8 +151,7 @@ export default function WebhooksPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Triggered when a new user registers on the
@@ -166,8 +162,7 @@ export default function WebhooksPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>user.updated</code>
@@ -175,8 +170,7 @@ export default function WebhooksPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Triggered when user profile data or username is
@@ -187,8 +181,7 @@ export default function WebhooksPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>user.deleted</code>
@@ -196,8 +189,7 @@ export default function WebhooksPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Triggered when a user deletes their account.
@@ -212,8 +204,7 @@ export default function WebhooksPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>auth.login_success</code>
@@ -221,8 +212,7 @@ export default function WebhooksPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Triggered on a successful user login.
@@ -232,8 +222,7 @@ export default function WebhooksPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>auth.login_failed</code>
@@ -241,8 +230,7 @@ export default function WebhooksPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Triggered on a failed login attempt (suspicious
@@ -253,8 +241,7 @@ export default function WebhooksPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>oauth.app_created</code>
@@ -262,8 +249,7 @@ export default function WebhooksPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Triggered when a new developer registers an

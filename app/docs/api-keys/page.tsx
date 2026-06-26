@@ -107,8 +107,7 @@ export default function ApiKeysDocsPage() {
                                 sx={{
                                     color: "var(--fg-faint)",
                                     fontWeight: 600,
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Scope Name
@@ -117,8 +116,7 @@ export default function ApiKeysDocsPage() {
                                 sx={{
                                     color: "var(--fg-faint)",
                                     fontWeight: 600,
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Permissions Granted
@@ -130,8 +128,7 @@ export default function ApiKeysDocsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>users:read</code>
@@ -139,8 +136,7 @@ export default function ApiKeysDocsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Allows querying and searching user profiles and
@@ -151,8 +147,7 @@ export default function ApiKeysDocsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>users:write</code>
@@ -160,8 +155,7 @@ export default function ApiKeysDocsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Allows creating users, editing roles, or
@@ -172,8 +166,7 @@ export default function ApiKeysDocsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>apps:read</code>
@@ -181,8 +174,7 @@ export default function ApiKeysDocsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Allows reading developer OAuth client
@@ -193,8 +185,7 @@ export default function ApiKeysDocsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>apps:write</code>
@@ -202,8 +193,7 @@ export default function ApiKeysDocsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Allows registering, modifying, or deleting OAuth
@@ -214,8 +204,7 @@ export default function ApiKeysDocsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>webhooks:read</code> / <code>write</code>
@@ -223,8 +212,7 @@ export default function ApiKeysDocsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Allows managing webhook subscriptions and
@@ -235,8 +223,7 @@ export default function ApiKeysDocsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 <code>admin:read</code> / <code>write</code>
@@ -244,8 +231,7 @@ export default function ApiKeysDocsPage() {
                             <TableCell
                                 sx={{
                                     color: "var(--fg-muted)",
-                                    borderBottom:
-                                        "1px solid var(--border)",
+                                    borderBottom: "1px solid var(--border)",
                                 }}
                             >
                                 Grants access to admin panels, audit logs, and
