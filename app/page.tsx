@@ -520,15 +520,6 @@ export default function LandingPage() {
                                             </>
                                         )}
                                     </button>
-                                    <a
-                                        href="https://github.com/elixpo/accounts.elixpo"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="p-2.5 border border-[#192837]/10 bg-white hover:bg-[#192837]/5 rounded-xl transition-all hover:scale-[1.04] active:scale-[0.96] text-[#192837]"
-                                        aria-label="View on GitHub"
-                                    >
-                                        <Github className="w-5 h-5" />
-                                    </a>
                                 </div>
                             </div>
                         </div>
