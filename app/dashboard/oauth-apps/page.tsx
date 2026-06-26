@@ -344,6 +344,7 @@ const OAuthAppsPage = () => {
                     </Box>
                     <Button
                         variant="contained"
+                        disableElevation
                         aria-label="New OAuth App"
                         onClick={() => {
                             if (emailVerified === false) {
@@ -883,6 +884,7 @@ const OAuthAppsPage = () => {
                     <Button
                         onClick={handleCreateApp}
                         variant="contained"
+                        disableElevation
                         disabled={loading}
                         sx={{
                             background: "rgba(255, 119, 89,0.15)",
@@ -960,6 +962,7 @@ const OAuthAppsPage = () => {
                     <Button
                         onClick={() => handleDeleteApp(deleteConfirm.clientId)}
                         variant="contained"
+                        disableElevation
                         sx={{
                             background: "rgba(239, 68, 68, 0.15)",
                             color: "#ef4444",
@@ -1174,6 +1177,7 @@ const OAuthAppsPage = () => {
                     <Button
                         onClick={() => setOpenSecretDialog(false)}
                         variant="contained"
+                        disableElevation
                         sx={{
                             background: "rgba(255, 119, 89,0.15)",
                             color: "#ff7759",
