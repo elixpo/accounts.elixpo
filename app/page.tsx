@@ -2,14 +2,12 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import gsap from "gsap";
+import Footer from "./components/footer";
 import {
     ArrowRightCircle,
-    Check,
-    Copy,
     Fingerprint,
     Lock,
     LockKeyhole,
-    Mail,
     Menu,
     Network,
     X,
@@ -72,7 +70,6 @@ const FEATURES = [
 export default function LandingPage() {
     const [authed, setAuthed] = useState<boolean | null>(null);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -116,27 +113,6 @@ export default function LandingPage() {
             },
         );
     }, []);
-
-    const handleCopyEmail = async () => {
-        try {
-            await navigator.clipboard.writeText("hello@elixpo.com");
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch {
-            const ta = document.createElement("textarea");
-            ta.value = "hello@elixpo.com";
-            document.body.appendChild(ta);
-            ta.select();
-            try {
-                document.execCommand("copy");
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-            } catch {
-                window.location.href = "mailto:hello@elixpo.com";
-            }
-            document.body.removeChild(ta);
-        }
-    };
 
     return (
         <div className="relative w-full min-h-screen font-body text-[var(--fg)] bg-[var(--bg)] selection:bg-[#ff7759] selection:text-white overflow-x-hidden">
@@ -493,94 +469,7 @@ export default function LandingPage() {
             </section>
 
             {/* FOOTER */}
-            <footer className="bg-[var(--bg)] text-[var(--fg)] border-t border-[var(--border)] py-16 relative z-10">
-                <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
-                    <div className="flex flex-col md:flex-row justify-between gap-12 mb-12">
-                        <div className="max-w-sm">
-                            <div className="flex items-center gap-2.5 mb-4">
-                                <img
-                                    src="/LOGO/logo.png"
-                                    alt="Elixpo Mascot"
-                                    className="w-8 h-8 rounded-lg object-contain bg-white/85 p-0.5"
-                                />
-                                <span className="font-heading text-xl font-bold">
-                                    Elixpo{" "}
-                                    <span className="text-[#ff7759]">
-                                        Accounts
-                                    </span>
-                                </span>
-                            </div>
-                            <p className="text-sm opacity-80 leading-relaxed font-body">
-                                Open OAuth 2.0 single sign-on, built on the
-                                edge. Drop it into any app — Elixpo or yours —
-                                and let users sign in with one account.
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row gap-12 sm:gap-16">
-                            <div>
-                                <h4 className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-4">
-                                    Navigate
-                                </h4>
-                                <ul className="flex flex-col gap-3 font-body text-sm font-semibold">
-                                    {MARKETING_LINKS.map((link) => (
-                                        <li key={link.label}>
-                                            <Link
-                                                href={link.href}
-                                                className="hover:opacity-75 transition-opacity"
-                                            >
-                                                {link.label}
-                                            </Link>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            <div>
-                                <h4 className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-4">
-                                    Get in Touch
-                                </h4>
-                                <div className="flex flex-col gap-4 items-start font-body">
-                                    <button
-                                        onClick={handleCopyEmail}
-                                        className="flex items-center gap-2 border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--overlay)] px-4 py-2 rounded-xl text-sm font-semibold transition-all relative overflow-hidden active:scale-[0.98]"
-                                    >
-                                        {copied ? (
-                                            <>
-                                                <Check className="w-4 h-4 text-green-600" />
-                                                <span className="text-green-600 font-medium">
-                                                    Copied!
-                                                </span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Mail className="w-4 h-4 text-[var(--fg)]" />
-                                                <span>hello@elixpo.com</span>
-                                                <Copy className="w-3.5 h-3.5 text-[var(--fg-faint)] ml-2" />
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="border-t border-[var(--border)] pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm opacity-60 font-body font-medium">
-                        <div>
-                            © {new Date().getFullYear()} Elixpo · Built on
-                            Cloudflare's edge
-                        </div>
-                        <div className="flex gap-4">
-                            <Link href="/privacy" className="hover:underline">
-                                Privacy Policy
-                            </Link>
-                            <Link href="/terms" className="hover:underline">
-                                Terms of Service
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
 
             {/* MOBILE MENU SHEET */}
             <AnimatePresence>
