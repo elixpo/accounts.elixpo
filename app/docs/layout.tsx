@@ -1,20 +1,20 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import gsap from "gsap";
 import {
-    Search,
-    Menu,
-    X,
-    Copy,
-    Check,
-    LayoutDashboard,
     ArrowLeft,
     ArrowRight,
+    Check,
+    Copy,
+    LayoutDashboard,
+    Menu,
+    Search,
+    X,
 } from "lucide-react";
-import gsap from "gsap";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 const DOCS_NAV = [
     { label: "Overview", href: "/docs" },
@@ -86,9 +86,9 @@ export default function DocsLayout({
         gsap.fromTo(
             "#docs-content-container",
             { opacity: 0, y: 15 },
-            { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
+            { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
         );
-    }, [pathname]);
+    }, []);
 
     // Convert docs content to plain markdown copyable for LLMs
     const buildLlmPayload = (): string => {
@@ -195,13 +195,18 @@ export default function DocsLayout({
         }
     };
 
-    const currentPageIndex = DOCS_NAV.findIndex((item) => item.href === pathname);
-    const prevPage = currentPageIndex > 0 ? DOCS_NAV[currentPageIndex - 1] : null;
+    const currentPageIndex = DOCS_NAV.findIndex(
+        (item) => item.href === pathname,
+    );
+    const prevPage =
+        currentPageIndex > 0 ? DOCS_NAV[currentPageIndex - 1] : null;
     const nextPage =
-        currentPageIndex < DOCS_NAV.length - 1 ? DOCS_NAV[currentPageIndex + 1] : null;
+        currentPageIndex < DOCS_NAV.length - 1
+            ? DOCS_NAV[currentPageIndex + 1]
+            : null;
 
     const filteredNav = DOCS_NAV.filter((item) =>
-        item.label.toLowerCase().includes(search.toLowerCase())
+        item.label.toLowerCase().includes(search.toLowerCase()),
     );
 
     // Parse subheadings for table of contents
@@ -227,7 +232,7 @@ export default function DocsLayout({
         });
 
         setHeadings(list);
-    }, [pathname]);
+    }, []);
 
     // Active subheadings highlighting on scroll
     useEffect(() => {
@@ -236,12 +241,13 @@ export default function DocsLayout({
                 const visible = entries.filter((e) => e.isIntersecting);
                 if (visible.length > 0) {
                     const sorted = visible.sort(
-                        (a, b) => a.boundingClientRect.top - b.boundingClientRect.top
+                        (a, b) =>
+                            a.boundingClientRect.top - b.boundingClientRect.top,
                     );
                     setActiveHeadingId(sorted[0].target.id);
                 }
             },
-            { rootMargin: "-80px 0px -60% 0px" }
+            { rootMargin: "-80px 0px -60% 0px" },
         );
 
         const contentEl = document.getElementById("docs-content");
@@ -253,7 +259,7 @@ export default function DocsLayout({
         }
 
         return () => observer.disconnect();
-    }, [headings]);
+    }, []);
 
     const sidebarContent = (
         <div className="flex flex-col h-full text-[#192837] font-body p-4 md:p-0">
@@ -289,7 +295,9 @@ export default function DocsLayout({
                     );
                 })}
                 {filteredNav.length === 0 && (
-                    <p className="text-[#192837]/50 text-xs text-center py-4">No results found</p>
+                    <p className="text-[#192837]/50 text-xs text-center py-4">
+                        No results found
+                    </p>
                 )}
             </nav>
         </div>
@@ -390,7 +398,8 @@ export default function DocsLayout({
                                 className="w-7.5 h-7.5 rounded-lg object-contain bg-white/80 p-0.5"
                             />
                             <span className="font-heading text-lg font-bold tracking-tight">
-                                Elixpo <span className="text-[#ff7759]">Accounts</span>
+                                Elixpo{" "}
+                                <span className="text-[#ff7759]">Accounts</span>
                             </span>
                         </Link>
                     </div>
@@ -405,7 +414,9 @@ export default function DocsLayout({
                             {copied ? (
                                 <>
                                     <Check className="w-4 h-4 text-green-600" />
-                                    <span className="text-green-600">Copied</span>
+                                    <span className="text-green-600">
+                                        Copied
+                                    </span>
                                 </>
                             ) : (
                                 <>
@@ -462,7 +473,10 @@ export default function DocsLayout({
                                 initial={{ x: "-100%" }}
                                 animate={{ x: 0 }}
                                 exit={{ x: "-100%" }}
-                                transition={{ ease: [0.22, 1, 0.36, 1] as const, duration: 0.45 }}
+                                transition={{
+                                    ease: [0.22, 1, 0.36, 1] as const,
+                                    duration: 0.45,
+                                }}
                                 className="fixed left-0 top-0 w-[min(88vw,280px)] h-[100dvh] bg-[#CFC8C5] shadow-[12px_0_48px_rgba(25,40,55,0.18)] z-50 flex flex-col p-6 text-[#192837]"
                             >
                                 <div className="flex items-center justify-between pb-4 border-b border-[#192837]/10 mb-6">
@@ -542,7 +556,10 @@ export default function DocsLayout({
                             {headings.map((h) => (
                                 <li
                                     key={h.id}
-                                    style={{ paddingLeft: h.level === 3 ? "12px" : "0" }}
+                                    style={{
+                                        paddingLeft:
+                                            h.level === 3 ? "12px" : "0",
+                                    }}
                                 >
                                     <a
                                         href={`#${h.id}`}

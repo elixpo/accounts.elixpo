@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { ArrowRightCircle, Check } from "lucide-react";
 import gsap from "gsap";
-import Navbar from "../components/navbar";
+import { Check } from "lucide-react";
+import { useEffect, useState } from "react";
 import Footer from "../components/footer";
+import Navbar from "../components/navbar";
 
 interface Tier {
     id: "hobby" | "indie" | "studio";
@@ -26,7 +25,8 @@ const TIERS: Tier[] = [
         priceLabel: "₹0",
         priceCaption: "Forever free",
         accent: "#192837",
-        description: "Get started with personal OAuth apps and a Studio's worth of fun.",
+        description:
+            "Get started with personal OAuth apps and a Studio's worth of fun.",
         features: [
             "Up to 1,000 MAU per app",
             "3 OAuth apps",
@@ -42,7 +42,8 @@ const TIERS: Tier[] = [
         priceLabel: "₹1,599",
         priceCaption: "per month · billed in INR",
         accent: "#ff7759",
-        description: "Ship real products to real users. Lift the small-app caps.",
+        description:
+            "Ship real products to real users. Lift the small-app caps.",
         features: [
             "Up to 10,000 MAU per app",
             "10 OAuth apps",
@@ -59,7 +60,8 @@ const TIERS: Tier[] = [
         priceLabel: "₹8,299",
         priceCaption: "per month · billed in INR",
         accent: "#3B82F6",
-        description: "For studios shipping at scale. Audit logs and unlimited apps.",
+        description:
+            "For studios shipping at scale. Audit logs and unlimited apps.",
         features: [
             "Up to 100,000 MAU per app",
             "Unlimited OAuth apps",
@@ -96,13 +98,26 @@ export default function PricingPage() {
         gsap.fromTo(
             ".gsap-pricing-hero",
             { opacity: 0, y: 30 },
-            { opacity: 1, y: 0, duration: 0.8, stagger: 0.12, ease: "power3.out" },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.12,
+                ease: "power3.out",
+            },
         );
 
         gsap.fromTo(
             ".gsap-pricing-card",
             { opacity: 0, y: 35 },
-            { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power3.out", delay: 0.3 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: "power3.out",
+                delay: 0.3,
+            },
         );
     }, []);
 
@@ -158,10 +173,13 @@ export default function PricingPage() {
                 {/* Header */}
                 <div className="flex flex-col items-center text-center gap-4 mb-16 max-w-[700px] mx-auto">
                     <h1 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight leading-[1.1] gsap-pricing-hero">
-                        Pricing built for indie devs <span className="text-[#ff7759]">and studios.</span>
+                        Pricing built for indie devs{" "}
+                        <span className="text-[#ff7759]">and studios.</span>
                     </h1>
                     <p className="font-body text-base sm:text-lg text-[#192837] opacity-80 leading-relaxed gsap-pricing-hero">
-                        Start free. Scale only when your apps actually have users. No per-seat tax — pricing tracks monthly active users so we win when you do.
+                        Start free. Scale only when your apps actually have
+                        users. No per-seat tax — pricing tracks monthly active
+                        users so we win when you do.
                     </p>
 
                     {loading ? null : me?.is_internal ? (
@@ -207,7 +225,7 @@ export default function PricingPage() {
                                     >
                                         {tier.name}
                                     </h3>
-                                    
+
                                     <div className="flex items-baseline gap-1 mb-2">
                                         <span className="font-heading text-4xl font-extrabold tracking-tight">
                                             {tier.priceLabel}
@@ -223,12 +241,22 @@ export default function PricingPage() {
 
                                     <ul className="flex flex-col gap-3.5 mb-8">
                                         {tier.features.map((feature) => (
-                                            <li key={feature} className="flex gap-2.5 items-start text-sm">
+                                            <li
+                                                key={feature}
+                                                className="flex gap-2.5 items-start text-sm"
+                                            >
                                                 <div
                                                     className="p-0.5 rounded-full flex-shrink-0 mt-0.5"
-                                                    style={{ backgroundColor: `${tier.accent}15` }}
+                                                    style={{
+                                                        backgroundColor: `${tier.accent}15`,
+                                                    }}
                                                 >
-                                                    <Check className="w-3.5 h-3.5" style={{ color: tier.accent }} />
+                                                    <Check
+                                                        className="w-3.5 h-3.5"
+                                                        style={{
+                                                            color: tier.accent,
+                                                        }}
+                                                    />
                                                 </div>
                                                 <span className="font-body text-[#192837]/90 leading-normal font-medium">
                                                     {feature}
@@ -239,7 +267,12 @@ export default function PricingPage() {
                                 </div>
 
                                 <button
-                                    disabled={loading || isBusy || isCurrent || tier.id === "hobby"}
+                                    disabled={
+                                        loading ||
+                                        isBusy ||
+                                        isCurrent ||
+                                        tier.id === "hobby"
+                                    }
                                     onClick={() => {
                                         if (tier.id === "hobby") return;
                                         startCheckout(tier.id);
@@ -287,7 +320,9 @@ export default function PricingPage() {
 
                 {/* Sub-note */}
                 <p className="text-center text-xs opacity-60 font-body leading-relaxed max-w-md mx-auto">
-                    Charged in INR via Razorpay. Cancel any time — you keep access through the period you've paid for. No hidden fees, no per-seat tax.
+                    Charged in INR via Razorpay. Cancel any time — you keep
+                    access through the period you've paid for. No hidden fees,
+                    no per-seat tax.
                 </p>
             </main>
 

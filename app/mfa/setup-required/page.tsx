@@ -73,7 +73,9 @@ export default function SetupRequiredPage() {
                             textTransform: "none",
                             fontWeight: 600,
                             px: 3,
-                            "&:hover": { background: "rgba(255, 119, 89, 0.9)" },
+                            "&:hover": {
+                                background: "rgba(255, 119, 89, 0.9)",
+                            },
                         }}
                     >
                         Set up 2FA now

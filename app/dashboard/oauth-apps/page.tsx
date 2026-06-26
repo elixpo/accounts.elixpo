@@ -925,9 +925,7 @@ const OAuthAppsPage = () => {
                     </Box>
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
-                    <Typography
-                        sx={{ color: "rgba(25,40,55,0.7)", mb: 1 }}
-                    >
+                    <Typography sx={{ color: "rgba(25,40,55,0.7)", mb: 1 }}>
                         Are you sure you want to deactivate{" "}
                         <strong style={{ color: "#192837" }}>
                             {deleteConfirm.appName}

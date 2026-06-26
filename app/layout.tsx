@@ -100,8 +100,14 @@ export default function RootLayout({
             <head>
                 {/* Set the saved theme before first paint (no flash). */}
                 {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
-                <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
-                <link rel="stylesheet" href="https://db.onlinewebfonts.com/c/04e6981992c0e2e7642af2074ebe3901?family=Helvetica+Now+Display+Bold" type="text/css" />
+                <script
+                    dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }}
+                />
+                <link
+                    rel="stylesheet"
+                    href="https://db.onlinewebfonts.com/c/04e6981992c0e2e7642af2074ebe3901?family=Helvetica+Now+Display+Bold"
+                    type="text/css"
+                />
             </head>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}

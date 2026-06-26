@@ -360,7 +360,9 @@ function ChallengeInner() {
                             textTransform: "none",
                             py: 1.2,
                             fontWeight: 600,
-                            "&:hover": { background: "rgba(255, 119, 89, 0.9)" },
+                            "&:hover": {
+                                background: "rgba(255, 119, 89, 0.9)",
+                            },
                         }}
                     >
                         {busy ? "Authenticating…" : "Continue with passkey"}
@@ -411,7 +413,8 @@ function ChallengeInner() {
                                             borderColor: "rgba(25,40,55,0.15)",
                                         },
                                         "&:hover fieldset": {
-                                            borderColor: "rgba(255, 119, 89,0.4)",
+                                            borderColor:
+                                                "rgba(255, 119, 89,0.4)",
                                         },
                                         "&.Mui-focused fieldset": {
                                             borderColor: "#ff7759",

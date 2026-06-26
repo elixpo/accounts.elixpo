@@ -11,7 +11,9 @@ export default function ThemeToggle({ size = 18 }: { size?: number }) {
         <button
             type="button"
             onClick={toggle}
-            aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+            aria-label={
+                isDark ? "Switch to light theme" : "Switch to dark theme"
+            }
             title={isDark ? "Switch to light" : "Switch to dark"}
             className="grid h-[38px] w-[38px] place-items-center rounded-[10px] border transition-all"
             style={{

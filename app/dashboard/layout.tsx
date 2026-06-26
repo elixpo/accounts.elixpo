@@ -321,7 +321,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                             flexShrink: 0,
                                         }}
                                     >
-                                        {(displayName || userEmail)?.charAt(0).toUpperCase() || "E"}
+                                        {(displayName || userEmail)
+                                            ?.charAt(0)
+                                            .toUpperCase() || "E"}
                                     </Box>
                                 )}
                                 <Box
@@ -446,8 +448,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                             py: 1.25,
                                             color: "rgba(25,40,55,0.7)",
                                             "&:hover": {
-                                                bgcolor:
-                                                    "rgba(25,40,55,0.04)",
+                                                bgcolor: "rgba(25,40,55,0.04)",
                                                 color: "#192837",
                                             },
                                         }}
@@ -508,8 +509,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                             py: 1.25,
                                             color: "rgba(25,40,55,0.7)",
                                             "&:hover": {
-                                                bgcolor:
-                                                    "rgba(25,40,55,0.04)",
+                                                bgcolor: "rgba(25,40,55,0.04)",
                                                 color: "#192837",
                                             },
                                         }}
@@ -550,7 +550,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         },
                                     }}
                                 >
-                                    <ListItemIcon sx={{ color: "inherit", minWidth: 36 }}>
+                                    <ListItemIcon
+                                        sx={{ color: "inherit", minWidth: 36 }}
+                                    >
                                         {appTheme === "dark" ? (
                                             <LightModeOutlined fontSize="small" />
                                         ) : (
@@ -558,9 +560,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         )}
                                     </ListItemIcon>
                                     <ListItemText
-                                        primaryTypographyProps={{ fontSize: "0.875rem" }}
+                                        primaryTypographyProps={{
+                                            fontSize: "0.875rem",
+                                        }}
                                     >
-                                        {appTheme === "dark" ? "Light mode" : "Dark mode"}
+                                        {appTheme === "dark"
+                                            ? "Light mode"
+                                            : "Dark mode"}
                                     </ListItemText>
                                 </MenuItem>
 

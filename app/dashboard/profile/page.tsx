@@ -867,8 +867,7 @@ const ProfilePage = () => {
                                             alignItems: "center",
                                             gap: 1.5,
                                             p: 1.5,
-                                            background:
-                                                "#ffffff",
+                                            background: "#ffffff",
                                             border: "1px solid rgba(25,40,55,0.10)",
                                             borderRadius: "10px",
                                         }}
@@ -2302,8 +2301,7 @@ const ProfilePage = () => {
                 PaperProps={{
                     sx: {
                         backdropFilter: "blur(20px)",
-                        background:
-                            "rgba(255,255,255,0.95)",
+                        background: "rgba(255,255,255,0.95)",
                         border: "1px solid rgba(239,68,68,0.3)",
                         borderRadius: "16px",
                         minWidth: "360px",

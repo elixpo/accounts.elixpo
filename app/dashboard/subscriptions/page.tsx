@@ -45,7 +45,8 @@ const TIER_META: Record<
     indie: {
         name: "Indie",
         accent: "#ff7759",
-        description: "10,000 MAU per app · 10 OAuth apps · 5 webhook endpoints.",
+        description:
+            "10,000 MAU per app · 10 OAuth apps · 5 webhook endpoints.",
     },
     studio: {
         name: "Studio",
@@ -110,7 +111,7 @@ export default function SubscriptionsPage() {
                     fontSize: "1.7rem",
                     letterSpacing: "-0.02em",
                     mb: 0.5,
-                    color: "#192837"
+                    color: "#192837",
                 }}
             >
                 Subscriptions
@@ -142,7 +143,11 @@ export default function SubscriptionsPage() {
                     sx={{ mb: 2.5 }}
                 >
                     <Stack spacing={0.5}>
-                        <Stack direction="row" spacing={1.2} alignItems="center">
+                        <Stack
+                            direction="row"
+                            spacing={1.2}
+                            alignItems="center"
+                        >
                             <Typography
                                 sx={{
                                     fontWeight: 700,
@@ -236,7 +241,9 @@ export default function SubscriptionsPage() {
                         />
                         <Row
                             label="Billing cycle"
-                            value={isCancelled ? "Ending after this" : "Monthly"}
+                            value={
+                                isCancelled ? "Ending after this" : "Monthly"
+                            }
                         />
                     </Box>
                 )}
@@ -263,7 +270,10 @@ export default function SubscriptionsPage() {
                 a cancelled-but-pending sub has nothing left to do, and the
                 "Resubscribe" CTA up top handles the inverse action. */}
             {isPaid && !isCancelled && !me?.is_internal && (
-                <CancelSection renewsAt={renewsAt} onCancelled={() => location.reload()} />
+                <CancelSection
+                    renewsAt={renewsAt}
+                    onCancelled={() => location.reload()}
+                />
             )}
 
             {me?.is_internal && (
@@ -431,7 +441,10 @@ function CancelSection({
                         }}
                     >
                         {busy ? (
-                            <CircularProgress size={18} sx={{ color: "#fff" }} />
+                            <CircularProgress
+                                size={18}
+                                sx={{ color: "#fff" }}
+                            />
                         ) : (
                             "Confirm cancel"
                         )}

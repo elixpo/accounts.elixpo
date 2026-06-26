@@ -1444,8 +1444,7 @@ export default function SecurityPage() {
                                     "& .MuiOutlinedInput-root": {
                                         color: "#192837",
                                         "& fieldset": {
-                                            borderColor:
-                                                "rgba(25,40,55,0.10)",
+                                            borderColor: "rgba(25,40,55,0.10)",
                                         },
                                         "&:hover fieldset": {
                                             borderColor:

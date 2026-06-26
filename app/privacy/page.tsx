@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { Box, Stack, Typography } from "@mui/material";
+import type { Metadata } from "next";
 import BackgroundAurora from "../components/background-aurora";
 import Navbar from "../components/navbar";
 
@@ -58,9 +58,9 @@ export default function PrivacyPage() {
                         <Section title="1. Who we are">
                             Elixpo Accounts (the "Service") is operated by
                             Elixpo. We provide single sign-on, OAuth identity,
-                            and account management for the Elixpo product
-                            suite and for third-party applications you grant
-                            access to.
+                            and account management for the Elixpo product suite
+                            and for third-party applications you grant access
+                            to.
                         </Section>
 
                         <Section title="2. Information we collect">
@@ -93,11 +93,11 @@ export default function PrivacyPage() {
                                 </li>
                                 <li>
                                     <strong>Billing data:</strong> if you
-                                    subscribe to a paid tier, we store your
-                                    tier and renewal date. Card details are
-                                    handled exclusively by our payments
-                                    partner (Razorpay via Elixpo Pay); we never
-                                    see or store card numbers.
+                                    subscribe to a paid tier, we store your tier
+                                    and renewal date. Card details are handled
+                                    exclusively by our payments partner
+                                    (Razorpay via Elixpo Pay); we never see or
+                                    store card numbers.
                                 </li>
                             </ul>
                         </Section>
@@ -117,8 +117,8 @@ export default function PrivacyPage() {
                                 </li>
                                 <li>
                                     To honor your OAuth consents and forward
-                                    only the profile attributes you approved
-                                    to the third-party app.
+                                    only the profile attributes you approved to
+                                    the third-party app.
                                 </li>
                                 <li>
                                     To process payments and provision
@@ -136,43 +136,41 @@ export default function PrivacyPage() {
                                     requested in its scopes.
                                 </li>
                                 <li>
-                                    Service providers we depend on:
-                                    Cloudflare (hosting, D1, KV), Razorpay
-                                    (payments), and the identity providers
-                                    you sign in with.
+                                    Service providers we depend on: Cloudflare
+                                    (hosting, D1, KV), Razorpay (payments), and
+                                    the identity providers you sign in with.
                                 </li>
                                 <li>
-                                    Legal authorities, when compelled by a
-                                    valid legal process applicable in our
-                                    operating jurisdiction.
+                                    Legal authorities, when compelled by a valid
+                                    legal process applicable in our operating
+                                    jurisdiction.
                                 </li>
                             </ul>
                             We do not sell your personal data.
                         </Section>
 
                         <Section title="5. Data retention">
-                            We keep account data for as long as your account
-                            is active. When you delete your account, we
-                            permanently delete or anonymize your records
-                            within 30 days, except where retention is
-                            required by law (e.g. invoices and audit logs,
-                            which we keep for the period required by Indian
-                            tax law).
+                            We keep account data for as long as your account is
+                            active. When you delete your account, we permanently
+                            delete or anonymize your records within 30 days,
+                            except where retention is required by law (e.g.
+                            invoices and audit logs, which we keep for the
+                            period required by Indian tax law).
                         </Section>
 
                         <Section title="6. Security">
-                            We use industry-standard encryption (TLS in
-                            transit, AES-GCM at rest for sensitive fields),
-                            HMAC-signed webhooks, and hardware-backed JWT
-                            signing keys. We support hardware passkeys, TOTP,
-                            and email OTP as second factors; users with three
-                            or more OAuth apps must enroll a second factor.
+                            We use industry-standard encryption (TLS in transit,
+                            AES-GCM at rest for sensitive fields), HMAC-signed
+                            webhooks, and hardware-backed JWT signing keys. We
+                            support hardware passkeys, TOTP, and email OTP as
+                            second factors; users with three or more OAuth apps
+                            must enroll a second factor.
                         </Section>
 
                         <Section title="7. Your rights">
-                            Depending on where you live, you may have rights
-                            to access, correct, export, or delete your
-                            personal data. Email{" "}
+                            Depending on where you live, you may have rights to
+                            access, correct, export, or delete your personal
+                            data. Email{" "}
                             <a
                                 href="mailto:privacy@elixpo.com"
                                 style={{ color: "#ff7759" }}
@@ -184,16 +182,16 @@ export default function PrivacyPage() {
 
                         <Section title="8. Children">
                             Elixpo Accounts is not directed at children under
-                            13. If you become aware that a child has provided
-                            us with personal data, please contact us so we can
+                            13. If you become aware that a child has provided us
+                            with personal data, please contact us so we can
                             delete it.
                         </Section>
 
                         <Section title="9. Changes">
-                            We may update this policy from time to time. If
-                            we make material changes we'll notify you via
-                            email or an in-app banner at least 14 days before
-                            the change takes effect.
+                            We may update this policy from time to time. If we
+                            make material changes we'll notify you via email or
+                            an in-app banner at least 14 days before the change
+                            takes effect.
                         </Section>
 
                         <Section title="10. Contact">

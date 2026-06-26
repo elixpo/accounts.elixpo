@@ -120,9 +120,7 @@ function VerifyContent() {
                         >
                             Verified
                         </Typography>
-                        <Typography
-                            sx={{ color: "rgba(25,40,55,0.6)", mb: 3 }}
-                        >
+                        <Typography sx={{ color: "rgba(25,40,55,0.6)", mb: 3 }}>
                             {message}
                         </Typography>
                         <Typography
@@ -163,9 +161,7 @@ function VerifyContent() {
                         >
                             Verification Failed
                         </Typography>
-                        <Typography
-                            sx={{ color: "rgba(25,40,55,0.6)", mb: 3 }}
-                        >
+                        <Typography sx={{ color: "rgba(25,40,55,0.6)", mb: 3 }}>
                             {message}
                         </Typography>
                         <Button

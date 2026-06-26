@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowUpRight, Check, Copy, Mail, Star } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import ThemeToggle from "./theme-toggle";
 
@@ -24,7 +24,10 @@ const PRODUCT = {
     email: "hello@elixpo.com",
 };
 
-const COLUMNS: { title: string; links: { label: string; href: string; external?: boolean }[] }[] = [
+const COLUMNS: {
+    title: string;
+    links: { label: string; href: string; external?: boolean }[];
+}[] = [
     {
         title: "Navigate",
         links: [
@@ -84,7 +87,8 @@ function GithubStarsButton({ repo }: { repo: string }) {
             .then((r) => (r.ok ? r.json() : null))
             .then((raw) => {
                 const d = raw as { stargazers_count?: number } | null;
-                if (alive && d && typeof d.stargazers_count === "number") setStars(d.stargazers_count);
+                if (alive && d && typeof d.stargazers_count === "number")
+                    setStars(d.stargazers_count);
             })
             .catch(() => {});
         return () => {
@@ -152,17 +156,25 @@ export default function Footer() {
                 <div className="flex flex-col gap-12 lg:flex-row lg:justify-between">
                     {/* Brand */}
                     <div className="max-w-sm">
-                        <Link href="/" className="mb-4 flex items-center gap-2.5">
+                        <Link
+                            href="/"
+                            className="mb-4 flex items-center gap-2.5"
+                        >
                             <img
                                 src="/LOGO/logo.png"
                                 alt="Elixpo"
                                 className="h-8 w-8 rounded-lg bg-white/85 object-contain p-0.5"
                             />
                             <span className="font-heading text-xl font-bold">
-                                Elixpo <span style={{ color: PRODUCT.accent }}>{PRODUCT.name}</span>
+                                Elixpo{" "}
+                                <span style={{ color: PRODUCT.accent }}>
+                                    {PRODUCT.name}
+                                </span>
                             </span>
                         </Link>
-                        <p className="text-sm leading-relaxed opacity-80">{PRODUCT.description}</p>
+                        <p className="text-sm leading-relaxed opacity-80">
+                            {PRODUCT.description}
+                        </p>
 
                         {/* Email, then the GitHub-stars CTA stacked beneath it */}
                         <div className="mt-6 flex flex-col items-start gap-3">
@@ -186,7 +198,9 @@ export default function Footer() {
                                                 className="inline-flex items-center gap-1 opacity-90 transition-opacity hover:opacity-60"
                                             >
                                                 {link.label}
-                                                {link.external && <ArrowUpRight className="h-3 w-3" />}
+                                                {link.external && (
+                                                    <ArrowUpRight className="h-3 w-3" />
+                                                )}
                                             </Link>
                                         </li>
                                     ))}
@@ -200,7 +214,9 @@ export default function Footer() {
                 <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-[#192837]/10 pt-8 text-sm font-medium opacity-70 sm:flex-row">
                     <div>
                         © {year} Elixpo ·{" "}
-                        <span className="font-semibold opacity-100">Built in the Open</span>
+                        <span className="font-semibold opacity-100">
+                            Built in the Open
+                        </span>
                     </div>
                     <div className="flex items-center gap-4">
                         <a

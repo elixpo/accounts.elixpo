@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const MARKETING_LINKS = [
     { label: "Home", href: "/" },
@@ -134,7 +134,10 @@ export default function Navbar() {
                             initial={{ x: "100%" }}
                             animate={{ x: 0 }}
                             exit={{ x: "100%" }}
-                            transition={{ ease: [0.22, 1, 0.36, 1] as const, duration: 0.45 }}
+                            transition={{
+                                ease: [0.22, 1, 0.36, 1] as const,
+                                duration: 0.45,
+                            }}
                             className="fixed right-0 top-0 w-[min(88vw,360px)] h-[100dvh] bg-[#CFC8C5] shadow-[-12px_0_48px_rgba(25,40,55,0.18)] z-50 flex flex-col p-6 text-[#192837]"
                         >
                             {/* Header */}
@@ -164,26 +167,32 @@ export default function Navbar() {
 
                             {/* Staggered Navigation Links */}
                             <div className="flex-1 flex flex-col gap-6 py-8">
-                                {(authed ? APP_LINKS : MARKETING_LINKS).map((link, i) => (
-                                    <motion.div
-                                        key={link.label}
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{
-                                            delay: 0.18 + i * 0.07,
-                                            ease: [0.22, 1, 0.36, 1] as const,
-                                            duration: 0.45,
-                                        }}
-                                    >
-                                        <Link
-                                            href={link.href}
-                                            onClick={() => setIsMobileMenuOpen(false)}
-                                            className="text-lg font-semibold hover:opacity-70 transition-opacity"
+                                {(authed ? APP_LINKS : MARKETING_LINKS).map(
+                                    (link, i) => (
+                                        <motion.div
+                                            key={link.label}
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{
+                                                delay: 0.18 + i * 0.07,
+                                                ease: [
+                                                    0.22, 1, 0.36, 1,
+                                                ] as const,
+                                                duration: 0.45,
+                                            }}
                                         >
-                                            {link.label}
-                                        </Link>
-                                    </motion.div>
-                                ))}
+                                            <Link
+                                                href={link.href}
+                                                onClick={() =>
+                                                    setIsMobileMenuOpen(false)
+                                                }
+                                                className="text-lg font-semibold hover:opacity-70 transition-opacity"
+                                            >
+                                                {link.label}
+                                            </Link>
+                                        </motion.div>
+                                    ),
+                                )}
                             </div>
 
                             {/* Bottom Call to Actions */}
@@ -192,14 +201,18 @@ export default function Navbar() {
                                     <>
                                         <Link
                                             href="/dashboard/oauth-apps"
-                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            onClick={() =>
+                                                setIsMobileMenuOpen(false)
+                                            }
                                             className="w-full bg-[#ff7759] text-white py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
                                         >
                                             Go to Dashboard
                                         </Link>
                                         <Link
                                             href="/dashboard/profile"
-                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            onClick={() =>
+                                                setIsMobileMenuOpen(false)
+                                            }
                                             className="w-full bg-[#F2F2EE] text-[#192837] py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all border border-black/5"
                                         >
                                             Profile
@@ -209,14 +222,18 @@ export default function Navbar() {
                                     <>
                                         <Link
                                             href="/login"
-                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            onClick={() =>
+                                                setIsMobileMenuOpen(false)
+                                            }
                                             className="w-full bg-[#ff7759] text-white py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
                                         >
                                             Start For Free
                                         </Link>
                                         <Link
                                             href="/login"
-                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            onClick={() =>
+                                                setIsMobileMenuOpen(false)
+                                            }
                                             className="w-full bg-[#F2F2EE] text-[#192837] py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all border border-black/5"
                                         >
                                             Sign In

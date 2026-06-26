@@ -1,6 +1,13 @@
 "use client";
 
-import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
+import {
+    createContext,
+    type ReactNode,
+    useCallback,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 
 export type ThemeMode = "light" | "dark";
 
@@ -49,7 +56,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }, []);
 
     return (
-        <ThemeContext.Provider value={{ theme, setTheme, toggle }}>{children}</ThemeContext.Provider>
+        <ThemeContext.Provider value={{ theme, setTheme, toggle }}>
+            {children}
+        </ThemeContext.Provider>
     );
 }
 

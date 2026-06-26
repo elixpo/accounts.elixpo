@@ -1,10 +1,10 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import gsap from "gsap";
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
-import gsap from "gsap";
+import { Suspense, useEffect, useState } from "react";
 
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -122,7 +122,13 @@ const LoginContent = () => {
             gsap.fromTo(
                 ".gsap-login-animate",
                 { opacity: 0, y: 30 },
-                { opacity: 1, y: 0, duration: 0.8, stagger: 0.12, ease: "power3.out" },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    stagger: 0.12,
+                    ease: "power3.out",
+                },
             );
         }
     }, [checkingAuth]);
@@ -234,7 +240,10 @@ const LoginContent = () => {
                         </p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                    <form
+                        onSubmit={handleSubmit}
+                        className="flex flex-col gap-4"
+                    >
                         {/* Email Input */}
                         <div className="flex flex-col gap-1.5">
                             <label className="text-xs font-bold uppercase tracking-wider opacity-60">
@@ -259,14 +268,18 @@ const LoginContent = () => {
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    onChange={(e) =>
+                                        setPassword(e.target.value)
+                                    }
                                     required
                                     placeholder="••••••••"
                                     className="w-full px-4 py-3 pr-12 border border-[#192837]/15 bg-white/80 rounded-xl text-sm font-semibold focus:outline-none focus:border-[#ff7759] focus:ring-1 focus:ring-[#ff7759]"
                                 />
                                 <button
                                     type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
+                                    onClick={() =>
+                                        setShowPassword(!showPassword)
+                                    }
                                     className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#192837]/50 hover:text-[#192837] focus:outline-none"
                                 >
                                     {showPassword ? (
@@ -284,7 +297,9 @@ const LoginContent = () => {
                                 <input
                                     type="checkbox"
                                     checked={rememberMe}
-                                    onChange={(e) => setRememberMe(e.target.checked)}
+                                    onChange={(e) =>
+                                        setRememberMe(e.target.checked)
+                                    }
                                     className="w-4.5 h-4.5 text-[#ff7759] border-[#192837]/20 rounded focus:ring-[#ff7759]"
                                 />
                                 <span className="text-xs font-semibold opacity-70">

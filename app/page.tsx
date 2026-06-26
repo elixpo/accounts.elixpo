@@ -1,22 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import gsap from "gsap";
 import {
     ArrowRightCircle,
-    Zap,
-    LockKeyhole,
-    Fingerprint,
-    Menu,
-    X,
-    Network,
-    Lock,
-    Mail,
-    Copy,
     Check,
+    Copy,
+    Fingerprint,
+    Lock,
+    LockKeyhole,
+    Mail,
+    Menu,
+    Network,
+    X,
+    Zap,
 } from "lucide-react";
-import gsap from "gsap";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 // CSS Variables (from prompt specifications):
 // --font-heading: 'Helvetica Now Display Bold', sans-serif;
@@ -94,13 +94,26 @@ export default function LandingPage() {
         gsap.fromTo(
             ".gsap-hero-animate",
             { opacity: 0, y: 35 },
-            { opacity: 1, y: 0, duration: 0.9, stagger: 0.15, ease: "power4.out" },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.9,
+                stagger: 0.15,
+                ease: "power4.out",
+            },
         );
 
         gsap.fromTo(
             ".gsap-card-animate",
             { opacity: 0, y: 30 },
-            { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: "power3.out", delay: 0.4 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: "power3.out",
+                delay: 0.4,
+            },
         );
     }, []);
 
@@ -169,7 +182,8 @@ export default function LandingPage() {
                             className="w-8 h-8 rounded-lg object-contain bg-white/80 p-0.5"
                         />
                         <span className="font-heading text-xl font-bold tracking-tight text-[#192837]">
-                            Elixpo <span className="text-[#ff7759]">Accounts</span>
+                            Elixpo{" "}
+                            <span className="text-[#ff7759]">Accounts</span>
                         </span>
                     </Link>
 
@@ -227,15 +241,22 @@ export default function LandingPage() {
 
                         {/* Subtext */}
                         <p className="font-body text-[clamp(0.95rem,2.5vw,1.15rem)] leading-[1.65] text-[#192837] opacity-80 mb-9 max-w-[600px] mx-auto gsap-hero-animate">
-                            Open OAuth 2.0 single sign-on — <strong className="font-semibold opacity-100">not just for Elixpo</strong>. Add
-                            “Sign in with Elixpo” to any app, yours or ours, in two steps: register
-                            your app, then drop in the button. One account, signed in everywhere.
+                            Open OAuth 2.0 single sign-on —{" "}
+                            <strong className="font-semibold opacity-100">
+                                not just for Elixpo
+                            </strong>
+                            . Add “Sign in with Elixpo” to any app, yours or
+                            ours, in two steps: register your app, then drop in
+                            the button. One account, signed in everywhere.
                         </p>
 
                         {/* CTAs — Dashboard + Docs */}
                         <div className="gsap-hero-animate flex flex-wrap items-center justify-center gap-3">
                             <motion.div
-                                whileHover={{ scale: 1.04, filter: "brightness(1.1)" }}
+                                whileHover={{
+                                    scale: 1.04,
+                                    filter: "brightness(1.1)",
+                                }}
                                 whileTap={{ scale: 0.96 }}
                                 transition={{ duration: 0.2 }}
                             >
@@ -243,7 +264,11 @@ export default function LandingPage() {
                                     href={authed ? "/dashboard" : "/login"}
                                     className="bg-[#ff7759] text-white rounded-full py-[15px] px-7 font-body font-semibold text-[clamp(0.9rem,2vw,1rem)] shadow-[0_6px_24px_rgba(255,119,89,0.32)] flex items-center gap-2.5 group"
                                 >
-                                    <span>{authed ? "Go to Dashboard" : "Dashboard"}</span>
+                                    <span>
+                                        {authed
+                                            ? "Go to Dashboard"
+                                            : "Dashboard"}
+                                    </span>
                                     <ArrowRightCircle className="w-5 h-5 text-white transition-transform group-hover:translate-x-1" />
                                 </Link>
                             </motion.div>
@@ -266,11 +291,26 @@ export default function LandingPage() {
                 {/* Arrow to scroll down */}
                 <div
                     className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 opacity-60 text-xs font-semibold tracking-widest text-[#192837] cursor-pointer animate-bounce select-none"
-                    onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}
+                    onClick={() =>
+                        document
+                            .getElementById("features")
+                            ?.scrollIntoView({ behavior: "smooth" })
+                    }
                 >
                     <span>FEATURES</span>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2.5"
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                        />
                     </svg>
                 </div>
             </section>
@@ -286,8 +326,9 @@ export default function LandingPage() {
                             Add Sign in with Elixpo in two steps
                         </h2>
                         <p className="text-base sm:text-lg opacity-80 leading-relaxed font-body">
-                            No SDK to wrestle with. Create your account, register your app, and you&apos;re
-                            issuing logins — for Elixpo apps or your own.
+                            No SDK to wrestle with. Create your account,
+                            register your app, and you&apos;re issuing logins —
+                            for Elixpo apps or your own.
                         </p>
                     </div>
 
@@ -302,10 +343,13 @@ export default function LandingPage() {
                                     <Fingerprint className="w-5 h-5" />
                                 </div>
                             </div>
-                            <h3 className="font-heading text-xl font-bold mb-2">Create your account</h3>
+                            <h3 className="font-heading text-xl font-bold mb-2">
+                                Create your account
+                            </h3>
                             <p className="text-[#192837]/75 leading-relaxed text-sm sm:text-base font-body mb-6">
-                                Register a free Elixpo account — or sign in if you already have one. One
-                                identity that works everywhere.
+                                Register a free Elixpo account — or sign in if
+                                you already have one. One identity that works
+                                everywhere.
                             </p>
                             <div className="mt-auto flex flex-wrap items-center gap-3">
                                 <Link
@@ -334,10 +378,13 @@ export default function LandingPage() {
                                     <Network className="w-5 h-5" />
                                 </div>
                             </div>
-                            <h3 className="font-heading text-xl font-bold mb-2">Register your app</h3>
+                            <h3 className="font-heading text-xl font-bold mb-2">
+                                Register your app
+                            </h3>
                             <p className="text-[#192837]/75 leading-relaxed text-sm sm:text-base font-body mb-6">
-                                Add your app in the dashboard to get OAuth client credentials, then drop in
-                                the “Sign in with Elixpo” button. That&apos;s it.
+                                Add your app in the dashboard to get OAuth
+                                client credentials, then drop in the “Sign in
+                                with Elixpo” button. That&apos;s it.
                             </p>
                             <div className="mt-auto flex flex-wrap items-center gap-3">
                                 <Link
@@ -370,7 +417,8 @@ export default function LandingPage() {
                             What can you do with Elixpo Accounts?
                         </h2>
                         <p className="text-base sm:text-lg opacity-80 leading-relaxed font-body">
-                            Our open OAuth 2.0 gateway coordinates identity, billing, and webhooks on the edge.
+                            Our open OAuth 2.0 gateway coordinates identity,
+                            billing, and webhooks on the edge.
                         </p>
                     </div>
 
@@ -414,8 +462,9 @@ export default function LandingPage() {
                         Ready when you are.
                     </h2>
                     <p className="text-base opacity-80 mb-8 max-w-[560px] mx-auto font-body leading-relaxed">
-                        Create an account in seconds or sign in if you already have one. The same identity
-                        works across Elixpo and any app integrating our SSO.
+                        Create an account in seconds or sign in if you already
+                        have one. The same identity works across Elixpo and any
+                        app integrating our SSO.
                     </p>
                     <motion.div
                         whileHover={{ scale: 1.04, filter: "brightness(1.1)" }}
@@ -446,12 +495,16 @@ export default function LandingPage() {
                                     className="w-8 h-8 rounded-lg object-contain bg-white/85 p-0.5"
                                 />
                                 <span className="font-heading text-xl font-bold">
-                                    Elixpo <span className="text-[#ff7759]">Accounts</span>
+                                    Elixpo{" "}
+                                    <span className="text-[#ff7759]">
+                                        Accounts
+                                    </span>
                                 </span>
                             </div>
                             <p className="text-sm opacity-80 leading-relaxed font-body">
-                                Open OAuth 2.0 single sign-on, built on the edge. Drop it into any app
-                                — Elixpo or yours — and let users sign in with one account.
+                                Open OAuth 2.0 single sign-on, built on the
+                                edge. Drop it into any app — Elixpo or yours —
+                                and let users sign in with one account.
                             </p>
                         </div>
 
@@ -505,7 +558,8 @@ export default function LandingPage() {
 
                     <div className="border-t border-[#192837]/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm opacity-60 font-body font-medium">
                         <div>
-                            © {new Date().getFullYear()} Elixpo · Built on Cloudflare's edge
+                            © {new Date().getFullYear()} Elixpo · Built on
+                            Cloudflare's edge
                         </div>
                         <div className="flex gap-4">
                             <Link href="/privacy" className="hover:underline">
@@ -536,7 +590,10 @@ export default function LandingPage() {
                             initial={{ x: "100%" }}
                             animate={{ x: 0 }}
                             exit={{ x: "100%" }}
-                            transition={{ ease: [0.22, 1, 0.36, 1] as const, duration: 0.45 }}
+                            transition={{
+                                ease: [0.22, 1, 0.36, 1] as const,
+                                duration: 0.45,
+                            }}
                             className="fixed right-0 top-0 w-[min(88vw,360px)] h-[100dvh] bg-[#CFC8C5] shadow-[-12px_0_48px_rgba(25,40,55,0.18)] z-50 flex flex-col p-6 text-[#192837]"
                         >
                             {/* Header */}
@@ -565,26 +622,32 @@ export default function LandingPage() {
 
                             {/* Staggered Navigation Links */}
                             <div className="flex-1 flex flex-col gap-6 py-8">
-                                {(authed ? APP_LINKS : MARKETING_LINKS).map((link, i) => (
-                                    <motion.div
-                                        key={link.label}
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{
-                                            delay: 0.18 + i * 0.07,
-                                            ease: [0.22, 1, 0.36, 1] as const,
-                                            duration: 0.45,
-                                        }}
-                                    >
-                                        <Link
-                                            href={link.href}
-                                            onClick={() => setIsMobileMenuOpen(false)}
-                                            className="text-lg font-semibold hover:opacity-70 transition-opacity"
+                                {(authed ? APP_LINKS : MARKETING_LINKS).map(
+                                    (link, i) => (
+                                        <motion.div
+                                            key={link.label}
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{
+                                                delay: 0.18 + i * 0.07,
+                                                ease: [
+                                                    0.22, 1, 0.36, 1,
+                                                ] as const,
+                                                duration: 0.45,
+                                            }}
                                         >
-                                            {link.label}
-                                        </Link>
-                                    </motion.div>
-                                ))}
+                                            <Link
+                                                href={link.href}
+                                                onClick={() =>
+                                                    setIsMobileMenuOpen(false)
+                                                }
+                                                className="text-lg font-semibold hover:opacity-70 transition-opacity"
+                                            >
+                                                {link.label}
+                                            </Link>
+                                        </motion.div>
+                                    ),
+                                )}
                             </div>
 
                             {/* Bottom Call to Actions */}
@@ -593,14 +656,18 @@ export default function LandingPage() {
                                     <>
                                         <Link
                                             href="/dashboard/oauth-apps"
-                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            onClick={() =>
+                                                setIsMobileMenuOpen(false)
+                                            }
                                             className="w-full bg-[#ff7759] text-white py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
                                         >
                                             Go to Dashboard
                                         </Link>
                                         <Link
                                             href="/dashboard/profile"
-                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            onClick={() =>
+                                                setIsMobileMenuOpen(false)
+                                            }
                                             className="w-full bg-[#F2F2EE] text-[#192837] py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all border border-black/5"
                                         >
                                             Profile
@@ -610,14 +677,18 @@ export default function LandingPage() {
                                     <>
                                         <Link
                                             href="/login"
-                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            onClick={() =>
+                                                setIsMobileMenuOpen(false)
+                                            }
                                             className="w-full bg-[#ff7759] text-white py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
                                         >
                                             Start For Free
                                         </Link>
                                         <Link
                                             href="/login"
-                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            onClick={() =>
+                                                setIsMobileMenuOpen(false)
+                                            }
                                             className="w-full bg-[#F2F2EE] text-[#192837] py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all border border-black/5"
                                         >
                                             Sign In

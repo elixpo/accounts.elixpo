@@ -1,22 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
-import Link from "next/link";
-import {
-    Zap,
-    LockKeyhole,
-    Fingerprint,
-    Network,
-    Lock,
-    Cpu,
-    Shield,
-    Globe,
-    Code,
-    Activity,
-} from "lucide-react";
 import gsap from "gsap";
-import Navbar from "../components/navbar";
+import { Activity, Code, Cpu, Lock, Network, Shield } from "lucide-react";
+import Link from "next/link";
+import { useEffect } from "react";
 import Footer from "../components/footer";
+import Navbar from "../components/navbar";
 
 const REPO_URL = "https://github.com/elixpo/accounts.elixpo";
 
@@ -76,13 +65,26 @@ export default function AboutPage() {
         gsap.fromTo(
             ".gsap-about-hero",
             { opacity: 0, y: 30 },
-            { opacity: 1, y: 0, duration: 0.8, stagger: 0.12, ease: "power3.out" },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.12,
+                ease: "power3.out",
+            },
         );
 
         gsap.fromTo(
             ".gsap-about-card",
             { opacity: 0, y: 35 },
-            { opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.3 },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.08,
+                ease: "power3.out",
+                delay: 0.3,
+            },
         );
     }, []);
 
@@ -110,11 +112,15 @@ export default function AboutPage() {
                     </div>
 
                     <h1 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-[#192837] leading-[1.1] gsap-about-hero">
-                        A modern identity layer <span className="text-[#ff7759]">for any app.</span>
+                        A modern identity layer{" "}
+                        <span className="text-[#ff7759]">for any app.</span>
                     </h1>
 
                     <p className="font-body text-base sm:text-lg text-[#192837] opacity-80 leading-relaxed max-w-[620px] gsap-about-hero">
-                        Elixpo Accounts is an open OAuth 2.0 identity provider built on the edge. Authenticate users across your services with a single, secure account — yours or anyone's.
+                        Elixpo Accounts is an open OAuth 2.0 identity provider
+                        built on the edge. Authenticate users across your
+                        services with a single, secure account — yours or
+                        anyone's.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center gap-3 pt-4 gsap-about-hero">
@@ -163,7 +169,9 @@ export default function AboutPage() {
                             Fully open source
                         </h2>
                         <p className="font-body text-sm sm:text-base text-[#192837]/80 leading-relaxed max-w-[560px]">
-                            Elixpo Accounts is open source and free to self-host. Inspect the code, contribute to development, or deploy your own custom instance.
+                            Elixpo Accounts is open source and free to
+                            self-host. Inspect the code, contribute to
+                            development, or deploy your own custom instance.
                         </p>
                     </div>
                     <a
