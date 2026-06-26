@@ -255,8 +255,8 @@ function ChallengeInner() {
                     maxWidth: 440,
                     p: 4,
                     borderRadius: "20px",
-                    background: "#ffffff",
-                    border: "1px solid rgba(25,40,55,0.1)",
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
                     backdropFilter: "blur(20px)",
                 }}
             >
@@ -266,13 +266,13 @@ function ChallengeInner() {
                     />
                     <Typography
                         variant="h5"
-                        sx={{ color: "#192837", fontWeight: 700 }}
+                        sx={{ color: "var(--fg)", fontWeight: 700 }}
                     >
                         Two-factor verification
                     </Typography>
                     <Typography
                         sx={{
-                            color: "rgba(25,40,55,0.5)",
+                            color: "var(--fg-faint)",
                             fontSize: "0.9rem",
                             mt: 0.5,
                         }}
@@ -305,7 +305,7 @@ function ChallengeInner() {
                                 display: "flex",
                                 alignItems: "center",
                                 gap: 1.5,
-                                border: `1px solid ${selected === m ? "rgba(255, 119, 89,0.5)" : "rgba(25,40,55,0.1)"}`,
+                                border: `1px solid ${selected === m ? "rgba(255, 119, 89,0.5)" : "var(--border)"}`,
                                 bgcolor:
                                     selected === m
                                         ? "rgba(255, 119, 89,0.08)"
@@ -320,7 +320,7 @@ function ChallengeInner() {
                             <Box sx={{ flex: 1 }}>
                                 <Typography
                                     sx={{
-                                        color: "#192837",
+                                        color: "var(--fg)",
                                         fontSize: "0.9rem",
                                         fontWeight: 600,
                                     }}
@@ -329,7 +329,7 @@ function ChallengeInner() {
                                 </Typography>
                                 <Typography
                                     sx={{
-                                        color: "rgba(25,40,55,0.55)",
+                                        color: "var(--fg-faint)",
                                         fontSize: "0.72rem",
                                     }}
                                 >
@@ -408,9 +408,9 @@ function ChallengeInner() {
                                 sx={{
                                     mb: 2,
                                     "& .MuiOutlinedInput-root": {
-                                        color: "#192837",
+                                        color: "var(--fg)",
                                         "& fieldset": {
-                                            borderColor: "rgba(25,40,55,0.15)",
+                                            borderColor: "var(--border)",
                                         },
                                         "&:hover fieldset": {
                                             borderColor:
@@ -446,11 +446,11 @@ function ChallengeInner() {
                                 disabled={busy || emailResendCd.active}
                                 sx={{
                                     mt: 1,
-                                    color: "rgba(25,40,55,0.5)",
+                                    color: "var(--fg-faint)",
                                     textTransform: "none",
                                     fontSize: "0.8rem",
                                     "&.Mui-disabled": {
-                                        color: "rgba(25,40,55,0.3)",
+                                        color: "var(--fg-faint)",
                                     },
                                 }}
                             >
@@ -495,9 +495,9 @@ function ChallengeInner() {
                             sx={{
                                 mb: 2,
                                 "& .MuiOutlinedInput-root": {
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     "& fieldset": {
-                                        borderColor: "rgba(25,40,55,0.15)",
+                                        borderColor: "var(--border)",
                                     },
                                     "&:hover fieldset": {
                                         borderColor: "rgba(255, 119, 89,0.4)",
@@ -530,13 +530,13 @@ function ChallengeInner() {
                 )}
 
                 <FormControlLabel
-                    sx={{ mt: 2, color: "rgba(25,40,55,0.7)" }}
+                    sx={{ mt: 2, color: "var(--fg-muted)" }}
                     control={
                         <Checkbox
                             checked={trustDevice}
                             onChange={(e) => setTrustDevice(e.target.checked)}
                             sx={{
-                                color: "rgba(25,40,55,0.3)",
+                                color: "var(--fg-faint)",
                                 "&.Mui-checked": { color: "#ff7759" },
                             }}
                         />

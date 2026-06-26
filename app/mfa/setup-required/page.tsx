@@ -27,8 +27,8 @@ export default function SetupRequiredPage() {
                     maxWidth: 520,
                     p: 4,
                     borderRadius: "20px",
-                    background: "#ffffff",
-                    border: "1px solid rgba(25,40,55,0.1)",
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
                     backdropFilter: "blur(20px)",
                     textAlign: "center",
                 }}
@@ -36,11 +36,11 @@ export default function SetupRequiredPage() {
                 <LockIcon sx={{ color: "#b45309", fontSize: 48, mb: 2 }} />
                 <Typography
                     variant="h5"
-                    sx={{ color: "#192837", fontWeight: 700, mb: 1 }}
+                    sx={{ color: "var(--fg)", fontWeight: 700, mb: 1 }}
                 >
                     Two-factor authentication required
                 </Typography>
-                <Typography sx={{ color: "rgba(25,40,55,0.6)", mb: 3 }}>
+                <Typography sx={{ color: "var(--fg-faint)", mb: 3 }}>
                     You're managing 3 or more OAuth apps on Elixpo. To protect
                     those apps and the users who sign in with them, we now
                     require 2FA on your account.
@@ -83,7 +83,7 @@ export default function SetupRequiredPage() {
                     <Button
                         href="/api/auth/logout"
                         sx={{
-                            color: "rgba(25,40,55,0.5)",
+                            color: "var(--fg-faint)",
                             textTransform: "none",
                         }}
                     >

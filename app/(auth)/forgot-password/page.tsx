@@ -13,27 +13,27 @@ import { Suspense, useEffect, useState } from "react";
 
 const textFieldSx = {
     "& .MuiOutlinedInput-root": {
-        color: "#192837",
+        color: "var(--fg)",
         background: "transparent",
-        "& fieldset": { borderColor: "rgba(25, 40, 55, 0.1)" },
-        "&:hover fieldset": { borderColor: "rgba(25, 40, 55, 0.2)" },
+        "& fieldset": { borderColor: "var(--border)" },
+        "&:hover fieldset": { borderColor: "var(--border)" },
         "&.Mui-focused fieldset": { borderColor: "#ff7759" },
         "& input:-webkit-autofill": {
             WebkitBoxShadow: "0 0 0 1000px transparent inset !important",
-            WebkitTextFillColor: "#192837 !important",
+            WebkitTextFillColor: "var(--fg) !important",
             WebkitTransition: "background-color 5000s ease-in-out 0s",
         },
         "& input:-webkit-autofill:hover": {
             WebkitBoxShadow: "0 0 0 1000px transparent inset !important",
-            WebkitTextFillColor: "#192837 !important",
+            WebkitTextFillColor: "var(--fg) !important",
         },
         "& input:-webkit-autofill:focus": {
             WebkitBoxShadow: "0 0 0 1000px transparent inset !important",
-            WebkitTextFillColor: "#192837 !important",
+            WebkitTextFillColor: "var(--fg) !important",
         },
     },
     "& .MuiInputBase-input::placeholder": { color: "transparent", opacity: 0 },
-    "& .MuiInputLabel-root": { color: "rgba(25, 40, 55, 0.7)" },
+    "& .MuiInputLabel-root": { color: "var(--fg-muted)" },
     "& .MuiInputLabel-root.Mui-focused": { color: "#ff7759" },
 };
 
@@ -51,8 +51,8 @@ const btnSx = {
         borderColor: "rgba(255, 119, 89, 0.9)",
     },
     "&:disabled": {
-        color: "rgba(25, 40, 55, 0.4)",
-        borderColor: "rgba(25, 40, 55, 0.1)",
+        color: "var(--fg-faint)",
+        borderColor: "var(--border)",
     },
 };
 
@@ -245,8 +245,8 @@ function ForgotPasswordContent() {
                     maxWidth: "420px",
                     width: "100%",
                     backdropFilter: "blur(20px)",
-                    background: "#ffffff",
-                    border: "1px solid rgba(25, 40, 55, 0.1)",
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
                     borderRadius: "16px",
                     p: 3,
                 }}
@@ -254,13 +254,13 @@ function ForgotPasswordContent() {
                 <Box sx={{ mb: 3, textAlign: "center" }}>
                     <Typography
                         variant="h4"
-                        sx={{ fontWeight: 700, color: "#192837", mb: 0.5 }}
+                        sx={{ fontWeight: 700, color: "var(--fg)", mb: 0.5 }}
                     >
                         Reset Password
                     </Typography>
                     <Typography
                         sx={{
-                            color: "rgba(25, 40, 55, 0.5)",
+                            color: "var(--fg-faint)",
                             fontSize: "0.95rem",
                         }}
                     >
@@ -335,7 +335,7 @@ function ForgotPasswordContent() {
                         />
                         <Typography
                             sx={{
-                                color: "rgba(25, 40, 55, 0.5)",
+                                color: "var(--fg-faint)",
                                 fontSize: "0.85rem",
                                 mt: 1,
                                 mb: 2,
@@ -361,7 +361,7 @@ function ForgotPasswordContent() {
                                     color: "#ff7759",
                                     "&:hover": { background: "transparent" },
                                     "&:disabled": {
-                                        color: "rgba(25, 40, 55, 0.3)",
+                                        color: "var(--fg-faint)",
                                     },
                                 }}
                             >
@@ -423,7 +423,7 @@ function ForgotPasswordContent() {
                         </Typography>
                         <Typography
                             sx={{
-                                color: "rgba(25, 40, 55, 0.5)",
+                                color: "var(--fg-faint)",
                                 fontSize: "0.9rem",
                                 mb: 3,
                             }}
@@ -446,12 +446,12 @@ function ForgotPasswordContent() {
                         sx={{
                             mt: 2,
                             pt: 2,
-                            borderTop: "1px solid rgba(25, 40, 55, 0.1)",
+                            borderTop: "1px solid var(--border)",
                             textAlign: "center",
                         }}
                     >
                         <Typography
-                            sx={{ color: "rgba(25, 40, 55, 0.7)", mb: 1 }}
+                            sx={{ color: "var(--fg-muted)", mb: 1 }}
                         >
                             Back to login?
                         </Typography>

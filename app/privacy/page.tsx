@@ -30,7 +30,7 @@ export default function PrivacyPage() {
                     minHeight: "calc(100dvh - 68px)",
                     px: { xs: 2.5, sm: 4 },
                     py: { xs: 4, sm: 6 },
-                    color: "#192837",
+                    color: "var(--fg)",
                 }}
             >
                 <Box sx={{ maxWidth: 760, mx: "auto" }}>
@@ -46,7 +46,7 @@ export default function PrivacyPage() {
                     </Typography>
                     <Typography
                         sx={{
-                            color: "rgba(25,40,55,0.55)",
+                            color: "var(--fg-faint)",
                             fontSize: "0.95rem",
                             mb: 4,
                         }}
@@ -225,19 +225,19 @@ function Section({
                     fontWeight: 700,
                     fontSize: "1.15rem",
                     mb: 1.2,
-                    color: "#192837",
+                    color: "var(--fg)",
                 }}
             >
                 {title}
             </Typography>
             <Box
                 sx={{
-                    color: "rgba(25,40,55,0.75)",
+                    color: "var(--fg-muted)",
                     fontSize: "0.96rem",
                     lineHeight: 1.7,
                     "& ul": { pl: 3, m: 0, mt: 1 },
                     "& li": { mb: 0.6 },
-                    "& strong": { color: "#192837", fontWeight: 600 },
+                    "& strong": { color: "var(--fg)", fontWeight: 600 },
                 }}
             >
                 {children}

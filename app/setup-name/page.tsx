@@ -16,15 +16,15 @@ const ACCENT = "#ff7759";
 
 const textFieldSx = {
     "& .MuiOutlinedInput-root": {
-        color: "#192837",
+        color: "var(--fg)",
         background: "transparent",
-        "& fieldset": { borderColor: "rgba(25, 40, 55, 0.12)" },
-        "&:hover fieldset": { borderColor: "rgba(25, 40, 55, 0.24)" },
+        "& fieldset": { borderColor: "var(--border)" },
+        "&:hover fieldset": { borderColor: "var(--border)" },
         "&.Mui-focused fieldset": { borderColor: ACCENT },
     },
-    "& .MuiInputLabel-root": { color: "rgba(25, 40, 55, 0.7)" },
+    "& .MuiInputLabel-root": { color: "var(--fg-muted)" },
     "& .MuiInputLabel-root.Mui-focused": { color: ACCENT },
-    "& .MuiFormHelperText-root": { color: "rgba(25, 40, 55, 0.4)" },
+    "& .MuiFormHelperText-root": { color: "var(--fg-faint)" },
 };
 
 function slugifyHandle(s: string): string {
@@ -175,7 +175,7 @@ const SetupNameContent = () => {
                     sx={{
                         position: "relative",
                         zIndex: 1,
-                        color: "rgba(25,40,55,0.5)",
+                        color: "var(--fg-faint)",
                     }}
                 >
                     Loading...
@@ -197,7 +197,7 @@ const SetupNameContent = () => {
             ? "#15803d"
             : check.state === "taken"
               ? "#b91c1c"
-              : "rgba(25,40,55,0.4)";
+              : "var(--fg-faint)";
 
     return (
         <Box
@@ -218,8 +218,8 @@ const SetupNameContent = () => {
                     maxWidth: "460px",
                     width: "100%",
                     backdropFilter: "blur(20px)",
-                    background: "#ffffff",
-                    border: "1px solid rgba(25, 40, 55, 0.1)",
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
                     borderRadius: "16px",
                     boxShadow: "0 8px 32px 0 rgba(25, 40, 55, 0.06)",
                     p: 4,
@@ -228,13 +228,13 @@ const SetupNameContent = () => {
                 <Box sx={{ textAlign: "center", mb: 3 }}>
                     <Typography
                         variant="h4"
-                        sx={{ fontWeight: 700, color: "#192837", mb: 1 }}
+                        sx={{ fontWeight: 700, color: "var(--fg)", mb: 1 }}
                     >
                         Claim your handle
                     </Typography>
                     <Typography
                         sx={{
-                            color: "rgba(25, 40, 55, 0.5)",
+                            color: "var(--fg-faint)",
                             fontSize: "0.95rem",
                         }}
                     >
@@ -265,7 +265,7 @@ const SetupNameContent = () => {
                     InputProps={{
                         startAdornment: (
                             <Typography
-                                sx={{ color: "rgba(25,40,55,0.4)", mr: 0.5 }}
+                                sx={{ color: "var(--fg-faint)", mr: 0.5 }}
                             >
                                 @
                             </Typography>
@@ -304,8 +304,8 @@ const SetupNameContent = () => {
                         py: 1.3,
                         "&:hover": { background: "rgba(255, 119, 89, 0.9)" },
                         "&:disabled": {
-                            background: "rgba(25,40,55,0.08)",
-                            color: "rgba(25, 40, 55, 0.3)",
+                            background: "var(--overlay)",
+                            color: "var(--fg-faint)",
                         },
                     }}
                 >
@@ -314,7 +314,7 @@ const SetupNameContent = () => {
 
                 <Typography
                     sx={{
-                        color: "rgba(25, 40, 55, 0.5)",
+                        color: "var(--fg-faint)",
                         fontSize: "0.8rem",
                         textAlign: "center",
                         mt: 2.5,

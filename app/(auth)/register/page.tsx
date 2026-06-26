@@ -16,27 +16,27 @@ import { Suspense, useState } from "react";
 
 const textFieldSx = {
     "& .MuiOutlinedInput-root": {
-        color: "#192837",
+        color: "var(--fg)",
         background: "transparent",
-        "& fieldset": { borderColor: "rgba(25, 40, 55, 0.1)" },
-        "&:hover fieldset": { borderColor: "rgba(25, 40, 55, 0.2)" },
+        "& fieldset": { borderColor: "var(--border)" },
+        "&:hover fieldset": { borderColor: "var(--border)" },
         "&.Mui-focused fieldset": { borderColor: "#ff7759" },
         "& input:-webkit-autofill": {
             WebkitBoxShadow: "0 0 0 1000px transparent inset !important",
-            WebkitTextFillColor: "#192837 !important",
+            WebkitTextFillColor: "var(--fg) !important",
             WebkitTransition: "background-color 5000s ease-in-out 0s",
         },
         "& input:-webkit-autofill:hover": {
             WebkitBoxShadow: "0 0 0 1000px transparent inset !important",
-            WebkitTextFillColor: "#192837 !important",
+            WebkitTextFillColor: "var(--fg) !important",
         },
         "& input:-webkit-autofill:focus": {
             WebkitBoxShadow: "0 0 0 1000px transparent inset !important",
-            WebkitTextFillColor: "#192837 !important",
+            WebkitTextFillColor: "var(--fg) !important",
         },
     },
     "& .MuiInputBase-input::placeholder": { color: "transparent", opacity: 0 },
-    "& .MuiInputLabel-root": { color: "rgba(25, 40, 55, 0.7)" },
+    "& .MuiInputLabel-root": { color: "var(--fg-muted)" },
     "& .MuiInputLabel-root.Mui-focused": { color: "#ff7759" },
 };
 
@@ -124,8 +124,8 @@ const RegisterContent = () => {
                     display: "flex",
                     gap: 2.5,
                     backdropFilter: "blur(20px)",
-                    background: "#ffffff",
-                    border: "1px solid rgba(25, 40, 55, 0.1)",
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
                     borderRadius: "16px",
                     p: 3,
                     flexDirection: { xs: "column", md: "row" },
@@ -143,13 +143,13 @@ const RegisterContent = () => {
                     <Box sx={{ mb: 2, textAlign: "center" }}>
                         <Typography
                             variant="h4"
-                            sx={{ fontWeight: 700, color: "#192837", mb: 0.5 }}
+                            sx={{ fontWeight: 700, color: "var(--fg)", mb: 0.5 }}
                         >
                             Create Account
                         </Typography>
                         <Typography
                             sx={{
-                                color: "rgba(25, 40, 55, 0.5)",
+                                color: "var(--fg-faint)",
                                 fontSize: "0.95rem",
                             }}
                         >
@@ -195,7 +195,7 @@ const RegisterContent = () => {
                             sx={{
                                 ...textFieldSx,
                                 "& .MuiFormHelperText-root": {
-                                    color: "rgba(25, 40, 55, 0.5)",
+                                    color: "var(--fg-faint)",
                                 },
                             }}
                             required
@@ -208,7 +208,7 @@ const RegisterContent = () => {
                                             }
                                             edge="end"
                                             sx={{
-                                                color: "rgba(25,40,55,0.4)",
+                                                color: "var(--fg-faint)",
                                             }}
                                         >
                                             {showPassword ? (
@@ -241,7 +241,7 @@ const RegisterContent = () => {
                                             }
                                             edge="end"
                                             sx={{
-                                                color: "rgba(25,40,55,0.4)",
+                                                color: "var(--fg-faint)",
                                             }}
                                         >
                                             {showConfirmPassword ? (
@@ -274,8 +274,8 @@ const RegisterContent = () => {
                                     borderColor: "rgba(255, 119, 89, 0.9)",
                                 },
                                 "&:disabled": {
-                                    color: "rgba(25, 40, 55, 0.4)",
-                                    borderColor: "rgba(25, 40, 55, 0.1)",
+                                    color: "var(--fg-faint)",
+                                    borderColor: "var(--border)",
                                 },
                             }}
                         >
@@ -287,12 +287,12 @@ const RegisterContent = () => {
                         sx={{
                             mt: 2,
                             pt: 2,
-                            borderTop: "1px solid rgba(25, 40, 55, 0.1)",
+                            borderTop: "1px solid var(--border)",
                             textAlign: "center",
                         }}
                     >
                         <Typography
-                            sx={{ color: "rgba(25, 40, 55, 0.7)", mb: 1 }}
+                            sx={{ color: "var(--fg-muted)", mb: 1 }}
                         >
                             Already have an account?
                         </Typography>
@@ -323,11 +323,11 @@ const RegisterContent = () => {
                         paddingLeft: { xs: 0, md: 3 },
                         borderLeft: {
                             xs: "none",
-                            md: "1px solid rgba(25, 40, 55, 0.1)",
+                            md: "1px solid var(--border)",
                         },
                         paddingTop: { xs: 2, md: 0 },
                         borderTop: {
-                            xs: "1px solid rgba(25, 40, 55, 0.1)",
+                            xs: "1px solid var(--border)",
                             md: "none",
                         },
                     }}
@@ -335,7 +335,7 @@ const RegisterContent = () => {
                     <Box sx={{ mb: 2, textAlign: "center" }}>
                         <Typography
                             sx={{
-                                color: "rgba(25, 40, 55, 0.5)",
+                                color: "var(--fg-faint)",
                                 fontSize: "0.9rem",
                             }}
                         >
@@ -355,11 +355,11 @@ const RegisterContent = () => {
                             variant="outlined"
                             onClick={() => handleSSORegister("google")}
                             sx={{
-                                color: "#192837",
-                                borderColor: "rgba(25, 40, 55, 0.15)",
+                                color: "var(--fg)",
+                                borderColor: "var(--border)",
                                 "&:hover": {
-                                    borderColor: "rgba(25, 40, 55, 0.3)",
-                                    backgroundColor: "rgba(25, 40, 55, 0.04)",
+                                    borderColor: "var(--border)",
+                                    backgroundColor: "var(--overlay)",
                                 },
                                 py: 1,
                                 textTransform: "none",
@@ -406,11 +406,11 @@ const RegisterContent = () => {
                             variant="outlined"
                             onClick={() => handleSSORegister("github")}
                             sx={{
-                                color: "#192837",
-                                borderColor: "rgba(25, 40, 55, 0.15)",
+                                color: "var(--fg)",
+                                borderColor: "var(--border)",
                                 "&:hover": {
-                                    borderColor: "rgba(25, 40, 55, 0.3)",
-                                    backgroundColor: "rgba(25, 40, 55, 0.04)",
+                                    borderColor: "var(--border)",
+                                    backgroundColor: "var(--overlay)",
                                 },
                                 py: 1,
                                 textTransform: "none",
@@ -442,11 +442,11 @@ const RegisterContent = () => {
                             variant="outlined"
                             onClick={() => handleSSORegister("discord")}
                             sx={{
-                                color: "#192837",
-                                borderColor: "rgba(25, 40, 55, 0.15)",
+                                color: "var(--fg)",
+                                borderColor: "var(--border)",
                                 "&:hover": {
-                                    borderColor: "rgba(25, 40, 55, 0.3)",
-                                    backgroundColor: "rgba(25, 40, 55, 0.04)",
+                                    borderColor: "var(--border)",
+                                    backgroundColor: "var(--overlay)",
                                 },
                                 py: 1,
                                 textTransform: "none",
@@ -478,11 +478,11 @@ const RegisterContent = () => {
                             variant="outlined"
                             onClick={() => handleSSORegister("microsoft")}
                             sx={{
-                                color: "#192837",
-                                borderColor: "rgba(25, 40, 55, 0.15)",
+                                color: "var(--fg)",
+                                borderColor: "var(--border)",
                                 "&:hover": {
-                                    borderColor: "rgba(25, 40, 55, 0.3)",
-                                    backgroundColor: "rgba(25, 40, 55, 0.04)",
+                                    borderColor: "var(--border)",
+                                    backgroundColor: "var(--overlay)",
                                 },
                                 py: 1,
                                 textTransform: "none",

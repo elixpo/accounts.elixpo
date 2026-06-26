@@ -12,7 +12,7 @@ const NotFound = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 background:
-                    "linear-gradient(135deg, #F2F2EE 0%, #ffffff 50%, #F2F2EE 100%)",
+                    "linear-gradient(135deg, var(--bg) 0%, var(--surface) 50%, var(--bg) 100%)",
                 p: 2,
             }}
         >
@@ -98,7 +98,7 @@ const NotFound = () => {
 
                 <Typography
                     sx={{
-                        color: "rgba(25,40,55,0.6)",
+                        color: "var(--fg-faint)",
                         fontSize: "1.1rem",
                         mb: 4,
                         lineHeight: 1.6,
@@ -136,8 +136,8 @@ const NotFound = () => {
                             fullWidth
                             variant="outlined"
                             sx={{
-                                color: "rgba(25,40,55,0.7)",
-                                border: "1px solid rgba(25,40,55,0.10)",
+                                color: "var(--fg-muted)",
+                                border: "1px solid var(--border)",
                                 fontWeight: 600,
                                 py: 1.5,
                                 textTransform: "none",
@@ -156,7 +156,7 @@ const NotFound = () => {
                 {/* Error Code */}
                 <Typography
                     sx={{
-                        color: "rgba(25,40,55,0.3)",
+                        color: "var(--fg-faint)",
                         fontSize: "0.85rem",
                         mt: 6,
                         fontFamily: "monospace",

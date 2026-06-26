@@ -269,13 +269,13 @@ const secondaryBtnSx = {
     textTransform: "none",
     fontWeight: 500,
     fontSize: "0.95rem",
-    color: "#192837",
-    border: "1px solid rgba(25,40,55,0.12)",
+    color: "var(--fg)",
+    border: "1px solid var(--border)",
     borderRadius: "12px",
     py: 1.2,
     "&:hover": {
         borderColor: "rgba(255, 119, 89,0.4)",
-        background: "rgba(25,40,55,0.04)",
+        background: "var(--overlay)",
     },
 };
 
@@ -315,8 +315,8 @@ const ErrorContent = () => {
                     maxWidth: 460,
                     width: "100%",
                     backdropFilter: "blur(20px)",
-                    background: "#ffffff",
-                    border: "1px solid rgba(25, 40, 55, 0.1)",
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
                     borderRadius: "18px",
                     p: { xs: 3, md: 4 },
                 }}
@@ -359,7 +359,7 @@ const ErrorContent = () => {
                     sx={{
                         fontWeight: 800,
                         fontSize: { xs: "1.6rem", md: "1.85rem" },
-                        color: "#192837",
+                        color: "var(--fg)",
                         letterSpacing: "-0.02em",
                         lineHeight: 1.15,
                         mb: 1.2,
@@ -370,7 +370,7 @@ const ErrorContent = () => {
 
                 <Typography
                     sx={{
-                        color: "rgba(25, 40, 55, 0.65)",
+                        color: "var(--fg-faint)",
                         fontSize: "0.95rem",
                         lineHeight: 1.6,
                         mb: 3,
@@ -424,7 +424,7 @@ const ErrorContent = () => {
                     sx={{
                         mt: 3,
                         pt: 2.5,
-                        borderTop: "1px solid rgba(25,40,55,0.1)",
+                        borderTop: "1px solid var(--border)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "space-between",
@@ -433,7 +433,7 @@ const ErrorContent = () => {
                 >
                     <Typography
                         sx={{
-                            color: "rgba(25,40,55,0.5)",
+                            color: "var(--fg-faint)",
                             fontSize: "0.82rem",
                         }}
                     >
@@ -447,8 +447,8 @@ const ErrorContent = () => {
                             onClick={copyEmail}
                             aria-label="Copy support email"
                             sx={{
-                                color: "rgba(25,40,55,0.85)",
-                                border: "1px solid rgba(25,40,55,0.1)",
+                                color: "var(--fg-muted)",
+                                border: "1px solid var(--border)",
                                 borderRadius: "10px",
                                 width: 34,
                                 height: 34,

@@ -279,12 +279,12 @@ export default function PricingPage() {
                                     }}
                                     className={`w-full py-3.5 rounded-xl font-body font-bold text-sm tracking-wide transition-all select-none flex items-center justify-center ${
                                         tier.id === "hobby"
-                                            ? "bg-[#192837]/5 text-[#192837]/40 border border-[#192837]/10"
+                                            ? "bg-[var(--overlay)] text-[var(--fg-faint)] border border-[var(--border)]"
                                             : isCurrent
                                               ? "bg-[#ff7759]/10 text-[#ff7759] border border-[#ff7759]/25 cursor-default"
                                               : tier.highlight
                                                 ? "bg-[#ff7759] hover:brightness-110 text-white shadow-md active:scale-[0.98]"
-                                                : "bg-[#192837]/5 hover:bg-[#192837]/10 border border-[#192837]/10 text-[#192837] active:scale-[0.98]"
+                                                : "bg-[var(--overlay)] hover:bg-[#192837]/10 border border-[var(--border)] text-[var(--fg)] active:scale-[0.98]"
                                     }`}
                                 >
                                     {isBusy ? (
