@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowUpRight, Check, Copy, Mail, Star } from "lucide-react";
 import { useEffect, useState } from "react";
+import ThemeToggle from "./theme-toggle";
 
 /* ──────────────────────────────────────────────────────────────────────────
  * Elixpo — foundational footer
@@ -201,15 +202,18 @@ export default function Footer() {
                         © {year} Elixpo ·{" "}
                         <span className="font-semibold opacity-100">Built in the Open</span>
                     </div>
-                    <a
-                        href={SUITE_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 transition-opacity hover:opacity-100"
-                    >
-                        Part of the Elixpo suite
-                        <ArrowUpRight className="h-3.5 w-3.5" />
-                    </a>
+                    <div className="flex items-center gap-4">
+                        <a
+                            href={SUITE_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 transition-opacity hover:opacity-100"
+                        >
+                            Part of the Elixpo suite
+                            <ArrowUpRight className="h-3.5 w-3.5" />
+                        </a>
+                        <ThemeToggle size={16} />
+                    </div>
                 </div>
             </div>
         </footer>

@@ -142,11 +142,22 @@ export default function LandingPage() {
                     playsInline
                     preload="auto"
                     className="absolute inset-0 object-cover w-full h-full -z-10 pointer-events-none select-none"
+                    style={{ opacity: 0.6, filter: "saturate(0.92)" }}
                     src="/hero-bg.mp4"
                 />
-                
-                {/* Subtle Overlay to enhance text readability */}
-                <div className="absolute inset-0 bg-[#F2F2EE]/10 -z-10 pointer-events-none" />
+
+                {/* Cream wash — dims the video so the text leads */}
+                <div className="absolute inset-0 bg-[#F2F2EE]/55 -z-10 pointer-events-none" />
+                {/* Vignette — darkens the edges toward the centre */}
+                <div
+                    className="absolute inset-0 -z-10 pointer-events-none"
+                    style={{
+                        background:
+                            "radial-gradient(ellipse at center, rgba(242,242,238,0) 38%, rgba(25,40,55,0.22) 100%)",
+                    }}
+                />
+                {/* Bottom fade — flows the hero into the sections below */}
+                <div className="absolute bottom-0 left-0 right-0 h-44 -z-10 pointer-events-none bg-gradient-to-b from-transparent to-[#F2F2EE]" />
 
                 {/* Navbar */}
                 <header className="w-full max-w-[1280px] mx-auto px-5 sm:px-8 py-4 sm:py-5 flex items-center justify-between z-25">
@@ -162,20 +173,7 @@ export default function LandingPage() {
                         </span>
                     </Link>
 
-                    {/* Center: Marketing / App Links (Desktop Only) */}
-                    <nav className="hidden md:flex items-center gap-8">
-                        {(authed ? APP_LINKS : MARKETING_LINKS).map((link) => (
-                            <Link
-                                key={link.label}
-                                href={link.href}
-                                className="text-sm font-semibold tracking-wide hover:opacity-70 transition-opacity text-[#192837]"
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
-                    </nav>
-
-                    {/* Right: Call to Actions (Desktop Only) */}
+                    {/* Right: CTAs only — brand-minimal navbar */}
                     <div className="hidden md:flex items-center gap-3">
                         {authed === null ? (
                             // Loading state placeholder to prevent layout shifting
@@ -183,33 +181,25 @@ export default function LandingPage() {
                         ) : authed ? (
                             <>
                                 <Link
-                                    href="/dashboard/oauth-apps"
-                                    className="bg-[#ff7759] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 shadow-[0_4px_14px_rgba(255, 119, 89,0.22)]"
+                                    href="/dashboard"
+                                    className="bg-[#ff7759] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 shadow-[0_4px_14px_rgba(255,119,89,0.22)]"
                                 >
                                     Dashboard
                                 </Link>
                                 <Link
                                     href="/dashboard/profile"
-                                    className="bg-[#F2F2EE] text-[#192837] px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 border border-black/5"
+                                    className="bg-white text-[#192837] px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] active:scale-[0.96] transition-all duration-200 border border-[#192837]/10"
                                 >
                                     Profile
                                 </Link>
                             </>
                         ) : (
-                            <>
-                                <Link
-                                    href="/login"
-                                    className="bg-[#ff7759] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 shadow-[0_4px_14px_rgba(255, 119, 89,0.22)]"
-                                >
-                                    Start For Free
-                                </Link>
-                                <Link
-                                    href="/login"
-                                    className="bg-[#F2F2EE] text-[#192837] px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 border border-black/5"
-                                >
-                                    Sign In
-                                </Link>
-                            </>
+                            <Link
+                                href="/login"
+                                className="bg-[#ff7759] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 shadow-[0_4px_14px_rgba(255,119,89,0.22)]"
+                            >
+                                Sign In
+                            </Link>
                         )}
                     </div>
 
@@ -223,11 +213,11 @@ export default function LandingPage() {
                     </button>
                 </header>
 
-                {/* Hero Content Area */}
+                {/* Hero Content Area — fully centered */}
                 <main className="w-full max-w-[1280px] mx-auto px-5 sm:px-8 flex-1 flex flex-col justify-center py-12">
-                    <div className="max-w-[560px] pt-[clamp(40px,8vw,72px)] flex flex-col items-start text-left">
+                    <div className="max-w-[720px] mx-auto pt-[clamp(40px,8vw,72px)] flex flex-col items-center text-center">
                         {/* Heading */}
-                        <h1 className="font-heading text-[clamp(1.65rem,5vw,3rem)] leading-[1.05] tracking-[-0.01em] text-[#192837] mb-6 font-bold gsap-hero-animate">
+                        <h1 className="font-heading text-[clamp(1.9rem,6vw,3.4rem)] leading-[1.05] tracking-[-0.01em] text-[#192837] mb-6 font-bold gsap-hero-animate">
                             <Zap className="inline-block w-6 h-6 sm:w-8 sm:h-8 text-[#192837] align-middle relative -top-[2px] mr-2" />
                             Single sign-on,
                             <LockKeyhole className="inline-block w-6 h-6 sm:w-8 sm:h-8 text-[#192837] align-middle relative -top-[2px] mx-2" />
@@ -236,35 +226,40 @@ export default function LandingPage() {
                         </h1>
 
                         {/* Subtext */}
-                        <p className="font-body text-[clamp(0.9rem,2.5vw,1.1rem)] leading-[1.65] text-[#192837] opacity-80 mb-8 max-w-[560px] gsap-hero-animate">
+                        <p className="font-body text-[clamp(0.95rem,2.5vw,1.15rem)] leading-[1.65] text-[#192837] opacity-80 mb-9 max-w-[600px] mx-auto gsap-hero-animate">
                             Open OAuth 2.0 single sign-on — <strong className="font-semibold opacity-100">not just for Elixpo</strong>. Add
                             “Sign in with Elixpo” to any app, yours or ours, in two steps: register
                             your app, then drop in the button. One account, signed in everywhere.
                         </p>
 
-                        {/* CTA Button */}
-                        <div className="gsap-hero-animate">
+                        {/* CTAs — Dashboard + Docs */}
+                        <div className="gsap-hero-animate flex flex-wrap items-center justify-center gap-3">
                             <motion.div
                                 whileHover={{ scale: 1.04, filter: "brightness(1.1)" }}
                                 whileTap={{ scale: 0.96 }}
                                 transition={{ duration: 0.2 }}
                             >
                                 <Link
-                                    href={authed ? "/dashboard/oauth-apps" : "/login"}
-                                    className="bg-[#ff7759] text-white rounded-[50px] py-[17px] px-[24px] font-body font-semibold text-[clamp(0.9rem,2vw,1rem)] shadow-[0_4px_24px_rgba(255, 119, 89,0.28)] min-w-[210px] flex items-center justify-between gap-[32px] group"
+                                    href={authed ? "/dashboard" : "/login"}
+                                    className="bg-[#ff7759] text-white rounded-full py-[15px] px-7 font-body font-semibold text-[clamp(0.9rem,2vw,1rem)] shadow-[0_6px_24px_rgba(255,119,89,0.32)] flex items-center gap-2.5 group"
                                 >
-                                    <span>
-                                        {authed === null
-                                            ? "Get Started"
-                                            : authed
-                                              ? "Go to Dashboard"
-                                              : "Get It Free"}
-                                    </span>
+                                    <span>{authed ? "Go to Dashboard" : "Dashboard"}</span>
                                     <ArrowRightCircle className="w-5 h-5 text-white transition-transform group-hover:translate-x-1" />
                                 </Link>
                             </motion.div>
+                            <motion.div
+                                whileHover={{ scale: 1.04 }}
+                                whileTap={{ scale: 0.96 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <Link
+                                    href="/docs"
+                                    className="bg-white/85 backdrop-blur-sm text-[#192837] rounded-full py-[15px] px-7 font-body font-semibold text-[clamp(0.9rem,2vw,1rem)] border border-[#192837]/10 flex items-center gap-2.5"
+                                >
+                                    Docs
+                                </Link>
+                            </motion.div>
                         </div>
-
                     </div>
                 </main>
 
@@ -280,56 +275,8 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* FEATURES LIST SECTION */}
-            <section
-                id="features"
-                className="bg-[#F2F2EE] text-[#192837] py-28 border-t border-[#192837]/10 relative z-10"
-            >
-                <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
-                    <div className="text-center max-w-[700px] mx-auto mb-20">
-                        <h2 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-                            What can you do with Elixpo Accounts?
-                        </h2>
-                        <p className="text-base sm:text-lg opacity-80 leading-relaxed font-body">
-                            Our open OAuth 2.0 gateway coordinates identity, billing, and webhooks on the edge.
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                        {FEATURES.map((feature) => {
-                            const Icon = feature.icon;
-                            return (
-                                <div
-                                    key={feature.title}
-                                    className="bg-white border border-[#192837]/10 rounded-2xl p-6 sm:p-8 shadow-[0_4px_24px_rgba(25,40,55,0.015)] transition-all hover:shadow-[0_12px_32px_rgba(255, 119, 89,0.05)] hover:border-[#ff7759]/30 flex flex-col justify-between gsap-card-animate"
-                                >
-                                    <div>
-                                        <div className="flex items-center justify-between mb-6">
-                                            <div className="p-3 bg-[#ff7759]/10 border border-[#ff7759]/25 rounded-xl text-[#ff7759]">
-                                                <Icon className="w-6 h-6" />
-                                            </div>
-                                            {feature.soon && (
-                                                <span className="bg-[#192837]/5 text-[#192837]/75 border border-[#192837]/10 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest">
-                                                    Coming soon
-                                                </span>
-                                            )}
-                                        </div>
-                                        <h3 className="font-heading text-xl font-bold mb-3">
-                                            {feature.title}
-                                        </h3>
-                                        <p className="text-[#192837]/75 leading-relaxed text-sm sm:text-base font-body">
-                                            {feature.body}
-                                        </p>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            </section>
-
             {/* TWO STEPS SECTION */}
-            <section className="bg-white text-[#192837] py-28 border-t border-[#192837]/10 relative z-10">
+            <section className="bg-[#F2F2EE] text-[#192837] py-24 relative z-10">
                 <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
                     <div className="text-center max-w-[720px] mx-auto mb-16">
                         <span className="inline-block text-[11px] font-bold uppercase tracking-[0.18em] text-[#ff7759] mb-4">
@@ -408,6 +355,54 @@ export default function LandingPage() {
                                 </Link>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* FEATURES LIST SECTION */}
+            <section
+                id="features"
+                className="bg-[#F2F2EE] text-[#192837] py-28 border-t border-[#192837]/10 relative z-10"
+            >
+                <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
+                    <div className="text-center max-w-[700px] mx-auto mb-20">
+                        <h2 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+                            What can you do with Elixpo Accounts?
+                        </h2>
+                        <p className="text-base sm:text-lg opacity-80 leading-relaxed font-body">
+                            Our open OAuth 2.0 gateway coordinates identity, billing, and webhooks on the edge.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                        {FEATURES.map((feature) => {
+                            const Icon = feature.icon;
+                            return (
+                                <div
+                                    key={feature.title}
+                                    className="bg-white border border-[#192837]/10 rounded-2xl p-6 sm:p-8 shadow-[0_4px_24px_rgba(25,40,55,0.015)] transition-all hover:shadow-[0_12px_32px_rgba(255, 119, 89,0.05)] hover:border-[#ff7759]/30 flex flex-col justify-between gsap-card-animate"
+                                >
+                                    <div>
+                                        <div className="flex items-center justify-between mb-6">
+                                            <div className="p-3 bg-[#ff7759]/10 border border-[#ff7759]/25 rounded-xl text-[#ff7759]">
+                                                <Icon className="w-6 h-6" />
+                                            </div>
+                                            {feature.soon && (
+                                                <span className="bg-[#192837]/5 text-[#192837]/75 border border-[#192837]/10 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest">
+                                                    Coming soon
+                                                </span>
+                                            )}
+                                        </div>
+                                        <h3 className="font-heading text-xl font-bold mb-3">
+                                            {feature.title}
+                                        </h3>
+                                        <p className="text-[#192837]/75 leading-relaxed text-sm sm:text-base font-body">
+                                            {feature.body}
+                                        </p>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
