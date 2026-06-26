@@ -176,7 +176,7 @@ export default function QuickstartPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 3,
                     lineHeight: 1.6,
                 }}

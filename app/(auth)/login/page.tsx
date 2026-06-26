@@ -220,8 +220,8 @@ const LoginContent = () => {
     }
 
     return (
-        <div className="min-h-[80vh] flex items-center justify-center bg-transparent px-5 py-12 text-[#192837] font-body">
-            <div className="max-w-[900px] w-full bg-white/70 border border-[#192837]/10 backdrop-blur-xl rounded-2xl p-6 sm:p-10 shadow-[0_8px_32px_rgba(25,40,55,0.02)] flex flex-col md:flex-row gap-8 sm:gap-12 gsap-login-animate">
+        <div className="min-h-[80vh] flex items-center justify-center bg-transparent px-5 py-12 text-[var(--fg)] font-body">
+            <div className="max-w-[900px] w-full bg-[var(--surface)]/70 border border-[var(--border)] backdrop-blur-xl rounded-2xl p-6 sm:p-10 shadow-[0_8px_32px_rgba(25,40,55,0.02)] flex flex-col md:flex-row gap-8 sm:gap-12 gsap-login-animate">
                 {/* Email Form Column */}
                 <div className="flex-1 flex flex-col justify-center">
                     <div className="text-center mb-8">
@@ -229,7 +229,7 @@ const LoginContent = () => {
                             <img
                                 src="/LOGO/logo.png"
                                 alt="Elixpo Mascot"
-                                className="w-12 h-12 rounded-xl object-contain bg-white/80 p-0.5 shadow-sm"
+                                className="w-12 h-12 rounded-xl object-contain bg-[var(--surface)]/80 p-0.5 shadow-sm"
                             />
                         </div>
                         <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight mb-1.5">
@@ -255,7 +255,7 @@ const LoginContent = () => {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 placeholder="name@domain.com"
-                                className="w-full px-4 py-3 border border-[#192837]/15 bg-white/80 rounded-xl text-sm font-semibold focus:outline-none focus:border-[#ff7759] focus:ring-1 focus:ring-[#ff7759]"
+                                className="w-full px-4 py-3 border border-[var(--border)] bg-[var(--surface)]/80 rounded-xl text-sm font-semibold focus:outline-none focus:border-[#ff7759] focus:ring-1 focus:ring-[#ff7759]"
                             />
                         </div>
 
@@ -273,14 +273,14 @@ const LoginContent = () => {
                                     }
                                     required
                                     placeholder="••••••••"
-                                    className="w-full px-4 py-3 pr-12 border border-[#192837]/15 bg-white/80 rounded-xl text-sm font-semibold focus:outline-none focus:border-[#ff7759] focus:ring-1 focus:ring-[#ff7759]"
+                                    className="w-full px-4 py-3 pr-12 border border-[var(--border)] bg-[var(--surface)]/80 rounded-xl text-sm font-semibold focus:outline-none focus:border-[#ff7759] focus:ring-1 focus:ring-[#ff7759]"
                                 />
                                 <button
                                     type="button"
                                     onClick={() =>
                                         setShowPassword(!showPassword)
                                     }
-                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#192837]/50 hover:text-[#192837] focus:outline-none"
+                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--fg-faint)] hover:text-[var(--fg)] focus:outline-none"
                                 >
                                     {showPassword ? (
                                         <EyeOff className="w-5 h-5" />
@@ -300,7 +300,7 @@ const LoginContent = () => {
                                     onChange={(e) =>
                                         setRememberMe(e.target.checked)
                                     }
-                                    className="w-4.5 h-4.5 text-[#ff7759] border-[#192837]/20 rounded focus:ring-[#ff7759]"
+                                    className="w-4.5 h-4.5 text-[#ff7759] border-[var(--border)] rounded focus:ring-[#ff7759]"
                                 />
                                 <span className="text-xs font-semibold opacity-70">
                                     Remember me
@@ -358,7 +358,7 @@ const LoginContent = () => {
                     </form>
 
                     {/* Registration Redirect */}
-                    <div className="mt-6 pt-6 border-t border-[#192837]/10 text-center flex flex-col gap-1.5">
+                    <div className="mt-6 pt-6 border-t border-[var(--border)] text-center flex flex-col gap-1.5">
                         <span className="text-xs opacity-75 font-semibold">
                             Don't have an account yet?
                         </span>
@@ -376,7 +376,7 @@ const LoginContent = () => {
                 </div>
 
                 {/* SSO Button Column */}
-                <div className="flex-1 flex flex-col justify-center pl-0 md:pl-8 border-t md:border-t-0 md:border-l border-[#192837]/10 pt-6 md:pt-0">
+                <div className="flex-1 flex flex-col justify-center pl-0 md:pl-8 border-t md:border-t-0 md:border-l border-[var(--border)] pt-6 md:pt-0">
                     <p className="text-center text-xs font-bold uppercase tracking-wider opacity-50 mb-6">
                         Or continue with
                     </p>
@@ -384,7 +384,7 @@ const LoginContent = () => {
                     <div className="flex flex-col gap-3">
                         <button
                             onClick={() => handleSSOLogin("google")}
-                            className="w-full flex items-center justify-center gap-3 border border-[#192837]/15 bg-white hover:bg-[#192837]/5 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98] select-none text-[#192837]"
+                            className="w-full flex items-center justify-center gap-3 border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--overlay)] py-3 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98] select-none text-[var(--fg)]"
                         >
                             <GoogleIcon />
                             <span>Sign in with Google</span>
@@ -392,7 +392,7 @@ const LoginContent = () => {
 
                         <button
                             onClick={() => handleSSOLogin("github")}
-                            className="w-full flex items-center justify-center gap-3 border border-[#192837]/15 bg-white hover:bg-[#192837]/5 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98] select-none text-[#192837]"
+                            className="w-full flex items-center justify-center gap-3 border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--overlay)] py-3 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98] select-none text-[var(--fg)]"
                         >
                             <GithubIcon />
                             <span>Sign in with GitHub</span>
@@ -400,7 +400,7 @@ const LoginContent = () => {
 
                         <button
                             onClick={() => handleSSOLogin("discord")}
-                            className="w-full flex items-center justify-center gap-3 border border-[#192837]/15 bg-white hover:bg-[#192837]/5 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98] select-none text-[#192837]"
+                            className="w-full flex items-center justify-center gap-3 border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--overlay)] py-3 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98] select-none text-[var(--fg)]"
                         >
                             <DiscordIcon />
                             <span>Sign in with Discord</span>
@@ -408,7 +408,7 @@ const LoginContent = () => {
 
                         <button
                             onClick={() => handleSSOLogin("microsoft")}
-                            className="w-full flex items-center justify-center gap-3 border border-[#192837]/15 bg-white hover:bg-[#192837]/5 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98] select-none text-[#192837]"
+                            className="w-full flex items-center justify-center gap-3 border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--overlay)] py-3 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98] select-none text-[var(--fg)]"
                         >
                             <MicrosoftIcon />
                             <span>Sign in with Microsoft</span>

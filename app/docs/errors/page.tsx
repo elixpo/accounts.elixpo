@@ -34,7 +34,7 @@ export default function ErrorsPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 4,
                     fontSize: "1rem",
                     lineHeight: 1.7,
@@ -49,7 +49,7 @@ export default function ErrorsPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -59,7 +59,7 @@ export default function ErrorsPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 2,
                     lineHeight: 1.6,
                 }}
@@ -76,7 +76,7 @@ export default function ErrorsPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -86,41 +86,41 @@ export default function ErrorsPage() {
             </Typography>
             <TableContainer
                 sx={{
-                    border: "1px solid rgba(25, 40, 55, 0.10)",
+                    border: "1px solid var(--border)",
                     borderRadius: "8px",
                     mb: 4,
-                    background: "#ffffff",
+                    background: "var(--surface)",
                 }}
             >
                 <Table size="small">
-                    <TableHead sx={{ bgcolor: "rgba(25, 40, 55, 0.04)" }}>
+                    <TableHead sx={{ bgcolor: "var(--overlay)" }}>
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.6)",
+                                    color: "var(--fg-faint)",
                                     fontWeight: 600,
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 Error Code
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.6)",
+                                    color: "var(--fg-faint)",
                                     fontWeight: 600,
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 HTTP Status
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.6)",
+                                    color: "var(--fg-faint)",
                                     fontWeight: 600,
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 Meaning
@@ -131,9 +131,9 @@ export default function ErrorsPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 <code>invalid_request</code>
@@ -142,16 +142,16 @@ export default function ErrorsPage() {
                                 sx={{
                                     color: "#ff7759",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 400 Bad Request
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 The request is missing a required parameter,
@@ -162,9 +162,9 @@ export default function ErrorsPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 <code>invalid_client</code>
@@ -173,16 +173,16 @@ export default function ErrorsPage() {
                                 sx={{
                                     color: "#ff7759",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 401 Unauthorized
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 Client authentication failed (e.g. unknown
@@ -193,9 +193,9 @@ export default function ErrorsPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 <code>invalid_grant</code>
@@ -204,16 +204,16 @@ export default function ErrorsPage() {
                                 sx={{
                                     color: "#ff7759",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 400 Bad Request
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 The provided authorization code or refresh token
@@ -224,9 +224,9 @@ export default function ErrorsPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 <code>access_denied</code>
@@ -235,16 +235,16 @@ export default function ErrorsPage() {
                                 sx={{
                                     color: "#ff7759",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 403 Forbidden
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 The resource owner or authorization server
@@ -255,9 +255,9 @@ export default function ErrorsPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 <code>unsupported_response_type</code>
@@ -266,16 +266,16 @@ export default function ErrorsPage() {
                                 sx={{
                                     color: "#ff7759",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 400 Bad Request
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 The authorization server does not support
@@ -286,9 +286,9 @@ export default function ErrorsPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 <code>server_error</code>
@@ -297,16 +297,16 @@ export default function ErrorsPage() {
                                 sx={{
                                     color: "#ff7759",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 500 Internal Error
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
-                                        "1px solid rgba(25, 40, 55, 0.10)",
+                                        "1px solid var(--border)",
                                 }}
                             >
                                 The authorization server encountered an

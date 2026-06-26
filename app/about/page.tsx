@@ -111,12 +111,12 @@ export default function AboutPage() {
                         </span>
                     </div>
 
-                    <h1 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-[#192837] leading-[1.1] gsap-about-hero">
+                    <h1 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-[var(--fg)] leading-[1.1] gsap-about-hero">
                         A modern identity layer{" "}
                         <span className="text-[#ff7759]">for any app.</span>
                     </h1>
 
-                    <p className="font-body text-base sm:text-lg text-[#192837] opacity-80 leading-relaxed max-w-[620px] gsap-about-hero">
+                    <p className="font-body text-base sm:text-lg text-[var(--fg)] opacity-80 leading-relaxed max-w-[620px] gsap-about-hero">
                         Elixpo Accounts is an open OAuth 2.0 identity provider
                         built on the edge. Authenticate users across your
                         services with a single, secure account — yours or
@@ -134,9 +134,9 @@ export default function AboutPage() {
                             href={REPO_URL}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-2 bg-[#F2F2EE] border border-[#192837]/15 text-[#192837] px-8 py-3 rounded-full font-semibold hover:scale-[1.04] active:scale-[0.96] transition-all duration-200 min-w-[160px]"
+                            className="flex items-center justify-center gap-2 bg-[var(--bg)] border border-[var(--border)] text-[var(--fg)] px-8 py-3 rounded-full font-semibold hover:scale-[1.04] active:scale-[0.96] transition-all duration-200 min-w-[160px]"
                         >
-                            <Github className="w-5 h-5 text-[#192837]" />
+                            <Github className="w-5 h-5 text-[var(--fg)]" />
                             <span>View source</span>
                         </a>
                     </div>
@@ -147,15 +147,15 @@ export default function AboutPage() {
                     {FEATURES.map(({ icon: Icon, title, desc }) => (
                         <div
                             key={title}
-                            className="bg-white border border-[#192837]/10 rounded-2xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(25,40,55,0.015)] transition-all hover:shadow-[0_12px_32px_rgba(255, 119, 89,0.05)] hover:border-[#ff7759]/30 flex flex-col items-start gsap-about-card"
+                            className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(25,40,55,0.015)] transition-all hover:shadow-[0_12px_32px_rgba(255, 119, 89,0.05)] hover:border-[#ff7759]/30 flex flex-col items-start gsap-about-card"
                         >
                             <div className="p-3 bg-[#ff7759]/10 border border-[#ff7759]/25 rounded-xl text-[#ff7759] mb-6">
                                 <Icon className="w-5 h-5" />
                             </div>
-                            <h3 className="font-heading text-lg font-bold text-[#192837] mb-2">
+                            <h3 className="font-heading text-lg font-bold text-[var(--fg)] mb-2">
                                 {title}
                             </h3>
-                            <p className="font-body text-sm text-[#192837]/80 leading-relaxed">
+                            <p className="font-body text-sm text-[var(--fg-muted)] leading-relaxed">
                                 {desc}
                             </p>
                         </div>
@@ -163,12 +163,12 @@ export default function AboutPage() {
                 </div>
 
                 {/* Bottom Callout */}
-                <div className="bg-white border border-[#192837]/10 rounded-2xl p-6 sm:p-10 shadow-[0_4px_24px_rgba(25,40,55,0.015)] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 gsap-about-card">
+                <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-6 sm:p-10 shadow-[0_4px_24px_rgba(25,40,55,0.015)] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 gsap-about-card">
                     <div>
-                        <h2 className="font-heading text-xl sm:text-2xl font-bold tracking-tight text-[#192837] mb-2">
+                        <h2 className="font-heading text-xl sm:text-2xl font-bold tracking-tight text-[var(--fg)] mb-2">
                             Fully open source
                         </h2>
-                        <p className="font-body text-sm sm:text-base text-[#192837]/80 leading-relaxed max-w-[560px]">
+                        <p className="font-body text-sm sm:text-base text-[var(--fg-muted)] leading-relaxed max-w-[560px]">
                             Elixpo Accounts is open source and free to
                             self-host. Inspect the code, contribute to
                             development, or deploy your own custom instance.
@@ -178,9 +178,9 @@ export default function AboutPage() {
                         href={REPO_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 bg-[#192837]/5 hover:bg-[#192837]/10 border border-[#192837]/10 text-[#192837] px-6 py-3 rounded-xl font-semibold text-sm transition-all flex-shrink-0 active:scale-[0.98]"
+                        className="flex items-center gap-2 bg-[var(--overlay)] hover:bg-[#192837]/10 border border-[var(--border)] text-[var(--fg)] px-6 py-3 rounded-xl font-semibold text-sm transition-all flex-shrink-0 active:scale-[0.98]"
                     >
-                        <Github className="w-4 h-4 text-[#192837]" />
+                        <Github className="w-4 h-4 text-[var(--fg)]" />
                         <span>View on GitHub</span>
                     </a>
                 </div>

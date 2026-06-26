@@ -161,7 +161,7 @@ export default function PricingPage() {
     };
 
     return (
-        <div className="relative w-full min-h-screen font-body text-[#192837] bg-[#F2F2EE] selection:bg-[#ff7759] selection:text-white overflow-x-hidden">
+        <div className="relative w-full min-h-screen font-body text-[var(--fg)] bg-[var(--bg)] selection:bg-[#ff7759] selection:text-white overflow-x-hidden">
             <style>{`
                 .font-heading { font-family: var(--font-heading), sans-serif; }
                 .font-body { font-family: var(--font-body), sans-serif; }
@@ -176,7 +176,7 @@ export default function PricingPage() {
                         Pricing built for indie devs{" "}
                         <span className="text-[#ff7759]">and studios.</span>
                     </h1>
-                    <p className="font-body text-base sm:text-lg text-[#192837] opacity-80 leading-relaxed gsap-pricing-hero">
+                    <p className="font-body text-base sm:text-lg text-[var(--fg)] opacity-80 leading-relaxed gsap-pricing-hero">
                         Start free. Scale only when your apps actually have
                         users. No per-seat tax — pricing tracks monthly active
                         users so we win when you do.
@@ -206,10 +206,10 @@ export default function PricingPage() {
                         return (
                             <div
                                 key={tier.id}
-                                className={`bg-white border rounded-2xl p-6 sm:p-8 flex flex-col justify-between min-h-[480px] relative transition-all gsap-pricing-card ${
+                                className={`bg-[var(--surface)] border rounded-2xl p-6 sm:p-8 flex flex-col justify-between min-h-[480px] relative transition-all gsap-pricing-card ${
                                     tier.highlight
                                         ? "border-2 border-[#ff7759] shadow-[0_14px_60px_-20px_rgba(255, 119, 89,0.22)]"
-                                        : "border-[#192837]/10 shadow-[0_4px_24px_rgba(25,40,55,0.015)] hover:shadow-[0_12px_32px_rgba(255, 119, 89,0.04)]"
+                                        : "border-[var(--border)] shadow-[0_4px_24px_rgba(25,40,55,0.015)] hover:shadow-[0_12px_32px_rgba(255, 119, 89,0.04)]"
                                 }`}
                             >
                                 {tier.highlight && (
@@ -231,11 +231,11 @@ export default function PricingPage() {
                                             {tier.priceLabel}
                                         </span>
                                     </div>
-                                    <p className="font-body text-xs text-[#192837]/60 mb-6 font-medium">
+                                    <p className="font-body text-xs text-[var(--fg-faint)] mb-6 font-medium">
                                         {tier.priceCaption}
                                     </p>
 
-                                    <p className="font-body text-sm text-[#192837]/80 leading-relaxed mb-8 min-h-[44px]">
+                                    <p className="font-body text-sm text-[var(--fg-muted)] leading-relaxed mb-8 min-h-[44px]">
                                         {tier.description}
                                     </p>
 
@@ -258,7 +258,7 @@ export default function PricingPage() {
                                                         }}
                                                     />
                                                 </div>
-                                                <span className="font-body text-[#192837]/90 leading-normal font-medium">
+                                                <span className="font-body text-[var(--fg)] leading-normal font-medium">
                                                     {feature}
                                                 </span>
                                             </li>
