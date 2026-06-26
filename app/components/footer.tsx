@@ -101,12 +101,12 @@ function GithubStarsButton({ repo }: { repo: string }) {
             href={`https://github.com/${repo}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 rounded-xl border border-[#192837]/12 bg-white px-3.5 py-2 text-sm font-semibold text-[#192837] transition-all hover:border-[#192837]/30 hover:shadow-sm active:scale-[0.98]"
+            className="group inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3.5 py-2 text-sm font-semibold text-[var(--fg)] transition-all hover:border-[#192837]/30 hover:shadow-sm active:scale-[0.98]"
             aria-label={`Star ${repo} on GitHub`}
         >
             <Github className="h-[18px] w-[18px]" />
             <span>Star</span>
-            <span className="flex items-center gap-1 rounded-md bg-[#192837]/[0.05] px-1.5 py-0.5 text-xs font-bold tabular-nums">
+            <span className="flex items-center gap-1 rounded-md bg-[var(--overlay)] px-1.5 py-0.5 text-xs font-bold tabular-nums">
                 <Star className="h-3 w-3 fill-[#fbbf24] text-[#fbbf24]" />
                 {stars === null ? "—" : formatStars(stars)}
             </span>

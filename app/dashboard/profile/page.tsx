@@ -1437,7 +1437,7 @@ const ProfilePage = () => {
                             <DevicesOtherIcon
                                 sx={{
                                     fontSize: "2rem",
-                                    color: "var(--border)",
+                                    color: "var(--fg-faint)",
                                     mb: 1,
                                 }}
                             />

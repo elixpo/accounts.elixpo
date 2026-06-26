@@ -55,7 +55,7 @@ export default function OAuthPage() {
                 sx={{
                     fontSize: "2rem",
                     fontWeight: 800,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mb: 2,
                     letterSpacing: "-0.02em",
                 }}
@@ -81,7 +81,7 @@ export default function OAuthPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -161,7 +161,7 @@ export default function OAuthPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -190,7 +190,7 @@ export default function OAuthPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -219,7 +219,7 @@ export default function OAuthPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -249,7 +249,7 @@ export default function OAuthPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -279,7 +279,7 @@ export default function OAuthPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -315,7 +315,7 @@ export default function OAuthPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -375,7 +375,7 @@ export default function OAuthPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -411,7 +411,7 @@ export default function OAuthPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",

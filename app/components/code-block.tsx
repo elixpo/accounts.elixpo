@@ -29,8 +29,8 @@ export default function CodeBlock({ code, language }: CodeBlockProps) {
         <Box
             sx={{
                 position: "relative",
-                background: "#F4F3EF",
-                border: "1px solid rgba(25, 40, 55, 0.10)",
+                background: "var(--surface-2)",
+                border: "1px solid var(--border)",
                 borderRadius: "8px",
                 p: 2,
                 mb: 2,
@@ -48,13 +48,13 @@ export default function CodeBlock({ code, language }: CodeBlockProps) {
                         position: "absolute",
                         top: 8,
                         right: 8,
-                        color: copied ? "#ff7759" : "rgba(25, 40, 55, 0.5)",
-                        bgcolor: "rgba(25, 40, 55, 0.04)",
+                        color: copied ? "#ff7759" : "var(--fg-faint)",
+                        bgcolor: "var(--overlay)",
                         opacity: { xs: 1, md: 0 },
                         transition: "all 0.2s ease",
                         "&:hover": {
-                            bgcolor: "rgba(25, 40, 55, 0.08)",
-                            color: "#192837",
+                            bgcolor: "var(--overlay)",
+                            color: "var(--fg)",
                         },
                     }}
                 >
@@ -71,7 +71,7 @@ export default function CodeBlock({ code, language }: CodeBlockProps) {
                     margin: 0,
                     fontFamily: "var(--font-geist-mono), monospace",
                     fontSize: "0.82rem",
-                    color: "#192837",
+                    color: "var(--fg)",
                     overflowX: "auto",
                     whiteSpace: "pre",
                     pr: 4,
@@ -79,7 +79,7 @@ export default function CodeBlock({ code, language }: CodeBlockProps) {
                         height: "6px",
                     },
                     "&::-webkit-scrollbar-thumb": {
-                        bgcolor: "rgba(25, 40, 55, 0.10)",
+                        bgcolor: "var(--border)",
                         borderRadius: "3px",
                     },
                 }}

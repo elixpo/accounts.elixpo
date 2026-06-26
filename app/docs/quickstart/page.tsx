@@ -50,7 +50,7 @@ export default function QuickstartPage() {
                 sx={{
                     fontSize: "2rem",
                     fontWeight: 800,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mb: 2,
                     letterSpacing: "-0.02em",
                 }}
@@ -59,7 +59,7 @@ export default function QuickstartPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 4,
                     fontSize: "1rem",
                     lineHeight: 1.7,
@@ -88,7 +88,7 @@ export default function QuickstartPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -138,7 +138,7 @@ export default function QuickstartPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",

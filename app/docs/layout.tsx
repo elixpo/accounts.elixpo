@@ -548,8 +548,8 @@ export default function DocsLayout({
 
                 {/* Desktop Right On-This-Page Navigation Sidebar */}
                 {headings.length > 0 && (
-                    <aside className="w-[220px] flex-shrink-0 hidden lg:block border-l border-[#192837]/10 sticky top-16 h-[calc(100vh-64px)] overflow-y-auto pt-8 pl-6">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#192837]/50 block mb-4">
+                    <aside className="w-[220px] flex-shrink-0 hidden lg:block border-l border-[var(--border)] sticky top-16 h-[calc(100vh-64px)] overflow-y-auto pt-8 pl-6">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--fg-faint)] block mb-4">
                             On this page
                         </span>
                         <ul className="flex flex-col gap-2 text-xs font-semibold leading-relaxed">
@@ -563,10 +563,10 @@ export default function DocsLayout({
                                 >
                                     <a
                                         href={`#${h.id}`}
-                                        className={`transition-colors hover:text-[#192837] ${
+                                        className={`transition-colors hover:text-[var(--fg)] ${
                                             activeHeadingId === h.id
                                                 ? "text-[#ff7759] font-bold"
-                                                : "text-[#192837]/50"
+                                                : "text-[var(--fg-faint)]"
                                         }`}
                                     >
                                         {h.text}

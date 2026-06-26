@@ -405,7 +405,7 @@ export default function LandingPage() {
                                 </Link>
                                 <Link
                                     href="/docs/quickstart"
-                                    className="inline-flex items-center text-sm font-semibold text-[#192837] opacity-80 hover:opacity-100 transition-opacity"
+                                    className="inline-flex items-center text-sm font-semibold text-[var(--fg)] opacity-80 hover:opacity-100 transition-opacity"
                                 >
                                     Read the quickstart
                                 </Link>
@@ -418,7 +418,7 @@ export default function LandingPage() {
             {/* FEATURES LIST SECTION */}
             <section
                 id="features"
-                className="bg-[#F2F2EE] text-[#192837] py-28 border-t border-[#192837]/10 relative z-10"
+                className="bg-[var(--bg)] text-[var(--fg)] py-28 border-t border-[var(--border)] relative z-10"
             >
                 <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
                     <div className="text-center max-w-[700px] mx-auto mb-20">
@@ -437,7 +437,7 @@ export default function LandingPage() {
                             return (
                                 <div
                                     key={feature.title}
-                                    className="bg-white border border-[#192837]/10 rounded-2xl p-6 sm:p-8 shadow-[0_4px_24px_rgba(25,40,55,0.015)] transition-all hover:shadow-[0_12px_32px_rgba(255, 119, 89,0.05)] hover:border-[#ff7759]/30 flex flex-col justify-between gsap-card-animate"
+                                    className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-6 sm:p-8 shadow-[0_4px_24px_rgba(25,40,55,0.015)] transition-all hover:shadow-[0_12px_32px_rgba(255, 119, 89,0.05)] hover:border-[#ff7759]/30 flex flex-col justify-between gsap-card-animate"
                                 >
                                     <div>
                                         <div className="flex items-center justify-between mb-6">
@@ -445,7 +445,7 @@ export default function LandingPage() {
                                                 <Icon className="w-6 h-6" />
                                             </div>
                                             {feature.soon && (
-                                                <span className="bg-[#192837]/5 text-[#192837]/75 border border-[#192837]/10 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest">
+                                                <span className="bg-[var(--overlay)] text-[var(--fg-muted)] border border-[var(--border)] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest">
                                                     Coming soon
                                                 </span>
                                             )}
@@ -453,7 +453,7 @@ export default function LandingPage() {
                                         <h3 className="font-heading text-xl font-bold mb-3">
                                             {feature.title}
                                         </h3>
-                                        <p className="text-[#192837]/75 leading-relaxed text-sm sm:text-base font-body">
+                                        <p className="text-[var(--fg-muted)] leading-relaxed text-sm sm:text-base font-body">
                                             {feature.body}
                                         </p>
                                     </div>
@@ -465,7 +465,7 @@ export default function LandingPage() {
             </section>
 
             {/* READY WHEN YOU ARE SECTION */}
-            <section className="bg-[#F2F2EE] text-[#192837] py-24 border-t border-[#192837]/10 relative z-10">
+            <section className="bg-[var(--bg)] text-[var(--fg)] py-24 border-t border-[var(--border)] relative z-10">
                 <div className="max-w-[800px] mx-auto px-5 text-center">
                     <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4 tracking-tight">
                         Ready when you are.
@@ -493,7 +493,7 @@ export default function LandingPage() {
             </section>
 
             {/* FOOTER */}
-            <footer className="bg-[#F2F2EE] text-[#192837] border-t border-[#192837]/10 py-16 relative z-10">
+            <footer className="bg-[var(--bg)] text-[var(--fg)] border-t border-[var(--border)] py-16 relative z-10">
                 <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
                     <div className="flex flex-col md:flex-row justify-between gap-12 mb-12">
                         <div className="max-w-sm">
@@ -543,7 +543,7 @@ export default function LandingPage() {
                                 <div className="flex flex-col gap-4 items-start font-body">
                                     <button
                                         onClick={handleCopyEmail}
-                                        className="flex items-center gap-2 border border-[#192837]/10 bg-white hover:bg-[#192837]/5 px-4 py-2 rounded-xl text-sm font-semibold transition-all relative overflow-hidden active:scale-[0.98]"
+                                        className="flex items-center gap-2 border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--overlay)] px-4 py-2 rounded-xl text-sm font-semibold transition-all relative overflow-hidden active:scale-[0.98]"
                                     >
                                         {copied ? (
                                             <>
@@ -554,9 +554,9 @@ export default function LandingPage() {
                                             </>
                                         ) : (
                                             <>
-                                                <Mail className="w-4 h-4 text-[#192837]" />
+                                                <Mail className="w-4 h-4 text-[var(--fg)]" />
                                                 <span>hello@elixpo.com</span>
-                                                <Copy className="w-3.5 h-3.5 text-[#192837]/60 ml-2" />
+                                                <Copy className="w-3.5 h-3.5 text-[var(--fg-faint)] ml-2" />
                                             </>
                                         )}
                                     </button>
@@ -565,7 +565,7 @@ export default function LandingPage() {
                         </div>
                     </div>
 
-                    <div className="border-t border-[#192837]/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm opacity-60 font-body font-medium">
+                    <div className="border-t border-[var(--border)] pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm opacity-60 font-body font-medium">
                         <div>
                             © {new Date().getFullYear()} Elixpo · Built on
                             Cloudflare's edge
