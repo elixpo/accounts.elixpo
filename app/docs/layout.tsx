@@ -247,7 +247,7 @@ export default function DocsLayout({
                     placeholder="Search docs..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-[#192837]/15 bg-white rounded-xl text-sm font-medium focus:outline-none focus:border-[#7342E2] focus:ring-1 focus:ring-[#7342E2]"
+                    className="w-full pl-10 pr-4 py-2 border border-[#192837]/15 bg-white rounded-xl text-sm font-medium focus:outline-none focus:border-[#ff7759] focus:ring-1 focus:ring-[#ff7759]"
                 />
             </div>
 
@@ -262,7 +262,7 @@ export default function DocsLayout({
                             onClick={() => setMobileOpen(false)}
                             className={`flex items-center px-4 py-2 rounded-xl text-sm font-semibold tracking-wide transition-all ${
                                 active
-                                    ? "bg-[#7342E2]/10 text-[#7342E2]"
+                                    ? "bg-[#ff7759]/10 text-[#ff7759]"
                                     : "text-[#192837]/70 hover:bg-[#192837]/5 hover:text-[#192837]"
                             }`}
                         >
@@ -278,7 +278,7 @@ export default function DocsLayout({
     );
 
     return (
-        <div className="relative w-full min-h-screen font-body text-[#192837] bg-[#F2F2EE] selection:bg-[#7342E2] selection:text-white flex flex-col overflow-x-hidden">
+        <div className="relative w-full min-h-screen font-body text-[#192837] bg-[#F2F2EE] selection:bg-[#ff7759] selection:text-white flex flex-col overflow-x-hidden">
             <style>{`
                 .font-heading { font-family: var(--font-heading), sans-serif; }
                 .font-body { font-family: var(--font-body), sans-serif; }
@@ -369,7 +369,7 @@ export default function DocsLayout({
                                 className="w-7.5 h-7.5 rounded-lg object-contain bg-white/80 p-0.5"
                             />
                             <span className="font-heading text-lg font-bold tracking-tight">
-                                Elixpo <span className="text-[#7342E2]">Docs</span>
+                                Elixpo <span className="text-[#ff7759]">Docs</span>
                             </span>
                         </Link>
                     </div>
@@ -487,7 +487,7 @@ export default function DocsLayout({
                             {prevPage ? (
                                 <Link
                                     href={prevPage.href}
-                                    className="flex items-center gap-2 border border-[#7342E2]/25 hover:border-[#7342E2] bg-white hover:bg-[#7342E2]/5 text-[#7342E2] px-5 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98]"
+                                    className="flex items-center gap-2 border border-[#ff7759]/25 hover:border-[#ff7759] bg-white hover:bg-[#ff7759]/5 text-[#ff7759] px-5 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98]"
                                 >
                                     <ArrowLeft className="w-4 h-4" />
                                     <span>{prevPage.label}</span>
@@ -499,7 +499,7 @@ export default function DocsLayout({
                             {nextPage ? (
                                 <Link
                                     href={nextPage.href}
-                                    className="flex items-center gap-2 border border-[#7342E2]/25 hover:border-[#7342E2] bg-white hover:bg-[#7342E2]/5 text-[#7342E2] px-5 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98]"
+                                    className="flex items-center gap-2 border border-[#ff7759]/25 hover:border-[#ff7759] bg-white hover:bg-[#ff7759]/5 text-[#ff7759] px-5 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98]"
                                 >
                                     <span>{nextPage.label}</span>
                                     <ArrowRight className="w-4 h-4" />
@@ -527,7 +527,7 @@ export default function DocsLayout({
                                         href={`#${h.id}`}
                                         className={`transition-colors hover:text-[#192837] ${
                                             activeHeadingId === h.id
-                                                ? "text-[#7342E2] font-bold"
+                                                ? "text-[#ff7759] font-bold"
                                                 : "text-[#192837]/50"
                                         }`}
                                     >

@@ -341,8 +341,8 @@ function AuthorizeContent() {
                         style={{
                             width: 36,
                             height: 36,
-                            border: "3px solid rgba(115, 66, 226,0.2)",
-                            borderTopColor: "#7342E2",
+                            border: "3px solid rgba(255, 119, 89,0.2)",
+                            borderTopColor: "#ff7759",
                             borderRadius: "50%",
                             animation: "spin 0.8s linear infinite",
                             margin: "0 auto 16px",
@@ -396,7 +396,7 @@ function AuthorizeContent() {
                                 borderRadius: 12,
                                 overflow: "hidden",
                                 flexShrink: 0,
-                                border: "2px solid rgba(115, 66, 226,0.25)",
+                                border: "2px solid rgba(255, 119, 89,0.25)",
                             }}
                         >
                             <img
@@ -422,7 +422,7 @@ function AuthorizeContent() {
                                     width: 6,
                                     height: 6,
                                     borderRadius: "50%",
-                                    background: "#7342E2",
+                                    background: "#ff7759",
                                     opacity: 0.6,
                                 }}
                             />
@@ -431,7 +431,7 @@ function AuthorizeContent() {
                                     width: 24,
                                     height: 2,
                                     background:
-                                        "linear-gradient(90deg, rgba(115, 66, 226,0.5), rgba(115, 66, 226,0.15))",
+                                        "linear-gradient(90deg, rgba(255, 119, 89,0.5), rgba(255, 119, 89,0.15))",
                                 }}
                             />
                             <div
@@ -439,7 +439,7 @@ function AuthorizeContent() {
                                     width: 6,
                                     height: 6,
                                     borderRadius: "50%",
-                                    background: "#7342E2",
+                                    background: "#ff7759",
                                     opacity: 0.6,
                                 }}
                             />
@@ -513,7 +513,7 @@ function AuthorizeContent() {
                             </span>
                             <span
                                 style={{
-                                    color: "#7342E2",
+                                    color: "#ff7759",
                                     fontSize: 12.5,
                                     fontWeight: 600,
                                 }}
@@ -538,8 +538,8 @@ function AuthorizeContent() {
                         <div
                             style={{
                                 gridColumn: "1 / -1",
-                                background: "rgba(115, 66, 226,0.04)",
-                                border: "1px solid rgba(115, 66, 226,0.1)",
+                                background: "rgba(255, 119, 89,0.04)",
+                                border: "1px solid rgba(255, 119, 89,0.1)",
                                 borderRadius: 12,
                                 padding: 16,
                             }}
@@ -581,7 +581,7 @@ function AuthorizeContent() {
                                                 width="14"
                                                 height="14"
                                                 viewBox="0 0 20 20"
-                                                fill="#7342E2"
+                                                fill="#ff7759"
                                                 style={{ flexShrink: 0 }}
                                             >
                                                 <path
@@ -670,7 +670,7 @@ function AuthorizeContent() {
                                     color:
                                         timeRemaining < 60
                                             ? "#b91c1c"
-                                            : "#7342E2",
+                                            : "#ff7759",
                                     margin: 0,
                                 }}
                             >
@@ -715,8 +715,8 @@ function AuthorizeContent() {
                                 flex: 1,
                                 padding: "12px 16px",
                                 borderRadius: 10,
-                                border: "1px solid #7342E2",
-                                background: "#7342E2",
+                                border: "1px solid #ff7759",
+                                background: "#ff7759",
                                 color: "#fff",
                                 fontSize: 14,
                                 fontWeight: 700,
@@ -782,7 +782,7 @@ function AuthorizeContent() {
                     <button
                         onClick={() => router.push("/login")}
                         style={{
-                            color: "#7342E2",
+                            color: "#ff7759",
                             background: "none",
                             border: "none",
                             cursor: "pointer",

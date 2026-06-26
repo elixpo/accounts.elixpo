@@ -74,14 +74,14 @@ const textFieldSx = {
         background: "transparent",
         "& fieldset": { borderColor: "rgba(25,40,55,0.10)" },
         "&:hover fieldset": { borderColor: "rgba(25,40,55,0.10)" },
-        "&.Mui-focused fieldset": { borderColor: "#7342E2" },
+        "&.Mui-focused fieldset": { borderColor: "#ff7759" },
     },
     "& .MuiInputLabel-root": { color: "rgba(25,40,55,0.7)" },
-    "& .MuiInputLabel-root.Mui-focused": { color: "#7342E2" },
+    "& .MuiInputLabel-root.Mui-focused": { color: "#ff7759" },
 };
 
 const switchSx = {
-    "& .MuiSwitch-switchBase.Mui-checked": { color: "#7342E2" },
+    "& .MuiSwitch-switchBase.Mui-checked": { color: "#ff7759" },
     "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
         bgcolor: "#15803d",
     },
@@ -602,7 +602,7 @@ const ProfilePage = () => {
                 <Box sx={cardSx}>
                     <Typography variant="h6" sx={sectionTitleSx}>
                         <PersonIcon
-                            sx={{ color: "#7342E2", fontSize: "1.2rem" }}
+                            sx={{ color: "#ff7759", fontSize: "1.2rem" }}
                         />
                         Profile Info
                     </Typography>
@@ -621,7 +621,7 @@ const ProfilePage = () => {
                         >
                             <CircularProgress
                                 size={18}
-                                sx={{ color: "#7342E2" }}
+                                sx={{ color: "#ff7759" }}
                             />
                             <Typography
                                 sx={{
@@ -668,7 +668,7 @@ const ProfilePage = () => {
                                             width: 48,
                                             height: 48,
                                             borderRadius: "50%",
-                                            border: "2px solid rgba(115,66,226,0.3)",
+                                            border: "2px solid rgba(255, 119, 89,0.3)",
                                         }}
                                     />
                                 ) : (
@@ -678,7 +678,7 @@ const ProfilePage = () => {
                                             height: 48,
                                             borderRadius: "50%",
                                             background:
-                                                "linear-gradient(135deg, #7342E2 0%, #65a30d 100%)",
+                                                "linear-gradient(135deg, #ff7759 0%, #65a30d 100%)",
                                             display: "flex",
                                             alignItems: "center",
                                             justifyContent: "center",
@@ -717,7 +717,7 @@ const ProfilePage = () => {
                                                         sx={{
                                                             fontSize:
                                                                 "0.95rem !important",
-                                                            color: "#7342E2 !important",
+                                                            color: "#ff7759 !important",
                                                         }}
                                                     />
                                                 }
@@ -725,9 +725,9 @@ const ProfilePage = () => {
                                                 size="small"
                                                 sx={{
                                                     backgroundColor:
-                                                        "rgba(115,66,226,0.1)",
-                                                    color: "#7342E2",
-                                                    border: "1px solid rgba(115,66,226,0.25)",
+                                                        "rgba(255, 119, 89,0.1)",
+                                                    color: "#ff7759",
+                                                    border: "1px solid rgba(255, 119, 89,0.25)",
                                                     fontWeight: 500,
                                                     height: 24,
                                                 }}
@@ -807,12 +807,12 @@ const ProfilePage = () => {
                                             />
                                         }
                                         sx={{
-                                            color: "#7342E2",
+                                            color: "#ff7759",
                                             textTransform: "none",
                                             fontSize: "0.8rem",
                                             "&:hover": {
                                                 backgroundColor:
-                                                    "rgba(115,66,226,0.08)",
+                                                    "rgba(255, 119, 89,0.08)",
                                             },
                                         }}
                                     >
@@ -841,17 +841,17 @@ const ProfilePage = () => {
                                             mb: 1.5,
                                             bgcolor:
                                                 nameMsg.type === "success"
-                                                    ? "rgba(115,66,226,0.1)"
+                                                    ? "rgba(255, 119, 89,0.1)"
                                                     : "rgba(239,68,68,0.1)",
                                             color:
                                                 nameMsg.type === "success"
-                                                    ? "#7342E2"
+                                                    ? "#ff7759"
                                                     : "#ef4444",
-                                            border: `1px solid ${nameMsg.type === "success" ? "rgba(115,66,226,0.3)" : "rgba(239,68,68,0.3)"}`,
+                                            border: `1px solid ${nameMsg.type === "success" ? "rgba(255, 119, 89,0.3)" : "rgba(239,68,68,0.3)"}`,
                                             "& .MuiAlert-icon": {
                                                 color:
                                                     nameMsg.type === "success"
-                                                        ? "#7342E2"
+                                                        ? "#ff7759"
                                                         : "#ef4444",
                                             },
                                             py: 0,
@@ -906,12 +906,12 @@ const ProfilePage = () => {
                                                 />
                                             }
                                             sx={{
-                                                color: "#7342E2",
+                                                color: "#ff7759",
                                                 textTransform: "none",
                                                 fontSize: "0.8rem",
                                                 "&:hover": {
                                                     backgroundColor:
-                                                        "rgba(115,66,226,0.08)",
+                                                        "rgba(255, 119, 89,0.08)",
                                                 },
                                             }}
                                         >
@@ -950,16 +950,16 @@ const ProfilePage = () => {
                                                 }
                                                 sx={{
                                                     background:
-                                                        "rgba(115,66,226,0.15)",
-                                                    color: "#7342E2",
-                                                    border: "1px solid rgba(115,66,226,0.3)",
+                                                        "rgba(255, 119, 89,0.15)",
+                                                    color: "#ff7759",
+                                                    border: "1px solid rgba(255, 119, 89,0.3)",
                                                     fontWeight: 600,
                                                     textTransform: "none",
                                                     fontSize: "0.85rem",
                                                     py: 0.8,
                                                     "&:hover": {
                                                         background:
-                                                            "rgba(115,66,226,0.25)",
+                                                            "rgba(255, 119, 89,0.25)",
                                                     },
                                                     "&:disabled": {
                                                         color: "rgba(25,40,55,0.3)",
@@ -1063,7 +1063,7 @@ const ProfilePage = () => {
                                         !profile.provider) && (
                                         <PersonIcon
                                             sx={{
-                                                color: "#7342E2",
+                                                color: "#ff7759",
                                                 fontSize: "1.2rem",
                                             }}
                                         />
@@ -1110,18 +1110,18 @@ const ProfilePage = () => {
                                                 mb: 1.5,
                                                 bgcolor:
                                                     verifyMsg.type === "success"
-                                                        ? "rgba(115,66,226,0.1)"
+                                                        ? "rgba(255, 119, 89,0.1)"
                                                         : "rgba(239,68,68,0.1)",
                                                 color:
                                                     verifyMsg.type === "success"
-                                                        ? "#7342E2"
+                                                        ? "#ff7759"
                                                         : "#ef4444",
-                                                border: `1px solid ${verifyMsg.type === "success" ? "rgba(115,66,226,0.3)" : "rgba(239,68,68,0.3)"}`,
+                                                border: `1px solid ${verifyMsg.type === "success" ? "rgba(255, 119, 89,0.3)" : "rgba(239,68,68,0.3)"}`,
                                                 "& .MuiAlert-icon": {
                                                     color:
                                                         verifyMsg.type ===
                                                         "success"
-                                                            ? "#7342E2"
+                                                            ? "#ff7759"
                                                             : "#ef4444",
                                                 },
                                                 py: 0,
@@ -1242,16 +1242,16 @@ const ProfilePage = () => {
                                                     }
                                                     sx={{
                                                         background:
-                                                            "rgba(115,66,226,0.15)",
-                                                        color: "#7342E2",
-                                                        border: "1px solid rgba(115,66,226,0.3)",
+                                                            "rgba(255, 119, 89,0.15)",
+                                                        color: "#ff7759",
+                                                        border: "1px solid rgba(255, 119, 89,0.3)",
                                                         fontWeight: 600,
                                                         textTransform: "none",
                                                         fontSize: "0.85rem",
                                                         py: 1,
                                                         "&:hover": {
                                                             background:
-                                                                "rgba(115,66,226,0.25)",
+                                                                "rgba(255, 119, 89,0.25)",
                                                         },
                                                         "&:disabled": {
                                                             color: "rgba(25,40,55,0.3)",
@@ -1379,7 +1379,7 @@ const ProfilePage = () => {
                             <Typography variant="h6" sx={sectionTitleSx}>
                                 <DevicesOtherIcon
                                     sx={{
-                                        color: "#7342E2",
+                                        color: "#ff7759",
                                         fontSize: "1.2rem",
                                     }}
                                 />
@@ -1406,12 +1406,12 @@ const ProfilePage = () => {
                                     />
                                 }
                                 sx={{
-                                    color: "#7342E2",
+                                    color: "#ff7759",
                                     textTransform: "none",
                                     fontSize: "0.78rem",
                                     flexShrink: 0,
                                     "&:hover": {
-                                        bgcolor: "rgba(115,66,226,0.08)",
+                                        bgcolor: "rgba(255, 119, 89,0.08)",
                                     },
                                 }}
                             >
@@ -1430,7 +1430,7 @@ const ProfilePage = () => {
                         >
                             <CircularProgress
                                 size={20}
-                                sx={{ color: "#7342E2" }}
+                                sx={{ color: "#ff7759" }}
                             />
                         </Box>
                     ) : connectedServices.length === 0 ? (
@@ -1481,7 +1481,7 @@ const ProfilePage = () => {
                                             transition: "border-color 0.2s",
                                             "&:hover": {
                                                 borderColor:
-                                                    "rgba(115,66,226,0.15)",
+                                                    "rgba(255, 119, 89,0.15)",
                                             },
                                             flexShrink: 0,
                                         }}
@@ -1596,7 +1596,7 @@ const ProfilePage = () => {
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         sx={{
-                                                            color: "#7342E2",
+                                                            color: "#ff7759",
                                                             fontSize: "0.7rem",
                                                             fontFamily:
                                                                 "monospace",
@@ -1644,7 +1644,7 @@ const ProfilePage = () => {
                                         fontSize: "0.75rem",
                                         mt: 0.25,
                                         flexShrink: 0,
-                                        "&:hover": { color: "#7342E2" },
+                                        "&:hover": { color: "#ff7759" },
                                     }}
                                 >
                                     +{connectedServices.length - 3} more — view
@@ -1659,7 +1659,7 @@ const ProfilePage = () => {
                 <Box sx={cardSx}>
                     <Typography variant="h6" sx={sectionTitleSx}>
                         <EditIcon
-                            sx={{ color: "#7342E2", fontSize: "1.2rem" }}
+                            sx={{ color: "#ff7759", fontSize: "1.2rem" }}
                         />
                         Update Profile
                     </Typography>
@@ -1672,9 +1672,9 @@ const ProfilePage = () => {
                             severity="success"
                             sx={{
                                 mb: 2.5,
-                                backgroundColor: "rgba(115,66,226,0.1)",
-                                color: "#7342E2",
-                                borderColor: "rgba(115,66,226,0.3)",
+                                backgroundColor: "rgba(255, 119, 89,0.1)",
+                                color: "#ff7759",
+                                borderColor: "rgba(255, 119, 89,0.3)",
                             }}
                         >
                             {updateSuccess}
@@ -1823,17 +1823,17 @@ const ProfilePage = () => {
                             onClick={handleUpdateProfile}
                             disabled={updateLoading}
                             sx={{
-                                background: "rgba(115,66,226,0.15)",
-                                color: "#7342E2",
-                                border: "1px solid rgba(115,66,226,0.3)",
+                                background: "rgba(255, 119, 89,0.15)",
+                                color: "#ff7759",
+                                border: "1px solid rgba(255, 119, 89,0.3)",
                                 fontWeight: 600,
                                 textTransform: "none",
                                 fontSize: "0.95rem",
                                 py: 1.1,
                                 px: 3,
                                 "&:hover": {
-                                    background: "rgba(115,66,226,0.25)",
-                                    borderColor: "rgba(115,66,226,0.5)",
+                                    background: "rgba(255, 119, 89,0.25)",
+                                    borderColor: "rgba(255, 119, 89,0.5)",
                                 },
                                 "&:disabled": {
                                     color: "rgba(25,40,55,0.35)",
@@ -1850,7 +1850,7 @@ const ProfilePage = () => {
                                 >
                                     <CircularProgress
                                         size={16}
-                                        sx={{ color: "#7342E2" }}
+                                        sx={{ color: "#ff7759" }}
                                     />
                                     Saving...
                                 </Box>
@@ -1865,7 +1865,7 @@ const ProfilePage = () => {
                 <Box sx={cardSx}>
                     <Typography variant="h6" sx={sectionTitleSx}>
                         <NotificationsIcon
-                            sx={{ color: "#7342E2", fontSize: "1.2rem" }}
+                            sx={{ color: "#ff7759", fontSize: "1.2rem" }}
                         />
                         Notification Preferences
                     </Typography>
@@ -1878,9 +1878,9 @@ const ProfilePage = () => {
                             severity="success"
                             sx={{
                                 mb: 2.5,
-                                backgroundColor: "rgba(115,66,226,0.1)",
-                                color: "#7342E2",
-                                borderColor: "rgba(115,66,226,0.3)",
+                                backgroundColor: "rgba(255, 119, 89,0.1)",
+                                color: "#ff7759",
+                                borderColor: "rgba(255, 119, 89,0.3)",
                             }}
                         >
                             {notifSuccess}
@@ -1910,7 +1910,7 @@ const ProfilePage = () => {
                         >
                             <CircularProgress
                                 size={18}
-                                sx={{ color: "#7342E2" }}
+                                sx={{ color: "#ff7759" }}
                             />
                             <Typography
                                 sx={{
@@ -1999,17 +1999,17 @@ const ProfilePage = () => {
                                 onClick={handleSaveNotifPrefs}
                                 disabled={notifSaveLoading}
                                 sx={{
-                                    background: "rgba(115,66,226,0.15)",
-                                    color: "#7342E2",
-                                    border: "1px solid rgba(115,66,226,0.3)",
+                                    background: "rgba(255, 119, 89,0.15)",
+                                    color: "#ff7759",
+                                    border: "1px solid rgba(255, 119, 89,0.3)",
                                     fontWeight: 600,
                                     textTransform: "none",
                                     fontSize: "0.95rem",
                                     py: 1.1,
                                     px: 3,
                                     "&:hover": {
-                                        background: "rgba(115,66,226,0.25)",
-                                        borderColor: "rgba(115,66,226,0.5)",
+                                        background: "rgba(255, 119, 89,0.25)",
+                                        borderColor: "rgba(255, 119, 89,0.5)",
                                     },
                                     "&:disabled": {
                                         color: "rgba(25,40,55,0.35)",
@@ -2026,7 +2026,7 @@ const ProfilePage = () => {
                                     >
                                         <CircularProgress
                                             size={16}
-                                            sx={{ color: "#7342E2" }}
+                                            sx={{ color: "#ff7759" }}
                                         />
                                         Saving...
                                     </Box>
@@ -2279,11 +2279,11 @@ const ProfilePage = () => {
                         }
                         variant="contained"
                         sx={{
-                            background: "#7342E2",
+                            background: "#ff7759",
                             color: "#fff",
                             textTransform: "none",
                             fontWeight: 600,
-                            "&:hover": { background: "#7342E2" },
+                            "&:hover": { background: "#ff7759" },
                             "&:disabled": {
                                 background: "rgba(25,40,55,0.10)",
                                 color: "rgba(25,40,55,0.3)",

@@ -22,7 +22,7 @@ import gsap from "gsap";
 // --font-heading: 'Helvetica Now Display Bold', sans-serif;
 // --font-body: 'Inter', sans-serif;
 // --color-text: #192837;
-// --color-accent: #7342E2;
+// --color-accent: #ff7759;
 // --color-login-bg: #F2F2EE;
 
 const MARKETING_LINKS = [
@@ -37,6 +37,7 @@ const APP_LINKS = [
     { label: "OAuth Apps", href: "/dashboard/oauth-apps" },
     { label: "Services", href: "/dashboard/services" },
     { label: "Webhooks", href: "/dashboard/webhooks" },
+    { label: "Docs", href: "/docs" },
     { label: "Pricing", href: "/pricing" },
     { label: "Profile", href: "/dashboard/profile" },
 ];
@@ -142,7 +143,7 @@ export default function LandingPage() {
     };
 
     return (
-        <div className="relative w-full min-h-screen font-body text-[#192837] bg-[#F2F2EE] selection:bg-[#7342E2] selection:text-white overflow-x-hidden">
+        <div className="relative w-full min-h-screen font-body text-[#192837] bg-[#F2F2EE] selection:bg-[#ff7759] selection:text-white overflow-x-hidden">
             <style>{`
                 .font-heading { font-family: var(--font-heading), sans-serif; }
                 .font-body { font-family: var(--font-body), sans-serif; }
@@ -174,7 +175,7 @@ export default function LandingPage() {
                             className="w-8 h-8 rounded-lg object-contain bg-white/80 p-0.5"
                         />
                         <span className="font-heading text-xl font-bold tracking-tight text-[#192837]">
-                            Elixpo <span className="text-[#7342E2]">Accounts</span>
+                            Elixpo <span className="text-[#ff7759]">Accounts</span>
                         </span>
                     </Link>
 
@@ -200,7 +201,7 @@ export default function LandingPage() {
                             <>
                                 <Link
                                     href="/dashboard/oauth-apps"
-                                    className="bg-[#7342E2] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 shadow-[0_4px_14px_rgba(115,66,226,0.22)]"
+                                    className="bg-[#ff7759] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 shadow-[0_4px_14px_rgba(255, 119, 89,0.22)]"
                                 >
                                     Dashboard
                                 </Link>
@@ -215,7 +216,7 @@ export default function LandingPage() {
                             <>
                                 <Link
                                     href="/login"
-                                    className="bg-[#7342E2] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 shadow-[0_4px_14px_rgba(115,66,226,0.22)]"
+                                    className="bg-[#ff7759] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 shadow-[0_4px_14px_rgba(255, 119, 89,0.22)]"
                                 >
                                     Start For Free
                                 </Link>
@@ -267,7 +268,7 @@ export default function LandingPage() {
                             >
                                 <Link
                                     href={authed ? "/dashboard/oauth-apps" : "/login"}
-                                    className="bg-[#7342E2] text-white rounded-[50px] py-[17px] px-[24px] font-body font-semibold text-[clamp(0.9rem,2vw,1rem)] shadow-[0_4px_24px_rgba(115,66,226,0.28)] min-w-[210px] flex items-center justify-between gap-[32px] group"
+                                    className="bg-[#ff7759] text-white rounded-[50px] py-[17px] px-[24px] font-body font-semibold text-[clamp(0.9rem,2vw,1rem)] shadow-[0_4px_24px_rgba(255, 119, 89,0.28)] min-w-[210px] flex items-center justify-between gap-[32px] group"
                                 >
                                     <span>
                                         {authed === null
@@ -317,11 +318,11 @@ export default function LandingPage() {
                             return (
                                 <div
                                     key={feature.title}
-                                    className="bg-white border border-[#192837]/10 rounded-2xl p-6 sm:p-8 shadow-[0_4px_24px_rgba(25,40,55,0.015)] transition-all hover:shadow-[0_12px_32px_rgba(115,66,226,0.05)] hover:border-[#7342E2]/30 flex flex-col justify-between gsap-card-animate"
+                                    className="bg-white border border-[#192837]/10 rounded-2xl p-6 sm:p-8 shadow-[0_4px_24px_rgba(25,40,55,0.015)] transition-all hover:shadow-[0_12px_32px_rgba(255, 119, 89,0.05)] hover:border-[#ff7759]/30 flex flex-col justify-between gsap-card-animate"
                                 >
                                     <div>
                                         <div className="flex items-center justify-between mb-6">
-                                            <div className="p-3 bg-[#7342E2]/10 border border-[#7342E2]/25 rounded-xl text-[#7342E2]">
+                                            <div className="p-3 bg-[#ff7759]/10 border border-[#ff7759]/25 rounded-xl text-[#ff7759]">
                                                 <Icon className="w-6 h-6" />
                                             </div>
                                             {feature.soon && (
@@ -348,7 +349,7 @@ export default function LandingPage() {
             <section className="bg-white text-[#192837] py-28 border-t border-[#192837]/10 relative z-10">
                 <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
                     <div className="text-center max-w-[720px] mx-auto mb-16">
-                        <span className="inline-block text-[11px] font-bold uppercase tracking-[0.18em] text-[#7342E2] mb-4">
+                        <span className="inline-block text-[11px] font-bold uppercase tracking-[0.18em] text-[#ff7759] mb-4">
                             Get started
                         </span>
                         <h2 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mb-4">
@@ -364,10 +365,10 @@ export default function LandingPage() {
                         {/* Step 1 — account */}
                         <div className="relative bg-[#F2F2EE] border border-[#192837]/10 rounded-2xl p-8 flex flex-col gsap-card-animate">
                             <div className="flex items-center gap-3 mb-6">
-                                <span className="font-heading text-sm font-bold w-9 h-9 grid place-items-center rounded-full bg-[#7342E2] text-white">
+                                <span className="font-heading text-sm font-bold w-9 h-9 grid place-items-center rounded-full bg-[#ff7759] text-white">
                                     01
                                 </span>
-                                <div className="p-2.5 bg-[#7342E2]/10 border border-[#7342E2]/25 rounded-xl text-[#7342E2]">
+                                <div className="p-2.5 bg-[#ff7759]/10 border border-[#ff7759]/25 rounded-xl text-[#ff7759]">
                                     <Fingerprint className="w-5 h-5" />
                                 </div>
                             </div>
@@ -379,7 +380,7 @@ export default function LandingPage() {
                             <div className="mt-auto flex flex-wrap items-center gap-3">
                                 <Link
                                     href="/register"
-                                    className="inline-flex items-center gap-2 bg-[#7342E2] text-white px-5 py-2.5 rounded-full font-body font-semibold text-sm transition-all hover:brightness-110 active:scale-[0.98]"
+                                    className="inline-flex items-center gap-2 bg-[#ff7759] text-white px-5 py-2.5 rounded-full font-body font-semibold text-sm transition-all hover:brightness-110 active:scale-[0.98]"
                                 >
                                     Create account
                                     <ArrowRightCircle className="w-4 h-4" />
@@ -396,10 +397,10 @@ export default function LandingPage() {
                         {/* Step 2 — register the app */}
                         <div className="relative bg-[#F2F2EE] border border-[#192837]/10 rounded-2xl p-8 flex flex-col gsap-card-animate">
                             <div className="flex items-center gap-3 mb-6">
-                                <span className="font-heading text-sm font-bold w-9 h-9 grid place-items-center rounded-full bg-[#7342E2] text-white">
+                                <span className="font-heading text-sm font-bold w-9 h-9 grid place-items-center rounded-full bg-[#ff7759] text-white">
                                     02
                                 </span>
-                                <div className="p-2.5 bg-[#7342E2]/10 border border-[#7342E2]/25 rounded-xl text-[#7342E2]">
+                                <div className="p-2.5 bg-[#ff7759]/10 border border-[#ff7759]/25 rounded-xl text-[#ff7759]">
                                     <Network className="w-5 h-5" />
                                 </div>
                             </div>
@@ -411,7 +412,7 @@ export default function LandingPage() {
                             <div className="mt-auto flex flex-wrap items-center gap-3">
                                 <Link
                                     href="/dashboard/oauth-apps"
-                                    className="inline-flex items-center gap-2 bg-[#7342E2] text-white px-5 py-2.5 rounded-full font-body font-semibold text-sm transition-all hover:brightness-110 active:scale-[0.98]"
+                                    className="inline-flex items-center gap-2 bg-[#ff7759] text-white px-5 py-2.5 rounded-full font-body font-semibold text-sm transition-all hover:brightness-110 active:scale-[0.98]"
                                 >
                                     Register an app
                                     <ArrowRightCircle className="w-4 h-4" />
@@ -446,7 +447,7 @@ export default function LandingPage() {
                     >
                         <Link
                             href="/login"
-                            className="inline-flex items-center gap-3 bg-[#7342E2] text-white px-8 py-4 rounded-full font-body font-semibold transition-all shadow-[0_4px_24px_rgba(115,66,226,0.28)]"
+                            className="inline-flex items-center gap-3 bg-[#ff7759] text-white px-8 py-4 rounded-full font-body font-semibold transition-all shadow-[0_4px_24px_rgba(255, 119, 89,0.28)]"
                         >
                             <span>Continue to sign in</span>
                             <ArrowRightCircle className="w-5 h-5 text-white" />
@@ -467,7 +468,7 @@ export default function LandingPage() {
                                     className="w-8 h-8 rounded-lg object-contain bg-white/85 p-0.5"
                                 />
                                 <span className="font-heading text-xl font-bold">
-                                    Elixpo <span className="text-[#7342E2]">Accounts</span>
+                                    Elixpo <span className="text-[#ff7759]">Accounts</span>
                                 </span>
                             </div>
                             <p className="text-sm opacity-80 leading-relaxed font-body">
@@ -624,7 +625,7 @@ export default function LandingPage() {
                                         <Link
                                             href="/dashboard/oauth-apps"
                                             onClick={() => setIsMobileMenuOpen(false)}
-                                            className="w-full bg-[#7342E2] text-white py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
+                                            className="w-full bg-[#ff7759] text-white py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
                                         >
                                             Go to Dashboard
                                         </Link>
@@ -641,7 +642,7 @@ export default function LandingPage() {
                                         <Link
                                             href="/login"
                                             onClick={() => setIsMobileMenuOpen(false)}
-                                            className="w-full bg-[#7342E2] text-white py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
+                                            className="w-full bg-[#ff7759] text-white py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
                                         >
                                             Start For Free
                                         </Link>

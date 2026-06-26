@@ -107,7 +107,7 @@ export default function OAuthPage() {
                 sx={{
                     fontSize: "1.1rem",
                     fontWeight: 600,
-                    color: "#7342E2",
+                    color: "#ff7759",
                     mt: 3,
                     mb: 2,
                 }}
@@ -338,7 +338,7 @@ export default function OAuthPage() {
                     color: "rgba(25, 40, 55, 0.7)",
                     mb: 1,
                     pl: 2,
-                    borderLeft: "2px solid #7342E2",
+                    borderLeft: "2px solid #ff7759",
                 }}
             >
                 <strong>Approved:</strong>{" "}

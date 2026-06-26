@@ -56,19 +56,19 @@ const textFieldSx = {
         background: "transparent",
         "& fieldset": { borderColor: "rgba(25,40,55,0.10)" },
         "&:hover fieldset": { borderColor: "rgba(25,40,55,0.10)" },
-        "&.Mui-focused fieldset": { borderColor: "#7342E2" },
+        "&.Mui-focused fieldset": { borderColor: "#ff7759" },
     },
     "& .MuiInputLabel-root": { color: "rgba(25,40,55,0.7)" },
-    "& .MuiInputLabel-root.Mui-focused": { color: "#7342E2" },
+    "& .MuiInputLabel-root.Mui-focused": { color: "#ff7759" },
     "& .MuiFormHelperText-root": { color: "rgba(25,40,55,0.4)" },
 };
 
 const tableHeadSx = {
     "& .MuiTableCell-head": {
-        color: "#7342E2",
+        color: "#ff7759",
         fontWeight: 600,
-        backgroundColor: "rgba(115,66,226,0.05)",
-        borderColor: "rgba(115,66,226,0.2)",
+        backgroundColor: "rgba(255, 119, 89,0.05)",
+        borderColor: "rgba(255, 119, 89,0.2)",
     },
 };
 
@@ -360,14 +360,14 @@ const OAuthAppsPage = () => {
                         // label content stays the same; only the surface
                         // changes via responsive sx.
                         sx={{
-                            background: "rgba(115,66,226,0.15)",
-                            color: "#7342E2",
-                            border: "1px solid rgba(115,66,226,0.3)",
+                            background: "rgba(255, 119, 89,0.15)",
+                            color: "#ff7759",
+                            border: "1px solid rgba(255, 119, 89,0.3)",
                             fontWeight: 600,
                             textTransform: "none",
                             "&:hover": {
-                                background: "rgba(115,66,226,0.25)",
-                                borderColor: "rgba(115,66,226,0.5)",
+                                background: "rgba(255, 119, 89,0.25)",
+                                borderColor: "rgba(255, 119, 89,0.5)",
                             },
                             minWidth: { xs: 44, sm: "auto" },
                             width: { xs: 44, sm: "auto" },
@@ -407,9 +407,9 @@ const OAuthAppsPage = () => {
                         onClose={() => setSuccessMessage("")}
                         sx={{
                             mb: 2,
-                            backgroundColor: "rgba(115,66,226,0.1)",
-                            color: "#7342E2",
-                            borderColor: "rgba(115,66,226,0.3)",
+                            backgroundColor: "rgba(255, 119, 89,0.1)",
+                            color: "#ff7759",
+                            borderColor: "rgba(255, 119, 89,0.3)",
                         }}
                     >
                         {successMessage}
@@ -500,7 +500,7 @@ const OAuthAppsPage = () => {
                                                                     "none",
                                                                 cursor: "pointer",
                                                                 "&:hover": {
-                                                                    color: "#7342E2",
+                                                                    color: "#ff7759",
                                                                     textDecoration:
                                                                         "underline",
                                                                     textUnderlineOffset:
@@ -530,7 +530,7 @@ const OAuthAppsPage = () => {
                                                                     textDecoration:
                                                                         "none",
                                                                     "&:hover": {
-                                                                        color: "#7342E2",
+                                                                        color: "#ff7759",
                                                                         textDecoration:
                                                                             "underline",
                                                                     },
@@ -578,7 +578,7 @@ const OAuthAppsPage = () => {
                                                             )
                                                         }
                                                         sx={{
-                                                            color: "#7342E2",
+                                                            color: "#ff7759",
                                                             p: 0.5,
                                                         }}
                                                         title="Copy Client ID"
@@ -598,15 +598,15 @@ const OAuthAppsPage = () => {
                                                     sx={{
                                                         backgroundColor:
                                                             app.is_active
-                                                                ? "rgba(115,66,226,0.2)"
+                                                                ? "rgba(255, 119, 89,0.2)"
                                                                 : "rgba(107, 114, 128, 0.2)",
                                                         color: app.is_active
-                                                            ? "#7342E2"
+                                                            ? "#ff7759"
                                                             : "rgba(25,40,55,0.6)",
                                                         border: "1px solid",
                                                         borderColor:
                                                             app.is_active
-                                                                ? "rgba(115,66,226,0.3)"
+                                                                ? "rgba(255, 119, 89,0.3)"
                                                                 : "rgba(107, 114, 128, 0.3)",
                                                     }}
                                                 />
@@ -843,7 +843,7 @@ const OAuthAppsPage = () => {
                                 })
                             }
                             sx={{
-                                color: "#7342E2",
+                                color: "#ff7759",
                                 textTransform: "none",
                                 fontSize: "0.8rem",
                                 mt: 0.5,
@@ -885,12 +885,12 @@ const OAuthAppsPage = () => {
                         variant="contained"
                         disabled={loading}
                         sx={{
-                            background: "rgba(115,66,226,0.15)",
-                            color: "#7342E2",
-                            border: "1px solid rgba(115,66,226,0.3)",
+                            background: "rgba(255, 119, 89,0.15)",
+                            color: "#ff7759",
+                            border: "1px solid rgba(255, 119, 89,0.3)",
                             fontWeight: 600,
                             "&:hover": {
-                                background: "rgba(115,66,226,0.25)",
+                                background: "rgba(255, 119, 89,0.25)",
                             },
                             "&:disabled": { color: "rgba(25,40,55,0.4)" },
                         }}
@@ -1032,12 +1032,12 @@ const OAuthAppsPage = () => {
                                         background: "#ffffff",
                                         p: 1.5,
                                         borderRadius: "8px",
-                                        border: "1px solid rgba(115,66,226,0.2)",
+                                        border: "1px solid rgba(255, 119, 89,0.2)",
                                     }}
                                 >
                                     <Typography
                                         sx={{
-                                            color: "#7342E2",
+                                            color: "#ff7759",
                                             fontFamily: "monospace",
                                             fontSize: "0.85rem",
                                             flex: 1,
@@ -1054,7 +1054,7 @@ const OAuthAppsPage = () => {
                                                 "id",
                                             )
                                         }
-                                        sx={{ color: "#7342E2" }}
+                                        sx={{ color: "#ff7759" }}
                                     >
                                         <ContentCopyIcon fontSize="small" />
                                     </IconButton>
@@ -1062,7 +1062,7 @@ const OAuthAppsPage = () => {
                                 {idCopied && (
                                     <Typography
                                         sx={{
-                                            color: "#7342E2",
+                                            color: "#ff7759",
                                             fontSize: "0.75rem",
                                             mt: 0.5,
                                         }}
@@ -1154,9 +1154,9 @@ const OAuthAppsPage = () => {
                                             size="small"
                                             sx={{
                                                 backgroundColor:
-                                                    "rgba(115,66,226,0.1)",
-                                                color: "#7342E2",
-                                                border: "1px solid rgba(115,66,226,0.2)",
+                                                    "rgba(255, 119, 89,0.1)",
+                                                color: "#ff7759",
+                                                border: "1px solid rgba(255, 119, 89,0.2)",
                                             }}
                                         />
                                     ))}
@@ -1175,11 +1175,11 @@ const OAuthAppsPage = () => {
                         onClick={() => setOpenSecretDialog(false)}
                         variant="contained"
                         sx={{
-                            background: "rgba(115,66,226,0.15)",
-                            color: "#7342E2",
-                            border: "1px solid rgba(115,66,226,0.3)",
+                            background: "rgba(255, 119, 89,0.15)",
+                            color: "#ff7759",
+                            border: "1px solid rgba(255, 119, 89,0.3)",
                             "&:hover": {
-                                background: "rgba(115,66,226,0.25)",
+                                background: "rgba(255, 119, 89,0.25)",
                             },
                         }}
                     >

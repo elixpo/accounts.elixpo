@@ -48,7 +48,7 @@ export default function CodeBlock({ code, language }: CodeBlockProps) {
                         position: "absolute",
                         top: 8,
                         right: 8,
-                        color: copied ? "#7342E2" : "rgba(25, 40, 55, 0.5)",
+                        color: copied ? "#ff7759" : "rgba(25, 40, 55, 0.5)",
                         bgcolor: "rgba(25, 40, 55, 0.04)",
                         opacity: { xs: 1, md: 0 },
                         transition: "all 0.2s ease",

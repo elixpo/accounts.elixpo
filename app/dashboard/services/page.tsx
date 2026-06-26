@@ -222,7 +222,7 @@ const ServicesPage = () => {
 
             {loading ? (
                 <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-                    <CircularProgress sx={{ color: "#7342E2" }} />
+                    <CircularProgress sx={{ color: "#ff7759" }} />
                 </Box>
             ) : services.length === 0 ? (
                 <Box
@@ -298,12 +298,12 @@ const ServicesPage = () => {
                                         "border-color 0.2s, background-color 0.2s, transform 0.2s",
                                     cursor: "pointer",
                                     "&:hover": {
-                                        borderColor: "rgba(115,66,226,0.45)",
-                                        bgcolor: "rgba(115,66,226,0.04)",
+                                        borderColor: "rgba(255, 119, 89,0.45)",
+                                        bgcolor: "rgba(255, 119, 89,0.04)",
                                         transform: "translateY(-1px)",
                                     },
                                     "&:focus-visible": {
-                                        outline: "2px solid #7342E2",
+                                        outline: "2px solid #ff7759",
                                         outlineOffset: 2,
                                     },
                                     display: "flex",
@@ -348,7 +348,7 @@ const ServicesPage = () => {
                                                     alignItems: "center",
                                                     gap: 0.5,
                                                     "&:hover": {
-                                                        color: "#7342E2",
+                                                        color: "#ff7759",
                                                     },
                                                 }}
                                             >

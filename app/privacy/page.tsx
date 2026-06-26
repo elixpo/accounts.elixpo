@@ -175,7 +175,7 @@ export default function PrivacyPage() {
                             personal data. Email{" "}
                             <a
                                 href="mailto:privacy@elixpo.com"
-                                style={{ color: "#7342E2" }}
+                                style={{ color: "#ff7759" }}
                             >
                                 privacy@elixpo.com
                             </a>{" "}
@@ -200,7 +200,7 @@ export default function PrivacyPage() {
                             Questions about this policy:{" "}
                             <a
                                 href="mailto:privacy@elixpo.com"
-                                style={{ color: "#7342E2" }}
+                                style={{ color: "#ff7759" }}
                             >
                                 privacy@elixpo.com
                             </a>

@@ -44,7 +44,7 @@ const TIER_META: Record<
     },
     indie: {
         name: "Indie",
-        accent: "#7342E2",
+        accent: "#ff7759",
         description: "10,000 MAU per app · 10 OAuth apps · 5 webhook endpoints.",
     },
     studio: {
@@ -88,7 +88,7 @@ export default function SubscriptionsPage() {
     if (loading) {
         return (
             <Box sx={{ display: "grid", placeItems: "center", py: 10 }}>
-                <CircularProgress sx={{ color: "#7342E2" }} />
+                <CircularProgress sx={{ color: "#ff7759" }} />
             </Box>
         );
     }
@@ -204,10 +204,10 @@ export default function SubscriptionsPage() {
                                 borderRadius: "10px",
                                 color: "#fff",
                                 background:
-                                    "linear-gradient(135deg, #7342E2, #7342E2)",
+                                    "linear-gradient(135deg, #ff7759, #ff7759)",
                                 "&:hover": {
                                     background:
-                                        "linear-gradient(135deg, #7342E2, #7342E2)",
+                                        "linear-gradient(135deg, #ff7759, #ff7759)",
                                 },
                             }}
                         >

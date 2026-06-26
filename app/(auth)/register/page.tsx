@@ -20,7 +20,7 @@ const textFieldSx = {
         background: "transparent",
         "& fieldset": { borderColor: "rgba(25, 40, 55, 0.1)" },
         "&:hover fieldset": { borderColor: "rgba(25, 40, 55, 0.2)" },
-        "&.Mui-focused fieldset": { borderColor: "#7342E2" },
+        "&.Mui-focused fieldset": { borderColor: "#ff7759" },
         "& input:-webkit-autofill": {
             WebkitBoxShadow: "0 0 0 1000px transparent inset !important",
             WebkitTextFillColor: "#192837 !important",
@@ -37,7 +37,7 @@ const textFieldSx = {
     },
     "& .MuiInputBase-input::placeholder": { color: "transparent", opacity: 0 },
     "& .MuiInputLabel-root": { color: "rgba(25, 40, 55, 0.7)" },
-    "& .MuiInputLabel-root.Mui-focused": { color: "#7342E2" },
+    "& .MuiInputLabel-root.Mui-focused": { color: "#ff7759" },
 };
 
 const RegisterContent = () => {
@@ -262,16 +262,16 @@ const RegisterContent = () => {
                             disabled={loading}
                             sx={{
                                 my: 2,
-                                background: "#7342E2",
+                                background: "#ff7759",
                                 color: "#fff",
-                                border: "1px solid #7342E2",
+                                border: "1px solid #ff7759",
                                 fontWeight: 600,
                                 py: 1.5,
                                 textTransform: "none",
                                 fontSize: "1rem",
                                 "&:hover": {
-                                    background: "rgba(115, 66, 226, 0.9)",
-                                    borderColor: "rgba(115, 66, 226, 0.9)",
+                                    background: "rgba(255, 119, 89, 0.9)",
+                                    borderColor: "rgba(255, 119, 89, 0.9)",
                                 },
                                 "&:disabled": {
                                     color: "rgba(25, 40, 55, 0.4)",
@@ -303,7 +303,7 @@ const RegisterContent = () => {
                                     : "/login"
                             }
                             style={{
-                                color: "#7342E2",
+                                color: "#ff7759",
                                 textDecoration: "none",
                                 fontWeight: 600,
                             }}

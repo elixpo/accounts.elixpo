@@ -140,7 +140,7 @@ export default function ErrorsPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "#7342E2",
+                                    color: "#ff7759",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -171,7 +171,7 @@ export default function ErrorsPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "#7342E2",
+                                    color: "#ff7759",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -202,7 +202,7 @@ export default function ErrorsPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "#7342E2",
+                                    color: "#ff7759",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -233,7 +233,7 @@ export default function ErrorsPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "#7342E2",
+                                    color: "#ff7759",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -264,7 +264,7 @@ export default function ErrorsPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "#7342E2",
+                                    color: "#ff7759",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -295,7 +295,7 @@ export default function ErrorsPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "#7342E2",
+                                    color: "#ff7759",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}

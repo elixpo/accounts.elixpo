@@ -35,7 +35,7 @@ import BackgroundAurora from "../components/background-aurora";
 const darkTheme = createTheme({
     palette: {
         mode: "dark",
-        primary: { main: "#7342E2" },
+        primary: { main: "#ff7759" },
         background: {
             default: "transparent",
             paper: "#ffffff",
@@ -156,7 +156,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     bgcolor: "#F2F2EE",
                 }}
             >
-                <CircularProgress sx={{ color: "#7342E2" }} />
+                <CircularProgress sx={{ color: "#ff7759" }} />
             </Box>
         );
     }
@@ -240,10 +240,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         title={item.label}
                                         sx={{
                                             color: isActive(item.href)
-                                                ? "#7342E2"
+                                                ? "#ff7759"
                                                 : "rgba(25,40,55,0.45)",
                                             bgcolor: isActive(item.href)
-                                                ? "rgba(115,66,226,0.1)"
+                                                ? "rgba(255, 119, 89,0.1)"
                                                 : "transparent",
                                             borderRadius: "8px",
                                             width: 38,
@@ -251,10 +251,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                             transition: "all 0.2s ease",
                                             "&:hover": {
                                                 bgcolor: isActive(item.href)
-                                                    ? "rgba(115,66,226,0.15)"
+                                                    ? "rgba(255, 119, 89,0.15)"
                                                     : "rgba(25,40,55,0.04)",
                                                 color: isActive(item.href)
-                                                    ? "#7342E2"
+                                                    ? "#ff7759"
                                                     : "rgba(25,40,55,0.8)",
                                             },
                                         }}
@@ -301,7 +301,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                             width: 34,
                                             height: 34,
                                             borderRadius: "50%",
-                                            border: "2px solid rgba(115,66,226,0.3)",
+                                            border: "2px solid rgba(255, 119, 89,0.3)",
                                         }}
                                     />
                                 ) : (
@@ -311,7 +311,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                             height: 34,
                                             borderRadius: "50%",
                                             background:
-                                                "linear-gradient(135deg, #7342E2 0%, #7342E2 100%)",
+                                                "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
                                             display: "flex",
                                             alignItems: "center",
                                             justifyContent: "center",

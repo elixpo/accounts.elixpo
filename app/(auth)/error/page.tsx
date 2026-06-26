@@ -23,7 +23,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 
-const _ACCENT = "#7342E2";
+const _ACCENT = "#ff7759";
 const SUPPORT_EMAIL = "hello@elixpo.com";
 
 interface Action {
@@ -253,14 +253,14 @@ const primaryBtnSx = {
     fontWeight: 600,
     fontSize: "0.95rem",
     color: "#fff",
-    background: "linear-gradient(135deg, #7342E2 0%, #7342E2 100%)",
+    background: "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
     borderRadius: "12px",
     py: 1.2,
-    boxShadow: "0 8px 24px rgba(115,66,226,0.32)",
+    boxShadow: "0 8px 24px rgba(255, 119, 89,0.32)",
     transition: "all 0.2s ease",
     "&:hover": {
-        background: "linear-gradient(135deg, #7342E2 0%, #7342E2 100%)",
-        boxShadow: "0 12px 32px rgba(115,66,226,0.45)",
+        background: "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
+        boxShadow: "0 12px 32px rgba(255, 119, 89,0.45)",
         transform: "translateY(-1px)",
     },
 };
@@ -274,7 +274,7 @@ const secondaryBtnSx = {
     borderRadius: "12px",
     py: 1.2,
     "&:hover": {
-        borderColor: "rgba(115,66,226,0.4)",
+        borderColor: "rgba(255, 119, 89,0.4)",
         background: "rgba(25,40,55,0.04)",
     },
 };
@@ -453,9 +453,9 @@ const ErrorContent = () => {
                                 width: 34,
                                 height: 34,
                                 "&:hover": {
-                                    color: "#7342E2",
-                                    borderColor: "rgba(115,66,226,0.45)",
-                                    background: "rgba(115,66,226,0.08)",
+                                    color: "#ff7759",
+                                    borderColor: "rgba(255, 119, 89,0.45)",
+                                    background: "rgba(255, 119, 89,0.08)",
                                 },
                             }}
                         >

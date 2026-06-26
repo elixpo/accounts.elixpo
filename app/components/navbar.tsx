@@ -53,7 +53,7 @@ export default function Navbar() {
                     className="w-8 h-8 rounded-lg object-contain bg-white/80 p-0.5"
                 />
                 <span className="font-heading text-xl font-bold tracking-tight text-[#192837]">
-                    Elixpo <span className="text-[#7342E2]">Accounts</span>
+                    Elixpo <span className="text-[#ff7759]">Accounts</span>
                 </span>
             </Link>
 
@@ -79,7 +79,7 @@ export default function Navbar() {
                     <>
                         <Link
                             href="/dashboard/oauth-apps"
-                            className="bg-[#7342E2] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 shadow-[0_4px_14px_rgba(115,66,226,0.22)]"
+                            className="bg-[#ff7759] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 shadow-[0_4px_14px_rgba(255, 119, 89,0.22)]"
                         >
                             Dashboard
                         </Link>
@@ -94,7 +94,7 @@ export default function Navbar() {
                     <>
                         <Link
                             href="/login"
-                            className="bg-[#7342E2] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 shadow-[0_4px_14px_rgba(115,66,226,0.22)]"
+                            className="bg-[#ff7759] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 shadow-[0_4px_14px_rgba(255, 119, 89,0.22)]"
                         >
                             Start For Free
                         </Link>
@@ -193,7 +193,7 @@ export default function Navbar() {
                                         <Link
                                             href="/dashboard/oauth-apps"
                                             onClick={() => setIsMobileMenuOpen(false)}
-                                            className="w-full bg-[#7342E2] text-white py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
+                                            className="w-full bg-[#ff7759] text-white py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
                                         >
                                             Go to Dashboard
                                         </Link>
@@ -210,7 +210,7 @@ export default function Navbar() {
                                         <Link
                                             href="/login"
                                             onClick={() => setIsMobileMenuOpen(false)}
-                                            className="w-full bg-[#7342E2] text-white py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
+                                            className="w-full bg-[#ff7759] text-white py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all shadow-md"
                                         >
                                             Start For Free
                                         </Link>

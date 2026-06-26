@@ -74,9 +74,9 @@ export default function QuickstartPage() {
                 <Chip
                     label="Base URL: https://accounts.elixpo.com"
                     sx={{
-                        bgcolor: "rgba(115, 66, 226, 0.1)",
-                        color: "#7342E2",
-                        border: "1px solid rgba(115, 66, 226, 0.2)",
+                        bgcolor: "rgba(255, 119, 89, 0.1)",
+                        color: "#ff7759",
+                        border: "1px solid rgba(255, 119, 89, 0.2)",
                         fontFamily: "var(--font-geist-mono), monospace",
                         fontSize: "0.85rem",
                     }}

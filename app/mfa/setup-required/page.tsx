@@ -68,12 +68,12 @@ export default function SetupRequiredPage() {
                         href="/dashboard/security"
                         variant="contained"
                         sx={{
-                            background: "#7342E2",
+                            background: "#ff7759",
                             color: "#fff",
                             textTransform: "none",
                             fontWeight: 600,
                             px: 3,
-                            "&:hover": { background: "rgba(115, 66, 226, 0.9)" },
+                            "&:hover": { background: "rgba(255, 119, 89, 0.9)" },
                         }}
                     >
                         Set up 2FA now

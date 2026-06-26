@@ -190,7 +190,7 @@ const LoginContent = () => {
         return (
             <div className="min-h-[80vh] flex items-center justify-center bg-transparent">
                 <svg
-                    className="animate-spin h-8 w-8 text-[#7342E2]"
+                    className="animate-spin h-8 w-8 text-[#ff7759]"
                     fill="none"
                     viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
@@ -246,7 +246,7 @@ const LoginContent = () => {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 placeholder="name@domain.com"
-                                className="w-full px-4 py-3 border border-[#192837]/15 bg-white/80 rounded-xl text-sm font-semibold focus:outline-none focus:border-[#7342E2] focus:ring-1 focus:ring-[#7342E2]"
+                                className="w-full px-4 py-3 border border-[#192837]/15 bg-white/80 rounded-xl text-sm font-semibold focus:outline-none focus:border-[#ff7759] focus:ring-1 focus:ring-[#ff7759]"
                             />
                         </div>
 
@@ -262,7 +262,7 @@ const LoginContent = () => {
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                     placeholder="••••••••"
-                                    className="w-full px-4 py-3 pr-12 border border-[#192837]/15 bg-white/80 rounded-xl text-sm font-semibold focus:outline-none focus:border-[#7342E2] focus:ring-1 focus:ring-[#7342E2]"
+                                    className="w-full px-4 py-3 pr-12 border border-[#192837]/15 bg-white/80 rounded-xl text-sm font-semibold focus:outline-none focus:border-[#ff7759] focus:ring-1 focus:ring-[#ff7759]"
                                 />
                                 <button
                                     type="button"
@@ -285,7 +285,7 @@ const LoginContent = () => {
                                     type="checkbox"
                                     checked={rememberMe}
                                     onChange={(e) => setRememberMe(e.target.checked)}
-                                    className="w-4.5 h-4.5 text-[#7342E2] border-[#192837]/20 rounded focus:ring-[#7342E2]"
+                                    className="w-4.5 h-4.5 text-[#ff7759] border-[#192837]/20 rounded focus:ring-[#ff7759]"
                                 />
                                 <span className="text-xs font-semibold opacity-70">
                                     Remember me
@@ -293,7 +293,7 @@ const LoginContent = () => {
                             </label>
                             <Link
                                 href="/forgot-password"
-                                className="text-xs font-bold text-[#7342E2] hover:underline"
+                                className="text-xs font-bold text-[#ff7759] hover:underline"
                             >
                                 Forgot password?
                             </Link>
@@ -310,7 +310,7 @@ const LoginContent = () => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full mt-2 bg-[#7342E2] hover:brightness-110 disabled:opacity-50 text-white font-semibold py-3.5 rounded-xl transition-all shadow-md active:scale-[0.98] select-none flex items-center justify-center gap-2"
+                            className="w-full mt-2 bg-[#ff7759] hover:brightness-110 disabled:opacity-50 text-white font-semibold py-3.5 rounded-xl transition-all shadow-md active:scale-[0.98] select-none flex items-center justify-center gap-2"
                         >
                             {loading ? (
                                 <>
@@ -353,7 +353,7 @@ const LoginContent = () => {
                                     ? `/register?next=${encodeURIComponent(next)}`
                                     : "/register"
                             }
-                            className="text-sm font-bold text-[#7342E2] hover:underline"
+                            className="text-sm font-bold text-[#ff7759] hover:underline"
                         >
                             Create an Elixpo ID
                         </Link>

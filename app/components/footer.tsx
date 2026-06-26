@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 
 const PRODUCT = {
     name: "Accounts",
-    accent: "#7342E2",
+    accent: "#ff7759",
     description:
         "Open OAuth 2.0 single sign-on for the modern web. Add “Sign in with Elixpo” to any app — Elixpo or your own — in two steps, on one edge-hosted account.",
     repo: "elixpo/accounts.elixpo",

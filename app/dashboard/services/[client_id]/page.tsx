@@ -111,7 +111,7 @@ const ServiceDetailPage = ({
                     minHeight: "60vh",
                 }}
             >
-                <CircularProgress sx={{ color: "#7342E2" }} />
+                <CircularProgress sx={{ color: "#ff7759" }} />
             </Box>
         );
     }
@@ -233,7 +233,7 @@ const ServiceDetailPage = ({
                                     alignItems: "center",
                                     gap: 0.5,
                                     mt: 0.5,
-                                    "&:hover": { color: "#7342E2" },
+                                    "&:hover": { color: "#ff7759" },
                                 }}
                             >
                                 {hostname}
@@ -305,9 +305,9 @@ const ServiceDetailPage = ({
                                     label={s}
                                     size="small"
                                     sx={{
-                                        bgcolor: "rgba(115,66,226,0.1)",
-                                        color: "#7342E2",
-                                        border: "1px solid rgba(115,66,226,0.25)",
+                                        bgcolor: "rgba(255, 119, 89,0.1)",
+                                        color: "#ff7759",
+                                        border: "1px solid rgba(255, 119, 89,0.25)",
                                         fontFamily:
                                             "var(--font-geist-mono), monospace",
                                         fontSize: "0.72rem",
@@ -411,7 +411,7 @@ const ServiceDetailPage = ({
                                     height: `${Math.max((p.count / maxC) * 100, 4)}%`,
                                     borderRadius: "3px 3px 0 0",
                                     background:
-                                        "linear-gradient(180deg, rgba(115,66,226,0.95) 0%, rgba(115,66,226,0.55) 100%)",
+                                        "linear-gradient(180deg, rgba(255, 119, 89,0.95) 0%, rgba(255, 119, 89,0.55) 100%)",
                                     transition: "filter 0.15s ease",
                                     "&:hover": {
                                         filter: "brightness(1.25)",
@@ -472,7 +472,7 @@ function ServiceHeaderIcon({
     return (
         <Typography
             sx={{
-                color: "#7342E2",
+                color: "#ff7759",
                 fontWeight: 700,
                 fontSize: "1.5rem",
             }}

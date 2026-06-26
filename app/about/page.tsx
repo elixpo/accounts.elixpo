@@ -87,7 +87,7 @@ export default function AboutPage() {
     }, []);
 
     return (
-        <div className="relative w-full min-h-screen font-body text-[#192837] bg-[#F2F2EE] selection:bg-[#7342E2] selection:text-white overflow-x-hidden">
+        <div className="relative w-full min-h-screen font-body text-[#192837] bg-[#F2F2EE] selection:bg-[#ff7759] selection:text-white overflow-x-hidden">
             <style>{`
                 .font-heading { font-family: var(--font-heading), sans-serif; }
                 .font-body { font-family: var(--font-body), sans-serif; }
@@ -104,13 +104,13 @@ export default function AboutPage() {
                             alt="Elixpo Mascot"
                             className="w-10 h-10 rounded-lg object-contain bg-white/80 p-0.5"
                         />
-                        <span className="bg-[#7342E2]/10 text-[#7342E2] border border-[#7342E2]/25 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                        <span className="bg-[#ff7759]/10 text-[#ff7759] border border-[#ff7759]/25 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
                             About
                         </span>
                     </div>
 
                     <h1 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight text-[#192837] leading-[1.1] gsap-about-hero">
-                        A modern identity layer <span className="text-[#7342E2]">for any app.</span>
+                        A modern identity layer <span className="text-[#ff7759]">for any app.</span>
                     </h1>
 
                     <p className="font-body text-base sm:text-lg text-[#192837] opacity-80 leading-relaxed max-w-[620px] gsap-about-hero">
@@ -120,7 +120,7 @@ export default function AboutPage() {
                     <div className="flex flex-col sm:flex-row items-center gap-3 pt-4 gsap-about-hero">
                         <Link
                             href="/login"
-                            className="bg-[#7342E2] text-white px-8 py-3 rounded-full font-semibold hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 shadow-md text-center min-w-[160px]"
+                            className="bg-[#ff7759] text-white px-8 py-3 rounded-full font-semibold hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 shadow-md text-center min-w-[160px]"
                         >
                             Get started
                         </Link>
@@ -141,9 +141,9 @@ export default function AboutPage() {
                     {FEATURES.map(({ icon: Icon, title, desc }) => (
                         <div
                             key={title}
-                            className="bg-white border border-[#192837]/10 rounded-2xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(25,40,55,0.015)] transition-all hover:shadow-[0_12px_32px_rgba(115,66,226,0.05)] hover:border-[#7342E2]/30 flex flex-col items-start gsap-about-card"
+                            className="bg-white border border-[#192837]/10 rounded-2xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(25,40,55,0.015)] transition-all hover:shadow-[0_12px_32px_rgba(255, 119, 89,0.05)] hover:border-[#ff7759]/30 flex flex-col items-start gsap-about-card"
                         >
-                            <div className="p-3 bg-[#7342E2]/10 border border-[#7342E2]/25 rounded-xl text-[#7342E2] mb-6">
+                            <div className="p-3 bg-[#ff7759]/10 border border-[#ff7759]/25 rounded-xl text-[#ff7759] mb-6">
                                 <Icon className="w-5 h-5" />
                             </div>
                             <h3 className="font-heading text-lg font-bold text-[#192837] mb-2">

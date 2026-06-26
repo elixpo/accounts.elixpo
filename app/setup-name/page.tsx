@@ -12,7 +12,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import BackgroundAurora from "../components/background-aurora";
 
-const ACCENT = "#7342E2";
+const ACCENT = "#ff7759";
 
 const textFieldSx = {
     "& .MuiOutlinedInput-root": {
@@ -302,7 +302,7 @@ const SetupNameContent = () => {
                         textTransform: "none",
                         fontSize: "0.95rem",
                         py: 1.3,
-                        "&:hover": { background: "rgba(115, 66, 226, 0.9)" },
+                        "&:hover": { background: "rgba(255, 119, 89, 0.9)" },
                         "&:disabled": {
                             background: "rgba(25,40,55,0.08)",
                             color: "rgba(25, 40, 55, 0.3)",

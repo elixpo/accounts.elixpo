@@ -22,7 +22,7 @@ const NotFound = () => {
                     sx={{
                         fontSize: "120px",
                         fontWeight: 800,
-                        color: "#9b7bf7",
+                        color: "#ff7759",
                         mb: 2,
                         lineHeight: 1,
                     }}
@@ -37,7 +37,7 @@ const NotFound = () => {
                             position: "absolute",
                             width: "200px",
                             height: "200px",
-                            border: "2px solid rgba(155, 123, 247, 0.2)",
+                            border: "2px solid rgba(255, 119, 89, 0.2)",
                             borderRadius: "50%",
                             top: "50%",
                             left: "50%",
@@ -60,7 +60,7 @@ const NotFound = () => {
                             position: "absolute",
                             width: "150px",
                             height: "150px",
-                            border: "2px solid rgba(155, 123, 247, 0.3)",
+                            border: "2px solid rgba(255, 119, 89, 0.3)",
                             borderRadius: "50%",
                             top: "50%",
                             left: "50%",
@@ -114,16 +114,16 @@ const NotFound = () => {
                             fullWidth
                             variant="contained"
                             sx={{
-                                background: "rgba(155, 123, 247, 0.15)",
-                                color: "#9b7bf7",
-                                border: "1px solid rgba(155, 123, 247, 0.3)",
+                                background: "rgba(255, 119, 89, 0.15)",
+                                color: "#ff7759",
+                                border: "1px solid rgba(255, 119, 89, 0.3)",
                                 fontWeight: 600,
                                 py: 1.5,
                                 textTransform: "none",
                                 fontSize: "1rem",
                                 "&:hover": {
-                                    background: "rgba(155, 123, 247, 0.25)",
-                                    borderColor: "rgba(155, 123, 247, 0.5)",
+                                    background: "rgba(255, 119, 89, 0.25)",
+                                    borderColor: "rgba(255, 119, 89, 0.5)",
                                 },
                             }}
                         >

@@ -140,7 +140,7 @@ export default function TermsPage() {
                             recurring prices are listed on{" "}
                             <a
                                 href="/pricing"
-                                style={{ color: "#7342E2" }}
+                                style={{ color: "#ff7759" }}
                             >
                                 /pricing
                             </a>
@@ -154,7 +154,7 @@ export default function TermsPage() {
                             charge you again. Contact{" "}
                             <a
                                 href="mailto:support@elixpo.com"
-                                style={{ color: "#7342E2" }}
+                                style={{ color: "#ff7759" }}
                             >
                                 support@elixpo.com
                             </a>{" "}
@@ -228,7 +228,7 @@ export default function TermsPage() {
                         <Section title="14. Contact">
                             <a
                                 href="mailto:support@elixpo.com"
-                                style={{ color: "#7342E2" }}
+                                style={{ color: "#ff7759" }}
                             >
                                 support@elixpo.com
                             </a>

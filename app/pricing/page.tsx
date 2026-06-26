@@ -41,7 +41,7 @@ const TIERS: Tier[] = [
         name: "Indie",
         priceLabel: "₹1,599",
         priceCaption: "per month · billed in INR",
-        accent: "#7342E2",
+        accent: "#ff7759",
         description: "Ship real products to real users. Lift the small-app caps.",
         features: [
             "Up to 10,000 MAU per app",
@@ -146,7 +146,7 @@ export default function PricingPage() {
     };
 
     return (
-        <div className="relative w-full min-h-screen font-body text-[#192837] bg-[#F2F2EE] selection:bg-[#7342E2] selection:text-white overflow-x-hidden">
+        <div className="relative w-full min-h-screen font-body text-[#192837] bg-[#F2F2EE] selection:bg-[#ff7759] selection:text-white overflow-x-hidden">
             <style>{`
                 .font-heading { font-family: var(--font-heading), sans-serif; }
                 .font-body { font-family: var(--font-body), sans-serif; }
@@ -158,14 +158,14 @@ export default function PricingPage() {
                 {/* Header */}
                 <div className="flex flex-col items-center text-center gap-4 mb-16 max-w-[700px] mx-auto">
                     <h1 className="font-heading text-3xl sm:text-5xl font-bold tracking-tight leading-[1.1] gsap-pricing-hero">
-                        Pricing built for indie devs <span className="text-[#7342E2]">and studios.</span>
+                        Pricing built for indie devs <span className="text-[#ff7759]">and studios.</span>
                     </h1>
                     <p className="font-body text-base sm:text-lg text-[#192837] opacity-80 leading-relaxed gsap-pricing-hero">
                         Start free. Scale only when your apps actually have users. No per-seat tax — pricing tracks monthly active users so we win when you do.
                     </p>
 
                     {loading ? null : me?.is_internal ? (
-                        <div className="mt-4 px-4 py-1.5 rounded-full bg-[#7342E2]/10 border border-[#7342E2]/30 text-xs font-semibold text-[#7342E2] gsap-pricing-hero">
+                        <div className="mt-4 px-4 py-1.5 rounded-full bg-[#ff7759]/10 border border-[#ff7759]/30 text-xs font-semibold text-[#ff7759] gsap-pricing-hero">
                             You're on an internal account — billing is bypassed.
                         </div>
                     ) : null}
@@ -190,12 +190,12 @@ export default function PricingPage() {
                                 key={tier.id}
                                 className={`bg-white border rounded-2xl p-6 sm:p-8 flex flex-col justify-between min-h-[480px] relative transition-all gsap-pricing-card ${
                                     tier.highlight
-                                        ? "border-2 border-[#7342E2] shadow-[0_14px_60px_-20px_rgba(115,66,226,0.22)]"
-                                        : "border-[#192837]/10 shadow-[0_4px_24px_rgba(25,40,55,0.015)] hover:shadow-[0_12px_32px_rgba(115,66,226,0.04)]"
+                                        ? "border-2 border-[#ff7759] shadow-[0_14px_60px_-20px_rgba(255, 119, 89,0.22)]"
+                                        : "border-[#192837]/10 shadow-[0_4px_24px_rgba(25,40,55,0.015)] hover:shadow-[0_12px_32px_rgba(255, 119, 89,0.04)]"
                                 }`}
                             >
                                 {tier.highlight && (
-                                    <span className="absolute top-4 right-4 bg-[#7342E2]/10 border border-[#7342E2]/35 text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full text-[#7342E2]">
+                                    <span className="absolute top-4 right-4 bg-[#ff7759]/10 border border-[#ff7759]/35 text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full text-[#ff7759]">
                                         Most Popular
                                     </span>
                                 )}
@@ -248,9 +248,9 @@ export default function PricingPage() {
                                         tier.id === "hobby"
                                             ? "bg-[#192837]/5 text-[#192837]/40 border border-[#192837]/10"
                                             : isCurrent
-                                              ? "bg-[#7342E2]/10 text-[#7342E2] border border-[#7342E2]/25 cursor-default"
+                                              ? "bg-[#ff7759]/10 text-[#ff7759] border border-[#ff7759]/25 cursor-default"
                                               : tier.highlight
-                                                ? "bg-[#7342E2] hover:brightness-110 text-white shadow-md active:scale-[0.98]"
+                                                ? "bg-[#ff7759] hover:brightness-110 text-white shadow-md active:scale-[0.98]"
                                                 : "bg-[#192837]/5 hover:bg-[#192837]/10 border border-[#192837]/10 text-[#192837] active:scale-[0.98]"
                                     }`}
                                 >

@@ -78,9 +78,9 @@ const kindLabel: Record<Factor["kind"], string> = {
     email_otp: "Email code",
 };
 const kindIcon: Record<Factor["kind"], React.ReactNode> = {
-    passkey: <KeyIcon fontSize="small" sx={{ color: "#7342E2" }} />,
-    totp: <PhoneAndroidIcon fontSize="small" sx={{ color: "#7342E2" }} />,
-    email_otp: <MailOutlineIcon fontSize="small" sx={{ color: "#7342E2" }} />,
+    passkey: <KeyIcon fontSize="small" sx={{ color: "#ff7759" }} />,
+    totp: <PhoneAndroidIcon fontSize="small" sx={{ color: "#ff7759" }} />,
+    email_otp: <MailOutlineIcon fontSize="small" sx={{ color: "#ff7759" }} />,
 };
 
 export default function SecurityPage() {
@@ -653,7 +653,7 @@ export default function SecurityPage() {
     if (loading) {
         return (
             <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-                <CircularProgress sx={{ color: "#7342E2" }} />
+                <CircularProgress sx={{ color: "#ff7759" }} />
             </Box>
         );
     }
@@ -672,7 +672,7 @@ export default function SecurityPage() {
                         gap: 1.5,
                     }}
                 >
-                    <SecurityIcon sx={{ color: "#7342E2" }} /> Security
+                    <SecurityIcon sx={{ color: "#ff7759" }} /> Security
                 </Typography>
                 <Typography sx={{ color: "rgba(25,40,55,0.6)" }}>
                     Two-factor authentication and trusted devices.
@@ -813,13 +813,13 @@ export default function SecurityPage() {
                                         onClick={startEmailEnroll}
                                         disabled={emailResendCd.active}
                                         sx={{
-                                            color: "#7342E2",
+                                            color: "#ff7759",
                                             textTransform: "none",
                                             fontSize: "0.8rem",
                                             mr: 0.5,
                                             "&:hover": {
                                                 bgcolor:
-                                                    "rgba(115,66,226,0.08)",
+                                                    "rgba(255, 119, 89,0.08)",
                                             },
                                             "&.Mui-disabled": {
                                                 color: "rgba(25,40,55,0.35)",
@@ -836,13 +836,13 @@ export default function SecurityPage() {
                                         size="small"
                                         onClick={startTotp}
                                         sx={{
-                                            color: "#7342E2",
+                                            color: "#ff7759",
                                             textTransform: "none",
                                             fontSize: "0.8rem",
                                             mr: 0.5,
                                             "&:hover": {
                                                 bgcolor:
-                                                    "rgba(115,66,226,0.08)",
+                                                    "rgba(255, 119, 89,0.08)",
                                             },
                                         }}
                                     >
@@ -874,12 +874,12 @@ export default function SecurityPage() {
                         (f) => f.kind === "email_otp" && f.confirmed,
                     );
                     const enrollSx = {
-                        color: "#7342E2",
-                        borderColor: "rgba(115,66,226,0.4)",
+                        color: "#ff7759",
+                        borderColor: "rgba(255, 119, 89,0.4)",
                         textTransform: "none" as const,
                         "&:hover": {
-                            borderColor: "#7342E2",
-                            bgcolor: "rgba(115,66,226,0.06)",
+                            borderColor: "#ff7759",
+                            bgcolor: "rgba(255, 119, 89,0.06)",
                         },
                         "&.Mui-disabled": {
                             color: "rgba(25,40,55,0.3)",
@@ -950,7 +950,7 @@ export default function SecurityPage() {
                             }
                             sx={{
                                 background:
-                                    "linear-gradient(135deg, #7342E2 0%, #7342E2 100%)",
+                                    "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
                                 textTransform: "none",
                                 fontWeight: 600,
                             }}
@@ -1008,8 +1008,8 @@ export default function SecurityPage() {
                                 mb: 2,
                                 borderRadius: "10px",
                                 background:
-                                    "linear-gradient(135deg, rgba(115,66,226,0.12), rgba(115,66,226,0.05))",
-                                border: "1px solid rgba(115,66,226,0.35)",
+                                    "linear-gradient(135deg, rgba(255, 119, 89,0.12), rgba(255, 119, 89,0.05))",
+                                border: "1px solid rgba(255, 119, 89,0.35)",
                             }}
                         >
                             <Typography
@@ -1064,12 +1064,12 @@ export default function SecurityPage() {
                                         downloadBackupCodes(revealedCodes)
                                     }
                                     sx={{
-                                        color: "#7342E2",
+                                        color: "#ff7759",
                                         textTransform: "none",
-                                        bgcolor: "rgba(115,66,226,0.1)",
-                                        border: "1px solid rgba(115,66,226,0.3)",
+                                        bgcolor: "rgba(255, 119, 89,0.1)",
+                                        border: "1px solid rgba(255, 119, 89,0.3)",
                                         "&:hover": {
-                                            bgcolor: "rgba(115,66,226,0.18)",
+                                            bgcolor: "rgba(255, 119, 89,0.18)",
                                         },
                                     }}
                                 >
@@ -1111,8 +1111,8 @@ export default function SecurityPage() {
                         variant="outlined"
                         onClick={regenerateBackupCodes}
                         sx={{
-                            color: "#7342E2",
-                            borderColor: "rgba(115,66,226,0.4)",
+                            color: "#ff7759",
+                            borderColor: "rgba(255, 119, 89,0.4)",
                             textTransform: "none",
                         }}
                     >
@@ -1165,12 +1165,12 @@ export default function SecurityPage() {
                                     p: 1.5,
                                     borderRadius: "10px",
                                     bgcolor: s.is_current
-                                        ? "rgba(115,66,226,0.06)"
+                                        ? "rgba(255, 119, 89,0.06)"
                                         : "#ffffff",
-                                    border: `1px solid ${s.is_current ? "rgba(115,66,226,0.3)" : "rgba(25,40,55,0.10)"}`,
+                                    border: `1px solid ${s.is_current ? "rgba(255, 119, 89,0.3)" : "rgba(25,40,55,0.10)"}`,
                                 }}
                             >
-                                <LaptopIcon sx={{ color: "#7342E2" }} />
+                                <LaptopIcon sx={{ color: "#ff7759" }} />
                                 <Box sx={{ flex: 1, minWidth: 0 }}>
                                     <Box
                                         sx={{
@@ -1293,7 +1293,7 @@ export default function SecurityPage() {
                                 <LaptopIcon
                                     sx={{
                                         color: d.is_active
-                                            ? "#7342E2"
+                                            ? "#ff7759"
                                             : "rgba(25,40,55,0.3)",
                                     }}
                                 />
@@ -1400,7 +1400,7 @@ export default function SecurityPage() {
                                     fontFamily:
                                         "var(--font-geist-mono), monospace",
                                     bgcolor: "rgba(25,40,55,0.04)",
-                                    color: "#7342E2",
+                                    color: "#ff7759",
                                     p: 1,
                                     borderRadius: "6px",
                                     fontSize: "0.8rem",
@@ -1449,10 +1449,10 @@ export default function SecurityPage() {
                                         },
                                         "&:hover fieldset": {
                                             borderColor:
-                                                "rgba(115,66,226,0.4)",
+                                                "rgba(255, 119, 89,0.4)",
                                         },
                                         "&.Mui-focused fieldset": {
-                                            borderColor: "#7342E2",
+                                            borderColor: "#ff7759",
                                         },
                                     },
                                 }}
@@ -1475,7 +1475,7 @@ export default function SecurityPage() {
                         disabled={totpBusy || totpCode.length !== 6}
                         sx={{
                             background:
-                                "linear-gradient(135deg, #7342E2 0%, #7342E2 100%)",
+                                "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
                             textTransform: "none",
                             fontWeight: 600,
                         }}
@@ -1538,7 +1538,7 @@ export default function SecurityPage() {
                         sx={{
                             background: confirmCfg?.destructive
                                 ? "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)"
-                                : "linear-gradient(135deg, #7342E2 0%, #7342E2 100%)",
+                                : "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
                             textTransform: "none",
                             fontWeight: 600,
                         }}
@@ -1571,7 +1571,7 @@ export default function SecurityPage() {
                         gap: 1.5,
                     }}
                 >
-                    <MailOutlineIcon sx={{ color: "#7342E2" }} />
+                    <MailOutlineIcon sx={{ color: "#ff7759" }} />
                     Enable email code
                 </DialogTitle>
                 <DialogContent>
@@ -1614,10 +1614,10 @@ export default function SecurityPage() {
                                     borderColor: "rgba(25,40,55,0.10)",
                                 },
                                 "&:hover fieldset": {
-                                    borderColor: "rgba(115,66,226,0.4)",
+                                    borderColor: "rgba(255, 119, 89,0.4)",
                                 },
                                 "&.Mui-focused fieldset": {
-                                    borderColor: "#7342E2",
+                                    borderColor: "#ff7759",
                                 },
                             },
                         }}
@@ -1665,7 +1665,7 @@ export default function SecurityPage() {
                         variant="contained"
                         sx={{
                             background:
-                                "linear-gradient(135deg, #7342E2 0%, #7342E2 100%)",
+                                "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
                             textTransform: "none",
                             fontWeight: 600,
                         }}
