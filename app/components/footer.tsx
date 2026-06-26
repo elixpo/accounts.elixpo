@@ -129,7 +129,7 @@ function EmailButton({ email }: { email: string }) {
         <button
             type="button"
             onClick={copy}
-            className="inline-flex items-center gap-2 rounded-xl border border-[#192837]/12 bg-white px-3.5 py-2 text-sm font-semibold text-[#192837] transition-all hover:border-[#192837]/30 hover:shadow-sm active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3.5 py-2 text-sm font-semibold text-[var(--fg)] transition-all hover:border-[#192837]/30 hover:shadow-sm active:scale-[0.98]"
         >
             {copied ? (
                 <>
@@ -150,7 +150,7 @@ function EmailButton({ email }: { email: string }) {
 export default function Footer() {
     const year = new Date().getFullYear();
     return (
-        <footer className="relative z-10 w-full border-t border-[#192837]/10 bg-[#F2F2EE] font-body text-[#192837]">
+        <footer className="relative z-10 w-full border-t border-[var(--border)] bg-[var(--bg)] font-body text-[var(--fg)]">
             <div className="mx-auto max-w-[1280px] px-5 py-16 sm:px-8">
                 {/* Top: brand + link columns */}
                 <div className="flex flex-col gap-12 lg:flex-row lg:justify-between">
@@ -211,7 +211,7 @@ export default function Footer() {
                 </div>
 
                 {/* Bottom bar */}
-                <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-[#192837]/10 pt-8 text-sm font-medium opacity-70 sm:flex-row">
+                <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-[var(--border)] pt-8 text-sm font-medium opacity-70 sm:flex-row">
                     <div>
                         © {year} Elixpo ·{" "}
                         <span className="font-semibold opacity-100">

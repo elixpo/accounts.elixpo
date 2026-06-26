@@ -64,7 +64,7 @@ export default function WebhooksPage() {
                 sx={{
                     fontSize: "2rem",
                     fontWeight: 800,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mb: 2,
                     letterSpacing: "-0.02em",
                 }}
@@ -73,7 +73,7 @@ export default function WebhooksPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 4,
                     fontSize: "1rem",
                     lineHeight: 1.7,
@@ -89,7 +89,7 @@ export default function WebhooksPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -99,7 +99,7 @@ export default function WebhooksPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 3,
                     lineHeight: 1.6,
                 }}
@@ -144,7 +144,7 @@ export default function WebhooksPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -153,7 +153,7 @@ export default function WebhooksPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -165,7 +165,7 @@ export default function WebhooksPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -174,7 +174,7 @@ export default function WebhooksPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -186,7 +186,7 @@ export default function WebhooksPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -195,7 +195,7 @@ export default function WebhooksPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -211,7 +211,7 @@ export default function WebhooksPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -220,7 +220,7 @@ export default function WebhooksPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -231,7 +231,7 @@ export default function WebhooksPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -240,7 +240,7 @@ export default function WebhooksPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -252,7 +252,7 @@ export default function WebhooksPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -261,7 +261,7 @@ export default function WebhooksPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -279,7 +279,7 @@ export default function WebhooksPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -289,7 +289,7 @@ export default function WebhooksPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 2,
                     lineHeight: 1.6,
                 }}
@@ -304,7 +304,7 @@ export default function WebhooksPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -314,7 +314,7 @@ export default function WebhooksPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 2,
                     lineHeight: 1.6,
                 }}
@@ -326,7 +326,7 @@ export default function WebhooksPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 3,
                     lineHeight: 1.6,
                 }}
@@ -342,7 +342,7 @@ export default function WebhooksPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -352,7 +352,7 @@ export default function WebhooksPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 2,
                     lineHeight: 1.6,
                 }}

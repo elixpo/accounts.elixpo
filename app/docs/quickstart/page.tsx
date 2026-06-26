@@ -98,7 +98,7 @@ export default function QuickstartPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 2,
                     lineHeight: 1.6,
                 }}
@@ -110,7 +110,7 @@ export default function QuickstartPage() {
             <Box
                 component="ul"
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     pl: 3,
                     mb: 4,
                     "& li": { mb: 1, lineHeight: 1.6 },
@@ -148,7 +148,7 @@ export default function QuickstartPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 4,
                     lineHeight: 1.6,
                 }}
@@ -166,7 +166,7 @@ export default function QuickstartPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",

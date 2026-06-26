@@ -25,7 +25,7 @@ export default function ErrorsPage() {
                 sx={{
                     fontSize: "2rem",
                     fontWeight: 800,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mb: 2,
                     letterSpacing: "-0.02em",
                 }}

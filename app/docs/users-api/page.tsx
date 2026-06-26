@@ -31,7 +31,7 @@ export default function UsersApiPage() {
                 sx={{
                     fontSize: "2rem",
                     fontWeight: 800,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mb: 2,
                     letterSpacing: "-0.02em",
                 }}
@@ -40,7 +40,7 @@ export default function UsersApiPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 4,
                     fontSize: "1rem",
                     lineHeight: 1.7,
@@ -56,7 +56,7 @@ export default function UsersApiPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#192837",
+                    color: "var(--fg)",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -66,7 +66,7 @@ export default function UsersApiPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 2,
                     lineHeight: 1.6,
                 }}
@@ -78,7 +78,7 @@ export default function UsersApiPage() {
 
             <Typography
                 sx={{
-                    color: "rgba(25, 40, 55, 0.7)",
+                    color: "var(--fg-muted)",
                     mb: 2,
                     lineHeight: 1.6,
                 }}
@@ -112,7 +112,7 @@ export default function UsersApiPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.6)",
+                                    color: "var(--fg-faint)",
                                     fontWeight: 600,
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
@@ -122,7 +122,7 @@ export default function UsersApiPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.6)",
+                                    color: "var(--fg-faint)",
                                     fontWeight: 600,
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
@@ -132,7 +132,7 @@ export default function UsersApiPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.6)",
+                                    color: "var(--fg-faint)",
                                     fontWeight: 600,
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
@@ -146,7 +146,7 @@ export default function UsersApiPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -164,7 +164,7 @@ export default function UsersApiPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -176,7 +176,7 @@ export default function UsersApiPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -194,7 +194,7 @@ export default function UsersApiPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -205,7 +205,7 @@ export default function UsersApiPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -223,7 +223,7 @@ export default function UsersApiPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -235,7 +235,7 @@ export default function UsersApiPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -253,7 +253,7 @@ export default function UsersApiPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -265,7 +265,7 @@ export default function UsersApiPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#192837",
+                                    color: "var(--fg)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
@@ -283,7 +283,7 @@ export default function UsersApiPage() {
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(25, 40, 55, 0.7)",
+                                    color: "var(--fg-muted)",
                                     borderBottom:
                                         "1px solid rgba(25, 40, 55, 0.10)",
                                 }}

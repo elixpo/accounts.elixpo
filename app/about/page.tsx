@@ -89,7 +89,7 @@ export default function AboutPage() {
     }, []);
 
     return (
-        <div className="relative w-full min-h-screen font-body text-[#192837] bg-[#F2F2EE] selection:bg-[#ff7759] selection:text-white overflow-x-hidden">
+        <div className="relative w-full min-h-screen font-body text-[var(--fg)] bg-[var(--bg)] selection:bg-[#ff7759] selection:text-white overflow-x-hidden">
             <style>{`
                 .font-heading { font-family: var(--font-heading), sans-serif; }
                 .font-body { font-family: var(--font-body), sans-serif; }
