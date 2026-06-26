@@ -366,9 +366,11 @@ const OAuthAppsPage = () => {
                             border: "1px solid rgba(255, 119, 89,0.3)",
                             fontWeight: 600,
                             textTransform: "none",
+                            boxShadow: "none",
                             "&:hover": {
                                 background: "rgba(255, 119, 89,0.25)",
                                 borderColor: "rgba(255, 119, 89,0.5)",
+                                boxShadow: "none",
                             },
                             minWidth: { xs: 44, sm: "auto" },
                             width: { xs: 44, sm: "auto" },
