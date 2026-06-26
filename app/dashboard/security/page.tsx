@@ -214,7 +214,10 @@ export default function SecurityPage() {
         const qr = await QRCode.toDataURL(data.otpauth_uri, {
             margin: 1,
             width: 240,
-            color: { dark: "var(--fg)", light: "#161c18" },
+            // QR renders to a static canvas/data-URL — CSS vars don't resolve
+            // here and the qrcode lib's color parser is hex-only. Keep a fixed
+            // dark-on-white plate so it scans regardless of the UI theme.
+            color: { dark: "#161c18", light: "#ffffff" },
         });
         setTotpData({ ...data, qr_dataurl: qr });
         setTotpCode("");
