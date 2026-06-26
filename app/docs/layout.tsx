@@ -69,7 +69,8 @@ export default function DocsLayout({
         let cancelled = false;
         fetch("/api/auth/me", { credentials: "include" })
             .then((r) => (r.ok ? r.json() : null))
-            .then((d: { email?: string } | null) => {
+            .then((raw) => {
+                const d = raw as { email?: string } | null;
                 if (!cancelled) setAuthed(!!d?.email);
             })
             .catch(() => {
