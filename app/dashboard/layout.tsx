@@ -29,29 +29,54 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import BackgroundAurora from "../components/background-aurora";
 import { useTheme as useAppTheme } from "../components/theme-provider";
 
-const darkTheme = createTheme({
-    palette: {
-        mode: "dark",
-        primary: { main: "#ff7759" },
-        background: {
-            default: "transparent",
-            paper: "var(--surface)",
-        },
-        text: {
-            primary: "var(--fg)",
-            secondary: "var(--fg-muted)",
-            disabled: "var(--fg-faint)",
-        },
-        divider: "var(--border)",
+// MUI runs alpha()/decomposeColor() on palette colors at style-compute time
+// (e.g. a Button's hover background = alpha(palette.text.primary, …)). Those
+// helpers can parse hex/rgb/rgba but NOT `var(--token)`, so the palette must
+// hold literal colors. We mirror the globals.css tokens for each mode here and
+// switch on the app theme; the sx-level `var()` usages elsewhere are fine since
+// they're raw CSS and never pass through alpha().
+const PALETTE = {
+    light: {
+        paper: "#ffffff",
+        text: "#192837",
+        textMuted: "rgba(25, 40, 55, 0.70)",
+        textFaint: "rgba(25, 40, 55, 0.50)",
+        divider: "rgba(25, 40, 55, 0.10)",
     },
-    typography: {
-        fontFamily: "var(--font-geist-sans), Arial, sans-serif",
+    dark: {
+        paper: "#181b22",
+        text: "#f5f5f4",
+        textMuted: "rgba(245, 245, 244, 0.70)",
+        textFaint: "rgba(245, 245, 244, 0.50)",
+        divider: "rgba(255, 255, 255, 0.10)",
     },
+} as const;
+
+const makeTheme = (mode: "light" | "dark") => {
+    const c = PALETTE[mode];
+    return createTheme({
+        palette: {
+            mode,
+            primary: { main: "#ff7759" },
+            background: {
+                default: "transparent",
+                paper: c.paper,
+            },
+            text: {
+                primary: c.text,
+                secondary: c.textMuted,
+                disabled: c.textFaint,
+            },
+            divider: c.divider,
+        },
+        typography: {
+            fontFamily: "var(--font-geist-sans), Arial, sans-serif",
+        },
     components: {
         MuiCard: {
             styleOverrides: {
@@ -75,7 +100,8 @@ const darkTheme = createTheme({
             },
         },
     },
-});
+    });
+};
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -97,6 +123,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const [authChecked, setAuthChecked] = useState(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const { theme: appTheme, toggle: toggleAppTheme } = useAppTheme();
+    const muiTheme = useMemo(() => makeTheme(appTheme), [appTheme]);
 
     // Auth check. Uses window.location for redirects so router isn't
     // referenced inside the effect body — that way eslint-react-hooks can't
@@ -171,7 +198,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     }
 
     return (
-        <ThemeProvider theme={darkTheme}>
+        <ThemeProvider theme={muiTheme}>
             <Box sx={{ position: "relative", minHeight: "100vh" }}>
                 <BackgroundAurora variant="default" />
                 <Box sx={{ position: "relative", zIndex: 1 }}>
