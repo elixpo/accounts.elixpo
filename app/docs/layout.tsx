@@ -61,7 +61,24 @@ export default function DocsLayout({
     const [headings, setHeadings] = useState<HeadingItem[]>([]);
     const [activeHeadingId, setActiveHeadingId] = useState("");
     const [copied, setCopied] = useState(false);
+    const [authed, setAuthed] = useState<boolean | null>(null);
     const contentRef = useRef<HTMLDivElement>(null);
+
+    // Resolve sign-in state so the brand mark routes to the dashboard or landing.
+    useEffect(() => {
+        let cancelled = false;
+        fetch("/api/auth/me", { credentials: "include" })
+            .then((r) => (r.ok ? r.json() : null))
+            .then((d: { email?: string } | null) => {
+                if (!cancelled) setAuthed(!!d?.email);
+            })
+            .catch(() => {
+                if (!cancelled) setAuthed(false);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     // GSAP page content fade-in animation on pathname change
     useEffect(() => {
@@ -361,15 +378,18 @@ export default function DocsLayout({
                             <Menu className="w-5 h-5" />
                         </button>
 
-                        {/* Title */}
-                        <Link href="/docs" className="flex items-center gap-2.5">
+                        {/* Title — routes home: dashboard if signed in, else landing */}
+                        <Link
+                            href={authed ? "/dashboard" : "/"}
+                            className="flex items-center gap-2.5"
+                        >
                             <img
                                 src="/LOGO/logo.png"
                                 alt="Elixpo Mascot"
                                 className="w-7.5 h-7.5 rounded-lg object-contain bg-white/80 p-0.5"
                             />
                             <span className="font-heading text-lg font-bold tracking-tight">
-                                Elixpo <span className="text-[#ff7759]">Docs</span>
+                                Elixpo <span className="text-[#ff7759]">Accounts</span>
                             </span>
                         </Link>
                     </div>
