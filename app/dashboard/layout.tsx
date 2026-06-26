@@ -3,7 +3,6 @@
 import {
     Apps,
     DevicesOther,
-    GitHub,
     Logout,
     MenuBook,
     Person,
@@ -265,32 +264,29 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     </IconButton>
                                 ))}
                             </Box>
-                            {/* GitHub */}
-
-                            <IconButton
-                                component="a"
-                                href="https://github.com/elixpo/accounts.elixpo"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                title="GitHub"
+                            {/* User profile — name + email CTA (GitHub lives in the footer) */}
+                            <Box
+                                component="button"
+                                onClick={(e) => setAnchorEl(e.currentTarget)}
                                 sx={{
-                                    color: "rgba(25,40,55,0.35)",
-                                    width: 38,
-                                    height: 38,
-                                    borderRadius: "8px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                    cursor: "pointer",
+                                    background: "transparent",
+                                    border: "1px solid rgba(25,40,55,0.1)",
+                                    borderRadius: "10px",
+                                    pl: 0.6,
+                                    pr: { xs: 0.6, sm: 1.1 },
+                                    py: 0.5,
+                                    color: "inherit",
+                                    font: "inherit",
+                                    transition: "all 0.15s ease",
                                     "&:hover": {
-                                        color: "#192837",
-                                        bgcolor: "rgba(25,40,55,0.04)",
+                                        borderColor: "rgba(255,119,89,0.4)",
+                                        bgcolor: "rgba(255,119,89,0.06)",
                                     },
                                 }}
-                            >
-                                <GitHub sx={{ fontSize: "1.2rem" }} />
-                            </IconButton>
-                            {/* User Avatar / Menu */}
-
-                            <IconButton
-                                onClick={(e) => setAnchorEl(e.currentTarget)}
-                                sx={{ p: 0.5 }}
                             >
                                 {userAvatar ? (
                                     <Box
@@ -298,34 +294,70 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         src={userAvatar}
                                         alt="Avatar"
                                         sx={{
-                                            width: 34,
-                                            height: 34,
+                                            width: 32,
+                                            height: 32,
                                             borderRadius: "50%",
                                             border: "2px solid rgba(255, 119, 89,0.3)",
+                                            flexShrink: 0,
                                         }}
                                     />
                                 ) : (
                                     <Box
                                         sx={{
-                                            width: 34,
-                                            height: 34,
+                                            width: 32,
+                                            height: 32,
                                             borderRadius: "50%",
-                                            background:
-                                                "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
+                                            background: "#ff7759",
                                             display: "flex",
                                             alignItems: "center",
                                             justifyContent: "center",
-                                            fontSize: "0.95rem",
+                                            fontSize: "0.9rem",
                                             fontWeight: 700,
                                             color: "#fff",
+                                            flexShrink: 0,
                                         }}
                                     >
-                                        {(displayName || userEmail)
-                                            ?.charAt(0)
-                                            .toUpperCase() || "E"}
+                                        {(displayName || userEmail)?.charAt(0).toUpperCase() || "E"}
                                     </Box>
                                 )}
-                            </IconButton>
+                                <Box
+                                    sx={{
+                                        display: { xs: "none", sm: "flex" },
+                                        flexDirection: "column",
+                                        alignItems: "flex-start",
+                                        lineHeight: 1.15,
+                                        minWidth: 0,
+                                    }}
+                                >
+                                    <Typography
+                                        sx={{
+                                            fontSize: "0.82rem",
+                                            fontWeight: 600,
+                                            color: "#192837",
+                                            maxWidth: 160,
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                            whiteSpace: "nowrap",
+                                        }}
+                                    >
+                                        {displayName || userEmail || "Account"}
+                                    </Typography>
+                                    {userEmail && (
+                                        <Typography
+                                            sx={{
+                                                fontSize: "0.7rem",
+                                                color: "rgba(25,40,55,0.55)",
+                                                maxWidth: 160,
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                                whiteSpace: "nowrap",
+                                            }}
+                                        >
+                                            {userEmail}
+                                        </Typography>
+                                    )}
+                                </Box>
+                            </Box>
 
                             <Menu
                                 anchorEl={anchorEl}
