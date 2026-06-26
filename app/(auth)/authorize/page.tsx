@@ -59,7 +59,7 @@ function ClientIcon({
                 style={{
                     borderRadius: 10,
                     flexShrink: 0,
-                    background: "rgba(255,255,255,0.04)",
+                    background: "rgba(25,40,55,0.04)",
                 }}
                 onError={() => setStage((s) => s + 1)}
             />
@@ -263,7 +263,7 @@ function AuthorizeContent() {
                         maxWidth: 380,
                         width: "100%",
                         textAlign: "center",
-                        background: "rgba(255,255,255,0.04)",
+                        background: "#ffffff",
                         border: "1px solid rgba(239,68,68,0.2)",
                         borderRadius: 16,
                         padding: 32,
@@ -286,7 +286,7 @@ function AuthorizeContent() {
                     </div>
                     <p
                         style={{
-                            color: "#f87171",
+                            color: "#b91c1c",
                             fontWeight: 600,
                             fontSize: 16,
                             marginBottom: 8,
@@ -296,7 +296,7 @@ function AuthorizeContent() {
                     </p>
                     <p
                         style={{
-                            color: "rgba(255,255,255,0.5)",
+                            color: "rgba(25,40,55,0.5)",
                             fontSize: 14,
                             marginBottom: 24,
                             lineHeight: 1.5,
@@ -307,9 +307,9 @@ function AuthorizeContent() {
                     <button
                         onClick={() => router.push("/login")}
                         style={{
-                            background: "rgba(255,255,255,0.06)",
-                            color: "rgba(255,255,255,0.6)",
-                            border: "1px solid rgba(255,255,255,0.1)",
+                            background: "rgba(25,40,55,0.04)",
+                            color: "rgba(25,40,55,0.6)",
+                            border: "1px solid rgba(25,40,55,0.1)",
                             borderRadius: 10,
                             padding: "10px 24px",
                             cursor: "pointer",
@@ -341,14 +341,14 @@ function AuthorizeContent() {
                         style={{
                             width: 36,
                             height: 36,
-                            border: "3px solid rgba(155, 123, 247,0.2)",
-                            borderTopColor: "#9b7bf7",
+                            border: "3px solid rgba(115, 66, 226,0.2)",
+                            borderTopColor: "#7342E2",
                             borderRadius: "50%",
                             animation: "spin 0.8s linear infinite",
                             margin: "0 auto 16px",
                         }}
                     />
-                    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>
+                    <p style={{ color: "rgba(25,40,55,0.4)", fontSize: 14 }}>
                         Loading...
                     </p>
                     <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -373,8 +373,8 @@ function AuthorizeContent() {
                 {/* Main Card */}
                 <div
                     style={{
-                        background: "rgba(255,255,255,0.035)",
-                        border: "1px solid rgba(255,255,255,0.08)",
+                        background: "#ffffff",
+                        border: "1px solid rgba(25,40,55,0.1)",
                         borderRadius: 20,
                         overflow: "hidden",
                     }}
@@ -396,7 +396,7 @@ function AuthorizeContent() {
                                 borderRadius: 12,
                                 overflow: "hidden",
                                 flexShrink: 0,
-                                border: "2px solid rgba(155, 123, 247,0.25)",
+                                border: "2px solid rgba(115, 66, 226,0.25)",
                             }}
                         >
                             <img
@@ -422,7 +422,7 @@ function AuthorizeContent() {
                                     width: 6,
                                     height: 6,
                                     borderRadius: "50%",
-                                    background: "#9b7bf7",
+                                    background: "#7342E2",
                                     opacity: 0.6,
                                 }}
                             />
@@ -431,7 +431,7 @@ function AuthorizeContent() {
                                     width: 24,
                                     height: 2,
                                     background:
-                                        "linear-gradient(90deg, rgba(155, 123, 247,0.5), rgba(155, 123, 247,0.15))",
+                                        "linear-gradient(90deg, rgba(115, 66, 226,0.5), rgba(115, 66, 226,0.15))",
                                 }}
                             />
                             <div
@@ -439,7 +439,7 @@ function AuthorizeContent() {
                                     width: 6,
                                     height: 6,
                                     borderRadius: "50%",
-                                    background: "#9b7bf7",
+                                    background: "#7342E2",
                                     opacity: 0.6,
                                 }}
                             />
@@ -449,7 +449,7 @@ function AuthorizeContent() {
                         <div
                             style={{
                                 flexShrink: 0,
-                                border: "2px solid rgba(255,255,255,0.1)",
+                                border: "2px solid rgba(25,40,55,0.1)",
                                 borderRadius: 12,
                                 overflow: "hidden",
                             }}
@@ -466,7 +466,7 @@ function AuthorizeContent() {
                         <div style={{ minWidth: 0, flex: 1 }}>
                             <p
                                 style={{
-                                    color: "#f5f5f4",
+                                    color: "#192837",
                                     fontWeight: 700,
                                     fontSize: 15,
                                     margin: 0,
@@ -480,7 +480,7 @@ function AuthorizeContent() {
                             {hostname && (
                                 <p
                                     style={{
-                                        color: "rgba(255,255,255,0.3)",
+                                        color: "rgba(25,40,55,0.4)",
                                         fontSize: 12,
                                         margin: "2px 0 0",
                                         fontFamily: "monospace",
@@ -505,7 +505,7 @@ function AuthorizeContent() {
                         >
                             <span
                                 style={{
-                                    color: "rgba(255,255,255,0.45)",
+                                    color: "rgba(25,40,55,0.45)",
                                     fontSize: 12.5,
                                 }}
                             >
@@ -513,7 +513,7 @@ function AuthorizeContent() {
                             </span>
                             <span
                                 style={{
-                                    color: "#c4b5fd",
+                                    color: "#7342E2",
                                     fontSize: 12.5,
                                     fontWeight: 600,
                                 }}
@@ -538,15 +538,15 @@ function AuthorizeContent() {
                         <div
                             style={{
                                 gridColumn: "1 / -1",
-                                background: "rgba(155, 123, 247,0.04)",
-                                border: "1px solid rgba(155, 123, 247,0.1)",
+                                background: "rgba(115, 66, 226,0.04)",
+                                border: "1px solid rgba(115, 66, 226,0.1)",
                                 borderRadius: 12,
                                 padding: 16,
                             }}
                         >
                             <p
                                 style={{
-                                    color: "rgba(255,255,255,0.5)",
+                                    color: "rgba(25,40,55,0.5)",
                                     fontSize: 11,
                                     fontWeight: 600,
                                     textTransform: "uppercase",
@@ -581,7 +581,7 @@ function AuthorizeContent() {
                                                 width="14"
                                                 height="14"
                                                 viewBox="0 0 20 20"
-                                                fill="#9b7bf7"
+                                                fill="#7342E2"
                                                 style={{ flexShrink: 0 }}
                                             >
                                                 <path
@@ -592,7 +592,7 @@ function AuthorizeContent() {
                                             </svg>
                                             <span
                                                 style={{
-                                                    color: "rgba(255,255,255,0.7)",
+                                                    color: "rgba(25,40,55,0.7)",
                                                     fontSize: 13,
                                                 }}
                                             >
@@ -607,15 +607,15 @@ function AuthorizeContent() {
                         {/* Info card */}
                         <div
                             style={{
-                                background: "rgba(255,255,255,0.025)",
-                                border: "1px solid rgba(255,255,255,0.06)",
+                                background: "rgba(25,40,55,0.025)",
+                                border: "1px solid rgba(25,40,55,0.1)",
                                 borderRadius: 12,
                                 padding: 14,
                             }}
                         >
                             <p
                                 style={{
-                                    color: "rgba(255,255,255,0.3)",
+                                    color: "rgba(25,40,55,0.4)",
                                     fontSize: 11,
                                     fontWeight: 600,
                                     margin: "0 0 6px",
@@ -625,7 +625,7 @@ function AuthorizeContent() {
                             </p>
                             <p
                                 style={{
-                                    color: "rgba(255,255,255,0.45)",
+                                    color: "rgba(25,40,55,0.45)",
                                     fontSize: 12,
                                     lineHeight: 1.5,
                                     margin: 0,
@@ -642,8 +642,8 @@ function AuthorizeContent() {
                                 background:
                                     timeRemaining < 60
                                         ? "rgba(239,68,68,0.06)"
-                                        : "rgba(255,255,255,0.025)",
-                                border: `1px solid ${timeRemaining < 60 ? "rgba(239,68,68,0.15)" : "rgba(255,255,255,0.06)"}`,
+                                        : "rgba(25,40,55,0.025)",
+                                border: `1px solid ${timeRemaining < 60 ? "rgba(239,68,68,0.15)" : "rgba(25,40,55,0.1)"}`,
                                 borderRadius: 12,
                                 padding: 14,
                                 display: "flex",
@@ -654,7 +654,7 @@ function AuthorizeContent() {
                         >
                             <p
                                 style={{
-                                    color: "rgba(255,255,255,0.3)",
+                                    color: "rgba(25,40,55,0.4)",
                                     fontSize: 11,
                                     fontWeight: 600,
                                     margin: "0 0 4px",
@@ -669,8 +669,8 @@ function AuthorizeContent() {
                                     fontWeight: 700,
                                     color:
                                         timeRemaining < 60
-                                            ? "#ef4444"
-                                            : "#9b7bf7",
+                                            ? "#b91c1c"
+                                            : "#7342E2",
                                     margin: 0,
                                 }}
                             >
@@ -694,9 +694,9 @@ function AuthorizeContent() {
                                 flex: 1,
                                 padding: "12px 16px",
                                 borderRadius: 10,
-                                border: "1px solid rgba(255,255,255,0.1)",
-                                background: "rgba(255,255,255,0.04)",
-                                color: "rgba(255,255,255,0.5)",
+                                border: "1px solid rgba(25,40,55,0.1)",
+                                background: "rgba(25,40,55,0.04)",
+                                color: "rgba(25,40,55,0.6)",
                                 fontSize: 14,
                                 fontWeight: 600,
                                 cursor:
@@ -715,9 +715,9 @@ function AuthorizeContent() {
                                 flex: 1,
                                 padding: "12px 16px",
                                 borderRadius: 10,
-                                border: "1px solid rgba(155, 123, 247,0.3)",
-                                background: "rgba(155, 123, 247,0.12)",
-                                color: "#9b7bf7",
+                                border: "1px solid #7342E2",
+                                background: "#7342E2",
+                                color: "#fff",
                                 fontSize: 14,
                                 fontWeight: 700,
                                 cursor:
@@ -737,8 +737,8 @@ function AuthorizeContent() {
                                         style={{
                                             width: 16,
                                             height: 16,
-                                            border: "2px solid rgba(155, 123, 247,0.3)",
-                                            borderTopColor: "#9b7bf7",
+                                            border: "2px solid rgba(255,255,255,0.4)",
+                                            borderTopColor: "#fff",
                                             borderRadius: "50%",
                                             animation:
                                                 "spin 0.8s linear infinite",
@@ -774,7 +774,7 @@ function AuthorizeContent() {
                     style={{
                         textAlign: "center",
                         fontSize: 12,
-                        color: "rgba(255,255,255,0.25)",
+                        color: "rgba(25,40,55,0.4)",
                         marginTop: 16,
                     }}
                 >
@@ -782,7 +782,7 @@ function AuthorizeContent() {
                     <button
                         onClick={() => router.push("/login")}
                         style={{
-                            color: "#9b7bf7",
+                            color: "#7342E2",
                             background: "none",
                             border: "none",
                             cursor: "pointer",

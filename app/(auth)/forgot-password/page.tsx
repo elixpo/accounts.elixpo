@@ -13,46 +13,46 @@ import { Suspense, useEffect, useState } from "react";
 
 const textFieldSx = {
     "& .MuiOutlinedInput-root": {
-        color: "#f5f5f4",
+        color: "#192837",
         background: "transparent",
-        "& fieldset": { borderColor: "rgba(255, 255, 255, 0.1)" },
-        "&:hover fieldset": { borderColor: "rgba(255, 255, 255, 0.2)" },
-        "&.Mui-focused fieldset": { borderColor: "#9b7bf7" },
+        "& fieldset": { borderColor: "rgba(25, 40, 55, 0.1)" },
+        "&:hover fieldset": { borderColor: "rgba(25, 40, 55, 0.2)" },
+        "&.Mui-focused fieldset": { borderColor: "#7342E2" },
         "& input:-webkit-autofill": {
             WebkitBoxShadow: "0 0 0 1000px transparent inset !important",
-            WebkitTextFillColor: "#f5f5f4 !important",
+            WebkitTextFillColor: "#192837 !important",
             WebkitTransition: "background-color 5000s ease-in-out 0s",
         },
         "& input:-webkit-autofill:hover": {
             WebkitBoxShadow: "0 0 0 1000px transparent inset !important",
-            WebkitTextFillColor: "#f5f5f4 !important",
+            WebkitTextFillColor: "#192837 !important",
         },
         "& input:-webkit-autofill:focus": {
             WebkitBoxShadow: "0 0 0 1000px transparent inset !important",
-            WebkitTextFillColor: "#f5f5f4 !important",
+            WebkitTextFillColor: "#192837 !important",
         },
     },
     "& .MuiInputBase-input::placeholder": { color: "transparent", opacity: 0 },
-    "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.7)" },
-    "& .MuiInputLabel-root.Mui-focused": { color: "#9b7bf7" },
+    "& .MuiInputLabel-root": { color: "rgba(25, 40, 55, 0.7)" },
+    "& .MuiInputLabel-root.Mui-focused": { color: "#7342E2" },
 };
 
 const btnSx = {
     my: 2,
-    background: "rgba(155, 123, 247, 0.15)",
-    color: "#9b7bf7",
-    border: "1px solid rgba(155, 123, 247, 0.3)",
+    background: "#7342E2",
+    color: "#fff",
+    border: "1px solid #7342E2",
     fontWeight: 600,
     py: 1.2,
     textTransform: "none",
     fontSize: "1rem",
     "&:hover": {
-        background: "rgba(155, 123, 247, 0.25)",
-        borderColor: "rgba(155, 123, 247, 0.5)",
+        background: "rgba(115, 66, 226, 0.9)",
+        borderColor: "rgba(115, 66, 226, 0.9)",
     },
     "&:disabled": {
-        color: "rgba(255, 255, 255, 0.4)",
-        borderColor: "rgba(255, 255, 255, 0.1)",
+        color: "rgba(25, 40, 55, 0.4)",
+        borderColor: "rgba(25, 40, 55, 0.1)",
     },
 };
 
@@ -224,7 +224,7 @@ function ForgotPasswordContent() {
                     background: "transparent",
                 }}
             >
-                <CircularProgress sx={{ color: "#9b7bf7" }} />
+                <CircularProgress sx={{ color: "#7342E2" }} />
             </Box>
         );
     }
@@ -245,9 +245,8 @@ function ForgotPasswordContent() {
                     maxWidth: "420px",
                     width: "100%",
                     backdropFilter: "blur(20px)",
-                    background:
-                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    background: "#ffffff",
+                    border: "1px solid rgba(25, 40, 55, 0.1)",
                     borderRadius: "16px",
                     p: 3,
                 }}
@@ -255,13 +254,13 @@ function ForgotPasswordContent() {
                 <Box sx={{ mb: 3, textAlign: "center" }}>
                     <Typography
                         variant="h4"
-                        sx={{ fontWeight: 700, color: "#f5f5f4", mb: 0.5 }}
+                        sx={{ fontWeight: 700, color: "#192837", mb: 0.5 }}
                     >
                         Reset Password
                     </Typography>
                     <Typography
                         sx={{
-                            color: "rgba(255, 255, 255, 0.5)",
+                            color: "rgba(25, 40, 55, 0.5)",
                             fontSize: "0.95rem",
                         }}
                     >
@@ -277,7 +276,7 @@ function ForgotPasswordContent() {
                         sx={{
                             background: "rgba(239, 68, 68, 0.1)",
                             border: "1px solid rgba(239, 68, 68, 0.3)",
-                            color: "#f87171",
+                            color: "#b91c1c",
                             p: 1.5,
                             borderRadius: "8px",
                             mb: 2,
@@ -336,7 +335,7 @@ function ForgotPasswordContent() {
                         />
                         <Typography
                             sx={{
-                                color: "rgba(255, 255, 255, 0.5)",
+                                color: "rgba(25, 40, 55, 0.5)",
                                 fontSize: "0.85rem",
                                 mt: 1,
                                 mb: 2,
@@ -359,10 +358,10 @@ function ForgotPasswordContent() {
                                 onClick={handleResendOtp}
                                 sx={{
                                     textTransform: "none",
-                                    color: "#9b7bf7",
+                                    color: "#7342E2",
                                     "&:hover": { background: "transparent" },
                                     "&:disabled": {
-                                        color: "rgba(255, 255, 255, 0.3)",
+                                        color: "rgba(25, 40, 55, 0.3)",
                                     },
                                 }}
                             >
@@ -414,7 +413,7 @@ function ForgotPasswordContent() {
                     <Box sx={{ textAlign: "center", py: 2 }}>
                         <Typography
                             sx={{
-                                color: "#9b7bf7",
+                                color: "#15803d",
                                 fontSize: "1.1rem",
                                 fontWeight: 600,
                                 mb: 2,
@@ -424,7 +423,7 @@ function ForgotPasswordContent() {
                         </Typography>
                         <Typography
                             sx={{
-                                color: "rgba(255,255,255,0.5)",
+                                color: "rgba(25, 40, 55, 0.5)",
                                 fontSize: "0.9rem",
                                 mb: 3,
                             }}
@@ -447,19 +446,19 @@ function ForgotPasswordContent() {
                         sx={{
                             mt: 2,
                             pt: 2,
-                            borderTop: "1px solid rgba(255, 255, 255, 0.1)",
+                            borderTop: "1px solid rgba(25, 40, 55, 0.1)",
                             textAlign: "center",
                         }}
                     >
                         <Typography
-                            sx={{ color: "rgba(255, 255, 255, 0.7)", mb: 1 }}
+                            sx={{ color: "rgba(25, 40, 55, 0.7)", mb: 1 }}
                         >
                             Back to login?
                         </Typography>
                         <Link
                             href="/login"
                             style={{
-                                color: "#9b7bf7",
+                                color: "#7342E2",
                                 textDecoration: "none",
                                 fontWeight: 600,
                             }}
@@ -486,7 +485,7 @@ export default function ForgotPasswordPage() {
                         background: "transparent",
                     }}
                 >
-                    <CircularProgress sx={{ color: "#9b7bf7" }} />
+                    <CircularProgress sx={{ color: "#7342E2" }} />
                 </Box>
             }
         >

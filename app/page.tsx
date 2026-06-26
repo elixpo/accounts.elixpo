@@ -344,8 +344,92 @@ export default function LandingPage() {
                 </div>
             </section>
 
+            {/* TWO STEPS SECTION */}
+            <section className="bg-white text-[#192837] py-28 border-t border-[#192837]/10 relative z-10">
+                <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
+                    <div className="text-center max-w-[720px] mx-auto mb-16">
+                        <span className="inline-block text-[11px] font-bold uppercase tracking-[0.18em] text-[#7342E2] mb-4">
+                            Get started
+                        </span>
+                        <h2 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+                            Add Sign in with Elixpo in two steps
+                        </h2>
+                        <p className="text-base sm:text-lg opacity-80 leading-relaxed font-body">
+                            No SDK to wrestle with. Create your account, register your app, and you&apos;re
+                            issuing logins — for Elixpo apps or your own.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-[940px] mx-auto">
+                        {/* Step 1 — account */}
+                        <div className="relative bg-[#F2F2EE] border border-[#192837]/10 rounded-2xl p-8 flex flex-col gsap-card-animate">
+                            <div className="flex items-center gap-3 mb-6">
+                                <span className="font-heading text-sm font-bold w-9 h-9 grid place-items-center rounded-full bg-[#7342E2] text-white">
+                                    01
+                                </span>
+                                <div className="p-2.5 bg-[#7342E2]/10 border border-[#7342E2]/25 rounded-xl text-[#7342E2]">
+                                    <Fingerprint className="w-5 h-5" />
+                                </div>
+                            </div>
+                            <h3 className="font-heading text-xl font-bold mb-2">Create your account</h3>
+                            <p className="text-[#192837]/75 leading-relaxed text-sm sm:text-base font-body mb-6">
+                                Register a free Elixpo account — or sign in if you already have one. One
+                                identity that works everywhere.
+                            </p>
+                            <div className="mt-auto flex flex-wrap items-center gap-3">
+                                <Link
+                                    href="/register"
+                                    className="inline-flex items-center gap-2 bg-[#7342E2] text-white px-5 py-2.5 rounded-full font-body font-semibold text-sm transition-all hover:brightness-110 active:scale-[0.98]"
+                                >
+                                    Create account
+                                    <ArrowRightCircle className="w-4 h-4" />
+                                </Link>
+                                <Link
+                                    href="/login"
+                                    className="inline-flex items-center text-sm font-semibold text-[#192837] opacity-80 hover:opacity-100 transition-opacity"
+                                >
+                                    Sign in
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* Step 2 — register the app */}
+                        <div className="relative bg-[#F2F2EE] border border-[#192837]/10 rounded-2xl p-8 flex flex-col gsap-card-animate">
+                            <div className="flex items-center gap-3 mb-6">
+                                <span className="font-heading text-sm font-bold w-9 h-9 grid place-items-center rounded-full bg-[#7342E2] text-white">
+                                    02
+                                </span>
+                                <div className="p-2.5 bg-[#7342E2]/10 border border-[#7342E2]/25 rounded-xl text-[#7342E2]">
+                                    <Network className="w-5 h-5" />
+                                </div>
+                            </div>
+                            <h3 className="font-heading text-xl font-bold mb-2">Register your app</h3>
+                            <p className="text-[#192837]/75 leading-relaxed text-sm sm:text-base font-body mb-6">
+                                Add your app in the dashboard to get OAuth client credentials, then drop in
+                                the “Sign in with Elixpo” button. That&apos;s it.
+                            </p>
+                            <div className="mt-auto flex flex-wrap items-center gap-3">
+                                <Link
+                                    href="/dashboard/oauth-apps"
+                                    className="inline-flex items-center gap-2 bg-[#7342E2] text-white px-5 py-2.5 rounded-full font-body font-semibold text-sm transition-all hover:brightness-110 active:scale-[0.98]"
+                                >
+                                    Register an app
+                                    <ArrowRightCircle className="w-4 h-4" />
+                                </Link>
+                                <Link
+                                    href="/docs/quickstart"
+                                    className="inline-flex items-center text-sm font-semibold text-[#192837] opacity-80 hover:opacity-100 transition-opacity"
+                                >
+                                    Read the quickstart
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* READY WHEN YOU ARE SECTION */}
-            <section className="bg-white text-[#192837] py-24 border-t border-[#192837]/10 relative z-10">
+            <section className="bg-[#F2F2EE] text-[#192837] py-24 border-t border-[#192837]/10 relative z-10">
                 <div className="max-w-[800px] mx-auto px-5 text-center">
                     <h2 className="font-heading text-3xl sm:text-4xl font-bold mb-4 tracking-tight">
                         Ready when you are.

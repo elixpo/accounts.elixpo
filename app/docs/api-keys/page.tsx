@@ -23,7 +23,7 @@ export default function ApiKeysDocsPage() {
                 sx={{
                     fontSize: "2rem",
                     fontWeight: 800,
-                    color: "#fff",
+                    color: "#192837",
                     mb: 2,
                     letterSpacing: "-0.02em",
                 }}
@@ -32,7 +32,7 @@ export default function ApiKeysDocsPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(255, 255, 255, 0.7)",
+                    color: "rgba(25, 40, 55, 0.7)",
                     mb: 4,
                     fontSize: "1rem",
                     lineHeight: 1.7,
@@ -49,7 +49,7 @@ export default function ApiKeysDocsPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#fff",
+                    color: "#192837",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -59,7 +59,7 @@ export default function ApiKeysDocsPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(255, 255, 255, 0.7)",
+                    color: "rgba(25, 40, 55, 0.7)",
                     mb: 2,
                     lineHeight: 1.6,
                 }}
@@ -74,7 +74,7 @@ export default function ApiKeysDocsPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#fff",
+                    color: "#192837",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -84,7 +84,7 @@ export default function ApiKeysDocsPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(255, 255, 255, 0.7)",
+                    color: "rgba(25, 40, 55, 0.7)",
                     mb: 3,
                     lineHeight: 1.6,
                 }}
@@ -94,31 +94,31 @@ export default function ApiKeysDocsPage() {
             </Typography>
             <TableContainer
                 sx={{
-                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    border: "1px solid rgba(25, 40, 55, 0.10)",
                     borderRadius: "8px",
                     mb: 4,
-                    background: "rgba(255, 255, 255, 0.01)",
+                    background: "#ffffff",
                 }}
             >
                 <Table size="small">
-                    <TableHead sx={{ bgcolor: "rgba(255, 255, 255, 0.02)" }}>
+                    <TableHead sx={{ bgcolor: "rgba(25, 40, 55, 0.04)" }}>
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#9ca3af",
+                                    color: "rgba(25, 40, 55, 0.6)",
                                     fontWeight: 600,
                                     borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
+                                        "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
                             >
                                 Scope Name
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "#9ca3af",
+                                    color: "rgba(25, 40, 55, 0.6)",
                                     fontWeight: 600,
                                     borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
+                                        "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
                             >
                                 Permissions Granted
@@ -129,18 +129,18 @@ export default function ApiKeysDocsPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#fff",
+                                    color: "#192837",
                                     borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
+                                        "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
                             >
                                 <code>users:read</code>
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(255, 255, 255, 0.7)",
+                                    color: "rgba(25, 40, 55, 0.7)",
                                     borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
+                                        "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
                             >
                                 Allows querying and searching user profiles and
@@ -150,18 +150,18 @@ export default function ApiKeysDocsPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#fff",
+                                    color: "#192837",
                                     borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
+                                        "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
                             >
                                 <code>users:write</code>
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(255, 255, 255, 0.7)",
+                                    color: "rgba(25, 40, 55, 0.7)",
                                     borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
+                                        "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
                             >
                                 Allows creating users, editing roles, or
@@ -171,18 +171,18 @@ export default function ApiKeysDocsPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#fff",
+                                    color: "#192837",
                                     borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
+                                        "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
                             >
                                 <code>apps:read</code>
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(255, 255, 255, 0.7)",
+                                    color: "rgba(25, 40, 55, 0.7)",
                                     borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
+                                        "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
                             >
                                 Allows reading developer OAuth client
@@ -192,18 +192,18 @@ export default function ApiKeysDocsPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#fff",
+                                    color: "#192837",
                                     borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
+                                        "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
                             >
                                 <code>apps:write</code>
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(255, 255, 255, 0.7)",
+                                    color: "rgba(25, 40, 55, 0.7)",
                                     borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
+                                        "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
                             >
                                 Allows registering, modifying, or deleting OAuth
@@ -213,18 +213,18 @@ export default function ApiKeysDocsPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#fff",
+                                    color: "#192837",
                                     borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
+                                        "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
                             >
                                 <code>webhooks:read</code> / <code>write</code>
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(255, 255, 255, 0.7)",
+                                    color: "rgba(25, 40, 55, 0.7)",
                                     borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
+                                        "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
                             >
                                 Allows managing webhook subscriptions and
@@ -234,18 +234,18 @@ export default function ApiKeysDocsPage() {
                         <TableRow>
                             <TableCell
                                 sx={{
-                                    color: "#fff",
+                                    color: "#192837",
                                     borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
+                                        "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
                             >
                                 <code>admin:read</code> / <code>write</code>
                             </TableCell>
                             <TableCell
                                 sx={{
-                                    color: "rgba(255, 255, 255, 0.7)",
+                                    color: "rgba(25, 40, 55, 0.7)",
                                     borderBottom:
-                                        "1px solid rgba(255, 255, 255, 0.08)",
+                                        "1px solid rgba(25, 40, 55, 0.10)",
                                 }}
                             >
                                 Grants access to admin panels, audit logs, and
@@ -261,7 +261,7 @@ export default function ApiKeysDocsPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#fff",
+                    color: "#192837",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -271,7 +271,7 @@ export default function ApiKeysDocsPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(255, 255, 255, 0.7)",
+                    color: "rgba(25, 40, 55, 0.7)",
                     mb: 2,
                     lineHeight: 1.6,
                 }}

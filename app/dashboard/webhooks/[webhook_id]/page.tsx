@@ -30,8 +30,8 @@ const AVAILABLE_EVENTS = [
 ];
 
 const cardSx = {
-    background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: "#ffffff",
+    border: "1px solid rgba(25,40,55,0.10)",
     borderRadius: "16px",
     p: 3,
     mb: 3,
@@ -39,13 +39,13 @@ const cardSx = {
 
 const textFieldSx = {
     "& .MuiOutlinedInput-root": {
-        color: "#f5f5f4",
-        "& fieldset": { borderColor: "rgba(255,255,255,0.1)" },
-        "&:hover fieldset": { borderColor: "rgba(255,255,255,0.2)" },
-        "&.Mui-focused fieldset": { borderColor: "#9b7bf7" },
+        color: "#192837",
+        "& fieldset": { borderColor: "rgba(25,40,55,0.10)" },
+        "&:hover fieldset": { borderColor: "rgba(25,40,55,0.10)" },
+        "&.Mui-focused fieldset": { borderColor: "#7342E2" },
     },
-    "& .MuiInputLabel-root": { color: "rgba(255,255,255,0.7)" },
-    "& .MuiInputLabel-root.Mui-focused": { color: "#9b7bf7" },
+    "& .MuiInputLabel-root": { color: "rgba(25,40,55,0.7)" },
+    "& .MuiInputLabel-root.Mui-focused": { color: "#7342E2" },
 };
 
 export default function WebhookDetailPage() {
@@ -172,7 +172,7 @@ export default function WebhookDetailPage() {
                     py: 10,
                 }}
             >
-                <CircularProgress sx={{ color: "#9b7bf7" }} />
+                <CircularProgress sx={{ color: "#7342E2" }} />
             </Box>
         );
     }
@@ -186,23 +186,23 @@ export default function WebhookDetailPage() {
                         startIcon={<ArrowBackIcon />}
                         onClick={() => router.push("/dashboard/webhooks")}
                         sx={{
-                            color: "rgba(255,255,255,0.5)",
+                            color: "rgba(25,40,55,0.5)",
                             mb: 2,
                             textTransform: "none",
-                            "&:hover": { color: "#fff" },
+                            "&:hover": { color: "#192837" },
                         }}
                     >
                         Back to Webhooks
                     </Button>
                     <Typography
                         variant="h5"
-                        sx={{ fontWeight: 700, color: "#f5f5f4", mb: 0.5 }}
+                        sx={{ fontWeight: 700, color: "#192837", mb: 0.5 }}
                     >
                         Webhook Settings
                     </Typography>
                     <Typography
                         sx={{
-                            color: "rgba(255,255,255,0.5)",
+                            color: "rgba(25,40,55,0.5)",
                             fontSize: "0.85rem",
                             fontFamily: "monospace",
                         }}
@@ -218,18 +218,18 @@ export default function WebhookDetailPage() {
                             mb: 3,
                             bgcolor:
                                 message.type === "success"
-                                    ? "rgba(155, 123, 247,0.1)"
+                                    ? "rgba(115,66,226,0.1)"
                                     : "rgba(239,68,68,0.1)",
                             color:
                                 message.type === "success"
-                                    ? "#9b7bf7"
-                                    : "#ef4444",
-                            border: `1px solid ${message.type === "success" ? "rgba(155, 123, 247,0.3)" : "rgba(239,68,68,0.3)"}`,
+                                    ? "#7342E2"
+                                    : "#b91c1c",
+                            border: `1px solid ${message.type === "success" ? "rgba(115,66,226,0.3)" : "rgba(239,68,68,0.3)"}`,
                             "& .MuiAlert-icon": {
                                 color:
                                     message.type === "success"
-                                        ? "#9b7bf7"
-                                        : "#ef4444",
+                                        ? "#7342E2"
+                                        : "#b91c1c",
                             },
                         }}
                         onClose={() => setMessage(null)}
@@ -249,13 +249,13 @@ export default function WebhookDetailPage() {
                     >
                         <Box>
                             <Typography
-                                sx={{ color: "#f5f5f4", fontWeight: 600 }}
+                                sx={{ color: "#192837", fontWeight: 600 }}
                             >
                                 Active
                             </Typography>
                             <Typography
                                 variant="caption"
-                                sx={{ color: "rgba(255,255,255,0.5)" }}
+                                sx={{ color: "rgba(25,40,55,0.5)" }}
                             >
                                 Pause delivery without deleting the webhook
                             </Typography>
@@ -270,10 +270,10 @@ export default function WebhookDetailPage() {
                             }
                             sx={{
                                 "& .MuiSwitch-switchBase.Mui-checked": {
-                                    color: "#9b7bf7",
+                                    color: "#7342E2",
                                 },
                                 "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
-                                    { bgcolor: "#65a30d" },
+                                    { bgcolor: "#15803d" },
                             }}
                         />
                     </Box>
@@ -283,7 +283,7 @@ export default function WebhookDetailPage() {
                 <Box sx={cardSx}>
                     <Typography
                         sx={{
-                            color: "#f5f5f4",
+                            color: "#192837",
                             fontWeight: 600,
                             mb: 2,
                             fontSize: "1rem",
@@ -303,7 +303,7 @@ export default function WebhookDetailPage() {
 
                     <Typography
                         sx={{
-                            color: "rgba(255,255,255,0.7)",
+                            color: "rgba(25,40,55,0.7)",
                             mb: 1,
                             fontSize: "0.9rem",
                             fontWeight: 600,
@@ -328,9 +328,9 @@ export default function WebhookDetailPage() {
                                         onChange={() => handleEventToggle(ev)}
                                         size="small"
                                         sx={{
-                                            color: "rgba(255,255,255,0.3)",
+                                            color: "rgba(25,40,55,0.3)",
                                             "&.Mui-checked": {
-                                                color: "#9b7bf7",
+                                                color: "#7342E2",
                                             },
                                         }}
                                     />
@@ -338,7 +338,7 @@ export default function WebhookDetailPage() {
                                 label={
                                     <Typography
                                         sx={{
-                                            color: "#e5e7eb",
+                                            color: "#192837",
                                             fontFamily: "monospace",
                                             fontSize: "0.85rem",
                                         }}
@@ -356,13 +356,13 @@ export default function WebhookDetailPage() {
                         onClick={handleSave}
                         disabled={saving}
                         sx={{
-                            background: "rgba(155, 123, 247,0.15)",
-                            color: "#9b7bf7",
-                            border: "1px solid rgba(155, 123, 247,0.3)",
+                            background: "rgba(115,66,226,0.15)",
+                            color: "#7342E2",
+                            border: "1px solid rgba(115,66,226,0.3)",
                             fontWeight: 600,
                             textTransform: "none",
                             "&:hover": {
-                                background: "rgba(155, 123, 247,0.25)",
+                                background: "rgba(115,66,226,0.25)",
                             },
                         }}
                     >
@@ -373,15 +373,15 @@ export default function WebhookDetailPage() {
                 {/* Test */}
                 <Box sx={cardSx}>
                     <Typography
-                        sx={{ color: "#f5f5f4", fontWeight: 600, mb: 1 }}
+                        sx={{ color: "#192837", fontWeight: 600, mb: 1 }}
                     >
                         Send Test Payload
                     </Typography>
                     <Typography
                         variant="body2"
-                        sx={{ color: "rgba(255,255,255,0.5)", mb: 2 }}
+                        sx={{ color: "rgba(25,40,55,0.5)", mb: 2 }}
                     >
-                        Sends a <code style={{ color: "#9b7bf7" }}>ping</code>{" "}
+                        Sends a <code style={{ color: "#7342E2" }}>ping</code>{" "}
                         event to verify your endpoint is reachable.
                     </Typography>
                     <Button
@@ -390,12 +390,12 @@ export default function WebhookDetailPage() {
                         onClick={handleTest}
                         disabled={testing}
                         sx={{
-                            borderColor: "rgba(155, 123, 247,0.3)",
-                            color: "#9b7bf7",
+                            borderColor: "rgba(115,66,226,0.3)",
+                            color: "#7342E2",
                             textTransform: "none",
                             "&:hover": {
-                                borderColor: "#9b7bf7",
-                                bgcolor: "rgba(155, 123, 247,0.05)",
+                                borderColor: "#7342E2",
+                                bgcolor: "rgba(115,66,226,0.05)",
                             },
                         }}
                     >
@@ -408,7 +408,7 @@ export default function WebhookDetailPage() {
                     sx={{ ...cardSx, border: "1px solid rgba(239,68,68,0.35)" }}
                 >
                     <Typography
-                        sx={{ color: "#ef4444", fontWeight: 600, mb: 1 }}
+                        sx={{ color: "#b91c1c", fontWeight: 600, mb: 1 }}
                     >
                         Danger Zone
                     </Typography>
@@ -424,13 +424,13 @@ export default function WebhookDetailPage() {
                     >
                         <Box>
                             <Typography
-                                sx={{ color: "#f5f5f4", fontWeight: 500 }}
+                                sx={{ color: "#192837", fontWeight: 500 }}
                             >
                                 Delete webhook
                             </Typography>
                             <Typography
                                 variant="caption"
-                                sx={{ color: "rgba(255,255,255,0.5)" }}
+                                sx={{ color: "rgba(25,40,55,0.5)" }}
                             >
                                 Permanently remove this webhook and stop all
                                 deliveries
@@ -442,7 +442,7 @@ export default function WebhookDetailPage() {
                             onClick={handleDelete}
                             sx={{
                                 borderColor: "rgba(239,68,68,0.4)",
-                                color: "#ef4444",
+                                color: "#b91c1c",
                                 textTransform: "none",
                                 "&:hover": {
                                     bgcolor: "rgba(239,68,68,0.1)",

@@ -29,8 +29,8 @@ export default function CodeBlock({ code, language }: CodeBlockProps) {
         <Box
             sx={{
                 position: "relative",
-                background: "rgba(0, 0, 0, 0.4)",
-                border: "1px solid rgba(155, 123, 247, 0.15)",
+                background: "#F4F3EF",
+                border: "1px solid rgba(25, 40, 55, 0.10)",
                 borderRadius: "8px",
                 p: 2,
                 mb: 2,
@@ -48,13 +48,13 @@ export default function CodeBlock({ code, language }: CodeBlockProps) {
                         position: "absolute",
                         top: 8,
                         right: 8,
-                        color: copied ? "#9b7bf7" : "rgba(255, 255, 255, 0.4)",
-                        bgcolor: "rgba(255, 255, 255, 0.05)",
+                        color: copied ? "#7342E2" : "rgba(25, 40, 55, 0.5)",
+                        bgcolor: "rgba(25, 40, 55, 0.04)",
                         opacity: { xs: 1, md: 0 },
                         transition: "all 0.2s ease",
                         "&:hover": {
-                            bgcolor: "rgba(255, 255, 255, 0.1)",
-                            color: "#fff",
+                            bgcolor: "rgba(25, 40, 55, 0.08)",
+                            color: "#192837",
                         },
                     }}
                 >
@@ -71,7 +71,7 @@ export default function CodeBlock({ code, language }: CodeBlockProps) {
                     margin: 0,
                     fontFamily: "var(--font-geist-mono), monospace",
                     fontSize: "0.82rem",
-                    color: "#9b7bf7",
+                    color: "#192837",
                     overflowX: "auto",
                     whiteSpace: "pre",
                     pr: 4,
@@ -79,7 +79,7 @@ export default function CodeBlock({ code, language }: CodeBlockProps) {
                         height: "6px",
                     },
                     "&::-webkit-scrollbar-thumb": {
-                        bgcolor: "rgba(255, 255, 255, 0.1)",
+                        bgcolor: "rgba(25, 40, 55, 0.10)",
                         borderRadius: "3px",
                     },
                 }}

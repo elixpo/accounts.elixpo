@@ -30,7 +30,7 @@ export default function PrivacyPage() {
                     minHeight: "calc(100dvh - 68px)",
                     px: { xs: 2.5, sm: 4 },
                     py: { xs: 4, sm: 6 },
-                    color: "#f5f5f4",
+                    color: "#192837",
                 }}
             >
                 <Box sx={{ maxWidth: 760, mx: "auto" }}>
@@ -46,7 +46,7 @@ export default function PrivacyPage() {
                     </Typography>
                     <Typography
                         sx={{
-                            color: "rgba(245,245,244,0.55)",
+                            color: "rgba(25,40,55,0.55)",
                             fontSize: "0.95rem",
                             mb: 4,
                         }}
@@ -175,7 +175,7 @@ export default function PrivacyPage() {
                             personal data. Email{" "}
                             <a
                                 href="mailto:privacy@elixpo.com"
-                                style={{ color: "#9b7bf7" }}
+                                style={{ color: "#7342E2" }}
                             >
                                 privacy@elixpo.com
                             </a>{" "}
@@ -200,7 +200,7 @@ export default function PrivacyPage() {
                             Questions about this policy:{" "}
                             <a
                                 href="mailto:privacy@elixpo.com"
-                                style={{ color: "#9b7bf7" }}
+                                style={{ color: "#7342E2" }}
                             >
                                 privacy@elixpo.com
                             </a>
@@ -227,19 +227,19 @@ function Section({
                     fontWeight: 700,
                     fontSize: "1.15rem",
                     mb: 1.2,
-                    color: "#f5f5f4",
+                    color: "#192837",
                 }}
             >
                 {title}
             </Typography>
             <Box
                 sx={{
-                    color: "rgba(245,245,244,0.75)",
+                    color: "rgba(25,40,55,0.75)",
                     fontSize: "0.96rem",
                     lineHeight: 1.7,
                     "& ul": { pl: 3, m: 0, mt: 1 },
                     "& li": { mb: 0.6 },
-                    "& strong": { color: "#f5f5f4", fontWeight: 600 },
+                    "& strong": { color: "#192837", fontWeight: 600 },
                 }}
             >
                 {children}

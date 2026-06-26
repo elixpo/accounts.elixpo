@@ -331,13 +331,13 @@ export default function DocsLayout({
                     font-family: var(--font-geist-mono), monospace;
                 }
                 #docs-content pre {
-                    background: #192837;
-                    color: #f2f2ee;
+                    background: #F4F3EF;
+                    color: #192837;
                     padding: 1.25rem;
                     border-radius: 14px;
                     overflow-x: auto;
                     margin-bottom: 1.5rem;
-                    border: 1px solid rgba(25, 40, 55, 0.2);
+                    border: 1px solid rgba(25, 40, 55, 0.10);
                 }
                 #docs-content pre code {
                     background: transparent;

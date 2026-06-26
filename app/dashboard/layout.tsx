@@ -35,10 +35,10 @@ import BackgroundAurora from "../components/background-aurora";
 const darkTheme = createTheme({
     palette: {
         mode: "dark",
-        primary: { main: "#9b7bf7" },
+        primary: { main: "#7342E2" },
         background: {
             default: "transparent",
-            paper: "rgba(255, 255, 255, 0.03)",
+            paper: "#ffffff",
         },
     },
     typography: {
@@ -48,22 +48,20 @@ const darkTheme = createTheme({
         MuiCard: {
             styleOverrides: {
                 root: {
-                    background:
-                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background: "#ffffff",
                     backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    border: "1px solid rgba(25,40,55,0.10)",
                     borderRadius: "16px",
-                    boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
+                    boxShadow: "0 8px 32px 0 rgba(25,40,55,0.06)",
                 },
             },
         },
         MuiPaper: {
             styleOverrides: {
                 root: {
-                    background:
-                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+                    background: "#ffffff",
                     backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    border: "1px solid rgba(25,40,55,0.10)",
                     borderRadius: "16px",
                 },
             },
@@ -155,10 +153,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    bgcolor: "#0f1117",
+                    bgcolor: "#F2F2EE",
                 }}
             >
-                <CircularProgress sx={{ color: "#9b7bf7" }} />
+                <CircularProgress sx={{ color: "#7342E2" }} />
             </Box>
         );
     }
@@ -173,9 +171,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         position="sticky"
                         elevation={0}
                         sx={{
-                            bgcolor: "rgba(11, 13, 18, 0.4)",
+                            bgcolor: "rgba(242,242,238,0.8)",
                             backdropFilter: "blur(16px)",
-                            borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                            borderBottom: "1px solid rgba(25,40,55,0.10)",
                         }}
                     >
                         <Toolbar
@@ -213,7 +211,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     sx={{
                                         fontWeight: 700,
                                         fontSize: "1.1rem",
-                                        color: "#f5f5f4",
+                                        color: "#192837",
                                         display: { xs: "none", sm: "block" },
                                         letterSpacing: "-0.01em",
                                     }}
@@ -242,10 +240,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         title={item.label}
                                         sx={{
                                             color: isActive(item.href)
-                                                ? "#9b7bf7"
-                                                : "rgba(255, 255, 255, 0.45)",
+                                                ? "#7342E2"
+                                                : "rgba(25,40,55,0.45)",
                                             bgcolor: isActive(item.href)
-                                                ? "rgba(155, 123, 247, 0.1)"
+                                                ? "rgba(115,66,226,0.1)"
                                                 : "transparent",
                                             borderRadius: "8px",
                                             width: 38,
@@ -253,11 +251,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                             transition: "all 0.2s ease",
                                             "&:hover": {
                                                 bgcolor: isActive(item.href)
-                                                    ? "rgba(155, 123, 247, 0.15)"
-                                                    : "rgba(255, 255, 255, 0.06)",
+                                                    ? "rgba(115,66,226,0.15)"
+                                                    : "rgba(25,40,55,0.04)",
                                                 color: isActive(item.href)
-                                                    ? "#9b7bf7"
-                                                    : "rgba(255, 255, 255, 0.8)",
+                                                    ? "#7342E2"
+                                                    : "rgba(25,40,55,0.8)",
                                             },
                                         }}
                                     >
@@ -276,13 +274,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                 rel="noopener noreferrer"
                                 title="GitHub"
                                 sx={{
-                                    color: "rgba(255,255,255,0.35)",
+                                    color: "rgba(25,40,55,0.35)",
                                     width: 38,
                                     height: 38,
                                     borderRadius: "8px",
                                     "&:hover": {
-                                        color: "#fff",
-                                        bgcolor: "rgba(255,255,255,0.06)",
+                                        color: "#192837",
+                                        bgcolor: "rgba(25,40,55,0.04)",
                                     },
                                 }}
                             >
@@ -303,7 +301,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                             width: 34,
                                             height: 34,
                                             borderRadius: "50%",
-                                            border: "2px solid rgba(155, 123, 247, 0.3)",
+                                            border: "2px solid rgba(115,66,226,0.3)",
                                         }}
                                     />
                                 ) : (
@@ -313,13 +311,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                             height: 34,
                                             borderRadius: "50%",
                                             background:
-                                                "linear-gradient(135deg, #9b7bf7 0%, #65a30d 100%)",
+                                                "linear-gradient(135deg, #7342E2 0%, #7342E2 100%)",
                                             display: "flex",
                                             alignItems: "center",
                                             justifyContent: "center",
                                             fontSize: "0.95rem",
                                             fontWeight: 700,
-                                            color: "#161816",
+                                            color: "#fff",
                                         }}
                                     >
                                         {(displayName || userEmail)
@@ -345,13 +343,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     paper: {
                                         sx: {
                                             mt: 1,
-                                            bgcolor: "rgba(20, 24, 18, 0.95)",
+                                            bgcolor: "rgba(255,255,255,0.95)",
                                             backdropFilter: "blur(16px)",
-                                            border: "1px solid rgba(255, 255, 255, 0.1)",
+                                            border: "1px solid rgba(25,40,55,0.10)",
                                             borderRadius: "12px",
                                             minWidth: 220,
                                             boxShadow:
-                                                "0 8px 32px rgba(0,0,0,0.4)",
+                                                "0 8px 32px rgba(25,40,55,0.06)",
                                         },
                                     },
                                 }}
@@ -359,7 +357,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                 <Box sx={{ px: 2, py: 1.5 }}>
                                     <Typography
                                         sx={{
-                                            color: "#f5f5f4",
+                                            color: "#192837",
                                             fontWeight: 600,
                                             fontSize: "0.9rem",
                                         }}
@@ -368,7 +366,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     </Typography>
                                     <Typography
                                         sx={{
-                                            color: "rgba(255,255,255,0.4)",
+                                            color: "rgba(25,40,55,0.4)",
                                             fontSize: "0.8rem",
                                         }}
                                     >
@@ -377,7 +375,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                 </Box>
                                 <Divider
                                     sx={{
-                                        borderColor: "rgba(255,255,255,0.08)",
+                                        borderColor: "rgba(25,40,55,0.10)",
                                     }}
                                 />
                                 {/* Account group */}
@@ -410,11 +408,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         onClick={() => setAnchorEl(null)}
                                         sx={{
                                             py: 1.25,
-                                            color: "rgba(255,255,255,0.7)",
+                                            color: "rgba(25,40,55,0.7)",
                                             "&:hover": {
                                                 bgcolor:
-                                                    "rgba(255,255,255,0.05)",
-                                                color: "#f5f5f4",
+                                                    "rgba(25,40,55,0.04)",
+                                                color: "#192837",
                                             },
                                         }}
                                     >
@@ -438,7 +436,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
                                 <Divider
                                     sx={{
-                                        borderColor: "rgba(255,255,255,0.08)",
+                                        borderColor: "rgba(25,40,55,0.10)",
                                     }}
                                 />
 
@@ -472,11 +470,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         onClick={() => setAnchorEl(null)}
                                         sx={{
                                             py: 1.25,
-                                            color: "rgba(255,255,255,0.7)",
+                                            color: "rgba(25,40,55,0.7)",
                                             "&:hover": {
                                                 bgcolor:
-                                                    "rgba(255,255,255,0.05)",
-                                                color: "#f5f5f4",
+                                                    "rgba(25,40,55,0.04)",
+                                                color: "#192837",
                                             },
                                         }}
                                     >
@@ -500,7 +498,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
                                 <Divider
                                     sx={{
-                                        borderColor: "rgba(255,255,255,0.08)",
+                                        borderColor: "rgba(25,40,55,0.10)",
                                     }}
                                 />
 
@@ -508,10 +506,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     onClick={handleLogout}
                                     sx={{
                                         py: 1.25,
-                                        color: "rgba(255,255,255,0.5)",
+                                        color: "rgba(25,40,55,0.5)",
                                         "&:hover": {
                                             bgcolor: "rgba(239, 68, 68, 0.08)",
-                                            color: "#ef4444",
+                                            color: "#b91c1c",
                                         },
                                     }}
                                 >

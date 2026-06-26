@@ -10,7 +10,7 @@ export default function OverviewPage() {
                 sx={{
                     fontSize: "2rem",
                     fontWeight: 800,
-                    color: "#fff",
+                    color: "#192837",
                     mb: 2,
                     letterSpacing: "-0.02em",
                 }}
@@ -19,7 +19,7 @@ export default function OverviewPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(255, 255, 255, 0.7)",
+                    color: "rgba(25, 40, 55, 0.7)",
                     mb: 3,
                     fontSize: "1rem",
                     lineHeight: 1.7,
@@ -37,7 +37,7 @@ export default function OverviewPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#fff",
+                    color: "#192837",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -48,7 +48,7 @@ export default function OverviewPage() {
             <Box
                 component="ul"
                 sx={{
-                    color: "rgba(255, 255, 255, 0.7)",
+                    color: "rgba(25, 40, 55, 0.7)",
                     pl: 3,
                     mb: 4,
                     "& li": { mb: 1.5, lineHeight: 1.6 },
@@ -85,7 +85,7 @@ export default function OverviewPage() {
                 sx={{
                     fontSize: "1.4rem",
                     fontWeight: 700,
-                    color: "#fff",
+                    color: "#192837",
                     mt: 4,
                     mb: 2,
                     letterSpacing: "-0.01em",
@@ -95,7 +95,7 @@ export default function OverviewPage() {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(255, 255, 255, 0.7)",
+                    color: "rgba(25, 40, 55, 0.7)",
                     mb: 3,
                     fontSize: "1.0rem",
                     lineHeight: 1.7,
