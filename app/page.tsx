@@ -492,10 +492,10 @@ export default function LandingPage() {
                                 ease: [0.22, 1, 0.36, 1] as const,
                                 duration: 0.45,
                             }}
-                            className="fixed right-0 top-0 w-[min(88vw,360px)] h-[100dvh] bg-[#CFC8C5] shadow-[-12px_0_48px_rgba(25,40,55,0.18)] z-50 flex flex-col p-6 text-[#192837]"
+                            className="fixed right-0 top-0 w-[min(88vw,360px)] h-[100dvh] bg-[var(--surface)] shadow-[-12px_0_48px_rgba(25,40,55,0.18)] z-50 flex flex-col p-6 text-[var(--fg)]"
                         >
                             {/* Header */}
-                            <div className="flex items-center justify-between pb-4 border-b border-[#192837]/10">
+                            <div className="flex items-center justify-between pb-4 border-b border-[var(--border)]">
                                 <Link
                                     href="/"
                                     className="flex items-center gap-2"
@@ -506,13 +506,13 @@ export default function LandingPage() {
                                         alt="Elixpo Mascot"
                                         className="w-8 h-8 rounded-lg object-contain bg-white/80 p-0.5"
                                     />
-                                    <span className="font-heading text-lg font-bold text-[#192837]">
+                                    <span className="font-heading text-lg font-bold text-[var(--fg)]">
                                         Elixpo
                                     </span>
                                 </Link>
                                 <button
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="p-1 hover:bg-[#192837]/10 rounded-full transition-colors text-[#192837]"
+                                    className="p-1 hover:bg-[var(--overlay)] rounded-full transition-colors text-[var(--fg)]"
                                 >
                                     <X className="w-6 h-6" />
                                 </button>
@@ -549,7 +549,7 @@ export default function LandingPage() {
                             </div>
 
                             {/* Bottom Call to Actions */}
-                            <div className="border-t border-[#192837]/10 pt-6 flex flex-col gap-3">
+                            <div className="border-t border-[var(--border)] pt-6 flex flex-col gap-3">
                                 {authed === null ? null : authed ? (
                                     <>
                                         <Link
@@ -566,7 +566,7 @@ export default function LandingPage() {
                                             onClick={() =>
                                                 setIsMobileMenuOpen(false)
                                             }
-                                            className="w-full bg-[#F2F2EE] text-[#192837] py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all border border-black/5"
+                                            className="w-full bg-[var(--surface-2)] text-[var(--fg)] py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all border border-[var(--border)]"
                                         >
                                             Profile
                                         </Link>
@@ -587,7 +587,7 @@ export default function LandingPage() {
                                             onClick={() =>
                                                 setIsMobileMenuOpen(false)
                                             }
-                                            className="w-full bg-[#F2F2EE] text-[#192837] py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all border border-black/5"
+                                            className="w-full bg-[var(--surface-2)] text-[var(--fg)] py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all border border-[var(--border)]"
                                         >
                                             Sign In
                                         </Link>

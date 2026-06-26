@@ -101,7 +101,7 @@ function GithubStarsButton({ repo }: { repo: string }) {
             href={`https://github.com/${repo}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3.5 py-2 text-sm font-semibold text-[var(--fg)] transition-all hover:border-[#192837]/30 hover:shadow-sm active:scale-[0.98]"
+            className="group inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3.5 py-2 text-sm font-semibold text-[var(--fg)] transition-all hover:border-[var(--border)] hover:shadow-sm active:scale-[0.98]"
             aria-label={`Star ${repo} on GitHub`}
         >
             <Github className="h-[18px] w-[18px]" />
@@ -129,7 +129,7 @@ function EmailButton({ email }: { email: string }) {
         <button
             type="button"
             onClick={copy}
-            className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3.5 py-2 text-sm font-semibold text-[var(--fg)] transition-all hover:border-[#192837]/30 hover:shadow-sm active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3.5 py-2 text-sm font-semibold text-[var(--fg)] transition-all hover:border-[var(--border)] hover:shadow-sm active:scale-[0.98]"
         >
             {copied ? (
                 <>
