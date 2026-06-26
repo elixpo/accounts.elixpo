@@ -2,7 +2,9 @@
 
 import {
     Apps,
+    DarkModeOutlined,
     DevicesOther,
+    LightModeOutlined,
     Logout,
     MenuBook,
     Person,
@@ -30,6 +32,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 
 import BackgroundAurora from "../components/background-aurora";
+import { useTheme as useAppTheme } from "../components/theme-provider";
 
 const darkTheme = createTheme({
     palette: {
@@ -87,6 +90,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     const [userAvatar, setUserAvatar] = useState<string | null>(null);
     const [authChecked, setAuthChecked] = useState(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const { theme: appTheme, toggle: toggleAppTheme } = useAppTheme();
 
     // Auth check. Uses window.location for redirects so router isn't
     // referenced inside the effect body — that way eslint-react-hooks can't
@@ -527,6 +531,38 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         </ListItemText>
                                     </MenuItem>
                                 ))}
+
+                                <Divider
+                                    sx={{
+                                        borderColor: "rgba(25,40,55,0.10)",
+                                    }}
+                                />
+
+                                {/* Light / dark theme preference */}
+                                <MenuItem
+                                    onClick={toggleAppTheme}
+                                    sx={{
+                                        py: 1.25,
+                                        color: "rgba(25,40,55,0.7)",
+                                        "&:hover": {
+                                            bgcolor: "rgba(25,40,55,0.04)",
+                                            color: "#192837",
+                                        },
+                                    }}
+                                >
+                                    <ListItemIcon sx={{ color: "inherit", minWidth: 36 }}>
+                                        {appTheme === "dark" ? (
+                                            <LightModeOutlined fontSize="small" />
+                                        ) : (
+                                            <DarkModeOutlined fontSize="small" />
+                                        )}
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        primaryTypographyProps={{ fontSize: "0.875rem" }}
+                                    >
+                                        {appTheme === "dark" ? "Light mode" : "Dark mode"}
+                                    </ListItemText>
+                                </MenuItem>
 
                                 <Divider
                                     sx={{
