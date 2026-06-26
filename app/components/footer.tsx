@@ -1,24 +1,64 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { Mail, Copy, Check } from "lucide-react";
+import { ArrowUpRight, Check, Copy, Mail, Star } from "lucide-react";
+import { useEffect, useState } from "react";
 
-const EMAIL = "hello@elixpo.com";
-const REPO_URL = "https://github.com/elixpo/accounts.elixpo";
+/* ──────────────────────────────────────────────────────────────────────────
+ * Elixpo — foundational footer
+ *
+ * One branded footer the whole Elixpo suite shares. To reuse it in another
+ * product, copy this file and edit only the PRODUCT + COLUMNS blocks below
+ * (name, accent, description, repo, link columns). Everything else — the brand
+ * lockup, the GitHub-stars CTA, the "Built in the Open" bar, the cream theme —
+ * stays identical so every Elixpo product reads as one family.
+ * ────────────────────────────────────────────────────────────────────────── */
 
-const navLinks = [
-    { label: "Sign in", href: "/login" },
-    { label: "About", href: "/about" },
-    { label: "Docs", href: "/docs" },
-    { label: "Integrator guide", href: "/docs" },
+const PRODUCT = {
+    name: "Accounts",
+    accent: "#7342E2",
+    description:
+        "Open OAuth 2.0 single sign-on for the modern web. Add “Sign in with Elixpo” to any app — Elixpo or your own — in two steps, on one edge-hosted account.",
+    repo: "elixpo/accounts.elixpo",
+    email: "hello@elixpo.com",
+};
+
+const COLUMNS: { title: string; links: { label: string; href: string; external?: boolean }[] }[] = [
+    {
+        title: "Product",
+        links: [
+            { label: "Sign in", href: "/login" },
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "OAuth apps", href: "/dashboard/oauth-apps" },
+            { label: "Pricing", href: "/pricing" },
+        ],
+    },
+    {
+        title: "Developers",
+        links: [
+            { label: "Documentation", href: "/docs" },
+            { label: "Quickstart", href: "/docs/quickstart" },
+            { label: "OAuth 2.0", href: "/docs/oauth" },
+            { label: "Webhooks", href: "/docs/webhooks" },
+        ],
+    },
+    {
+        title: "Legal",
+        links: [
+            { label: "Privacy Policy", href: "/privacy" },
+            { label: "Terms of Service", href: "/terms" },
+            { label: "Security", href: "/dashboard/security" },
+        ],
+    },
 ];
+
+const SUITE_URL = "https://elixpo.com";
 
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
         viewBox="0 0 24 24"
-        width="20"
-        height="20"
+        width="18"
+        height="18"
         stroke="currentColor"
         strokeWidth="2"
         fill="none"
@@ -26,125 +66,150 @@ const Github = (props: React.SVGProps<SVGSVGElement>) => (
         strokeLinejoin="round"
         {...props}
     >
-        <title>GitHub Logo</title>
+        <title>GitHub</title>
         <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
     </svg>
 );
 
-export default function Footer() {
-    const [copied, setCopied] = useState(false);
+function formatStars(n: number): string {
+    return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
+}
 
-    const handleCopyEmail = async () => {
+/** GitHub CTA — always paired with the live star count. */
+function GithubStarsButton({ repo }: { repo: string }) {
+    const [stars, setStars] = useState<number | null>(null);
+    useEffect(() => {
+        let alive = true;
+        fetch(`https://api.github.com/repos/${repo}`)
+            .then((r) => (r.ok ? r.json() : null))
+            .then((raw) => {
+                const d = raw as { stargazers_count?: number } | null;
+                if (alive && d && typeof d.stargazers_count === "number") setStars(d.stargazers_count);
+            })
+            .catch(() => {});
+        return () => {
+            alive = false;
+        };
+    }, [repo]);
+
+    return (
+        <a
+            href={`https://github.com/${repo}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-2 rounded-xl border border-[#192837]/12 bg-white px-3.5 py-2 text-sm font-semibold text-[#192837] transition-all hover:border-[#192837]/30 hover:shadow-sm active:scale-[0.98]"
+            aria-label={`Star ${repo} on GitHub`}
+        >
+            <Github className="h-[18px] w-[18px]" />
+            <span>Star</span>
+            <span className="flex items-center gap-1 rounded-md bg-[#192837]/[0.05] px-1.5 py-0.5 text-xs font-bold tabular-nums">
+                <Star className="h-3 w-3 fill-[#fbbf24] text-[#fbbf24]" />
+                {stars === null ? "—" : formatStars(stars)}
+            </span>
+        </a>
+    );
+}
+
+function EmailButton({ email }: { email: string }) {
+    const [copied, setCopied] = useState(false);
+    const copy = async () => {
         try {
-            await navigator.clipboard.writeText(EMAIL);
+            await navigator.clipboard.writeText(email);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch {
-            const ta = document.createElement("textarea");
-            ta.value = EMAIL;
-            document.body.appendChild(ta);
-            ta.select();
-            try {
-                document.execCommand("copy");
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-            } catch {
-                window.location.href = `mailto:${EMAIL}`;
-            }
-            document.body.removeChild(ta);
+            window.location.href = `mailto:${email}`;
         }
     };
-
     return (
-        <footer className="bg-[#F2F2EE] text-[#192837] border-t border-[#192837]/10 py-16 relative z-10 w-full font-body">
-            <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
-                <div className="flex flex-col md:flex-row justify-between gap-12 mb-12">
+        <button
+            type="button"
+            onClick={copy}
+            className="inline-flex items-center gap-2 rounded-xl border border-[#192837]/12 bg-white px-3.5 py-2 text-sm font-semibold text-[#192837] transition-all hover:border-[#192837]/30 hover:shadow-sm active:scale-[0.98]"
+        >
+            {copied ? (
+                <>
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span className="text-green-600">Copied</span>
+                </>
+            ) : (
+                <>
+                    <Mail className="h-4 w-4" />
+                    <span>{email}</span>
+                    <Copy className="ml-1 h-3.5 w-3.5 opacity-60" />
+                </>
+            )}
+        </button>
+    );
+}
+
+export default function Footer() {
+    const year = new Date().getFullYear();
+    return (
+        <footer className="relative z-10 w-full border-t border-[#192837]/10 bg-[#F2F2EE] font-body text-[#192837]">
+            <div className="mx-auto max-w-[1280px] px-5 py-16 sm:px-8">
+                {/* Top: brand + link columns */}
+                <div className="flex flex-col gap-12 lg:flex-row lg:justify-between">
+                    {/* Brand */}
                     <div className="max-w-sm">
-                        <div className="flex items-center gap-2.5 mb-4">
+                        <Link href="/" className="mb-4 flex items-center gap-2.5">
                             <img
                                 src="/LOGO/logo.png"
-                                alt="Elixpo Mascot"
-                                className="w-8 h-8 rounded-lg object-contain bg-white/85 p-0.5"
+                                alt="Elixpo"
+                                className="h-8 w-8 rounded-lg bg-white/85 object-contain p-0.5"
                             />
                             <span className="font-heading text-xl font-bold">
-                                Elixpo <span className="text-[#7342E2]">Accounts</span>
+                                Elixpo <span style={{ color: PRODUCT.accent }}>{PRODUCT.name}</span>
                             </span>
+                        </Link>
+                        <p className="text-sm leading-relaxed opacity-80">{PRODUCT.description}</p>
+
+                        <div className="mt-6 flex flex-wrap items-center gap-3">
+                            <GithubStarsButton repo={PRODUCT.repo} />
+                            <EmailButton email={PRODUCT.email} />
                         </div>
-                        <p className="text-sm opacity-80 leading-relaxed">
-                            Open OAuth 2.0 single sign-on, built on the edge. Drop it into any app
-                            — Elixpo or yours — and let users sign in with one account.
-                        </p>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-12 sm:gap-16">
-                        <div>
-                            <h4 className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-4">
-                                Navigate
-                            </h4>
-                            <ul className="flex flex-col gap-3 text-sm font-semibold">
-                                {navLinks.map((link) => (
-                                    <li key={link.label}>
-                                        <Link
-                                            href={link.href}
-                                            className="hover:opacity-75 transition-opacity"
-                                        >
-                                            {link.label}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 className="text-[10px] font-bold uppercase tracking-widest opacity-60 mb-4">
-                                Get in Touch
-                            </h4>
-                            <div className="flex flex-col gap-4 items-start">
-                                <button
-                                    onClick={handleCopyEmail}
-                                    className="flex items-center gap-2 border border-[#192837]/10 bg-white hover:bg-[#192837]/5 px-4 py-2 rounded-xl text-sm font-semibold transition-all relative overflow-hidden active:scale-[0.98]"
-                                >
-                                    {copied ? (
-                                        <>
-                                            <Check className="w-4 h-4 text-green-600" />
-                                            <span className="text-green-600 font-medium">
-                                                Copied!
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Mail className="w-4 h-4 text-[#192837]" />
-                                            <span>{EMAIL}</span>
-                                            <Copy className="w-3.5 h-3.5 text-[#192837]/60 ml-2" />
-                                        </>
-                                    )}
-                                </button>
-                                <a
-                                    href={REPO_URL}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="p-2.5 border border-[#192837]/10 bg-white hover:bg-[#192837]/5 rounded-xl transition-all hover:scale-[1.04] active:scale-[0.96] text-[#192837]"
-                                    aria-label="View on GitHub"
-                                >
-                                    <Github className="w-5 h-5" />
-                                </a>
+                    {/* Link columns */}
+                    <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 sm:gap-16">
+                        {COLUMNS.map((col) => (
+                            <div key={col.title}>
+                                <h4 className="mb-4 text-[10px] font-bold uppercase tracking-widest opacity-50">
+                                    {col.title}
+                                </h4>
+                                <ul className="flex flex-col gap-3 text-sm font-semibold">
+                                    {col.links.map((link) => (
+                                        <li key={link.label}>
+                                            <Link
+                                                href={link.href}
+                                                className="inline-flex items-center gap-1 opacity-90 transition-opacity hover:opacity-60"
+                                            >
+                                                {link.label}
+                                                {link.external && <ArrowUpRight className="h-3 w-3" />}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
 
-                <div className="border-t border-[#192837]/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm opacity-60 font-medium">
+                {/* Bottom bar */}
+                <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-[#192837]/10 pt-8 text-sm font-medium opacity-70 sm:flex-row">
                     <div>
-                        © {new Date().getFullYear()} Elixpo · Built on Cloudflare's edge
+                        © {year} Elixpo ·{" "}
+                        <span className="font-semibold opacity-100">Built in the Open</span>
                     </div>
-                    <div className="flex gap-4">
-                        <Link href="/privacy" className="hover:underline">
-                            Privacy Policy
-                        </Link>
-                        <Link href="/terms" className="hover:underline">
-                            Terms of Service
-                        </Link>
-                    </div>
+                    <a
+                        href={SUITE_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 transition-opacity hover:opacity-100"
+                    >
+                        Part of the Elixpo suite
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                    </a>
                 </div>
             </div>
         </footer>

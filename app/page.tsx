@@ -68,16 +68,6 @@ const FEATURES = [
     },
 ];
 
-const ELIXPO_PRODUCTS = [
-    { name: "Elixpo", favicon: "https://elixpo.com/favicon.ico" },
-    { name: "Blogs", favicon: "https://blogs.elixpo.com/favicon.ico" },
-    { name: "Sketch", favicon: "https://sketch.elixpo.com/favicon.ico" },
-    { name: "URL", favicon: "https://lixrl.com/favicon.ico" },
-    { name: "Mails", favicon: "https://mails.elixpo.com/favicon.ico" },
-    { name: "Me", favicon: "https://me.elixpo.com/favicon.ico" },
-    { name: "Admin", favicon: "https://admin.elixpo.com/favicon.ico" },
-];
-
 const Github = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
         viewBox="0 0 24 24"
@@ -154,8 +144,6 @@ export default function LandingPage() {
     return (
         <div className="relative w-full min-h-screen font-body text-[#192837] bg-[#F2F2EE] selection:bg-[#7342E2] selection:text-white overflow-x-hidden">
             <style>{`
-                @keyframes pay-marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
-                .pay-marquee { animation: pay-marquee 32s linear infinite; }
                 .font-heading { font-family: var(--font-heading), sans-serif; }
                 .font-body { font-family: var(--font-body), sans-serif; }
             `}</style>
@@ -291,43 +279,6 @@ export default function LandingPage() {
                             </motion.div>
                         </div>
 
-                        {/* Brand Marquee (SSO integration partners) */}
-                        <div className="mt-16 w-full max-w-[560px] overflow-hidden relative [mask-image:linear-gradient(to_right,transparent,white_15%,white_85%,transparent)] gsap-hero-animate">
-                            <div className="flex gap-6 w-max pay-marquee py-2">
-                                {ELIXPO_PRODUCTS.map((b, idx) => (
-                                    <div
-                                        key={`${b.name}-${idx}`}
-                                        className="flex items-center gap-2.5 bg-white/45 border border-[#192837]/10 backdrop-blur-md rounded-xl p-2 pr-4 shadow-sm"
-                                    >
-                                        <img
-                                            src={b.favicon}
-                                            alt={`${b.name} logo`}
-                                            className="w-8 h-8 rounded-lg object-contain bg-white p-1"
-                                        />
-                                        <span className="text-xs font-bold text-[#192837] tracking-wide">
-                                            {b.name}
-                                        </span>
-                                    </div>
-                                ))}
-                                {/* Duplicate for infinite loop */}
-                                {ELIXPO_PRODUCTS.map((b, idx) => (
-                                    <div
-                                        key={`${b.name}-dup-${idx}`}
-                                        className="flex items-center gap-2.5 bg-white/45 border border-[#192837]/10 backdrop-blur-md rounded-xl p-2 pr-4 shadow-sm"
-                                        aria-hidden="true"
-                                    >
-                                        <img
-                                            src={b.favicon}
-                                            alt={`${b.name} logo`}
-                                            className="w-8 h-8 rounded-lg object-contain bg-white p-1"
-                                        />
-                                        <span className="text-xs font-bold text-[#192837] tracking-wide">
-                                            {b.name}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
                     </div>
                 </main>
 
