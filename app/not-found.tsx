@@ -12,7 +12,7 @@ const NotFound = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 background:
-                    "linear-gradient(135deg, #0f1117 0%, #131922 50%, #0f1117 100%)",
+                    "linear-gradient(135deg, #F2F2EE 0%, #ffffff 50%, #F2F2EE 100%)",
                 p: 2,
             }}
         >
@@ -98,7 +98,7 @@ const NotFound = () => {
 
                 <Typography
                     sx={{
-                        color: "rgba(255, 255, 255, 0.6)",
+                        color: "rgba(25,40,55,0.6)",
                         fontSize: "1.1rem",
                         mb: 4,
                         lineHeight: 1.6,
@@ -136,14 +136,14 @@ const NotFound = () => {
                             fullWidth
                             variant="outlined"
                             sx={{
-                                color: "rgba(255, 255, 255, 0.7)",
-                                border: "1px solid rgba(255, 255, 255, 0.2)",
+                                color: "rgba(25,40,55,0.7)",
+                                border: "1px solid rgba(25,40,55,0.10)",
                                 fontWeight: 600,
                                 py: 1.5,
                                 textTransform: "none",
                                 fontSize: "1rem",
                                 "&:hover": {
-                                    borderColor: "rgba(255, 255, 255, 0.4)",
+                                    borderColor: "rgba(25,40,55,0.4)",
                                     color: "#f5f5f4",
                                 },
                             }}
@@ -156,7 +156,7 @@ const NotFound = () => {
                 {/* Error Code */}
                 <Typography
                     sx={{
-                        color: "rgba(255, 255, 255, 0.3)",
+                        color: "rgba(25,40,55,0.3)",
                         fontSize: "0.85rem",
                         mt: 6,
                         fontFamily: "monospace",

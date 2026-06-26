@@ -93,8 +93,8 @@ function VerifyContent() {
                     textAlign: "center",
                     backdropFilter: "blur(20px)",
                     background:
-                        "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
-                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                        "linear-gradient(135deg, #ffffff 0%, #ffffff 100%)",
+                    border: "1px solid rgba(25,40,55,0.10)",
                     borderRadius: "16px",
                     boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
                     p: 4,
@@ -121,13 +121,13 @@ function VerifyContent() {
                             Verified
                         </Typography>
                         <Typography
-                            sx={{ color: "rgba(255,255,255,0.6)", mb: 3 }}
+                            sx={{ color: "rgba(25,40,55,0.6)", mb: 3 }}
                         >
                             {message}
                         </Typography>
                         <Typography
                             sx={{
-                                color: "rgba(255,255,255,0.5)",
+                                color: "rgba(25,40,55,0.5)",
                                 fontSize: "0.9rem",
                                 mb: 2,
                             }}
@@ -164,7 +164,7 @@ function VerifyContent() {
                             Verification Failed
                         </Typography>
                         <Typography
-                            sx={{ color: "rgba(255,255,255,0.6)", mb: 3 }}
+                            sx={{ color: "rgba(25,40,55,0.6)", mb: 3 }}
                         >
                             {message}
                         </Typography>
@@ -199,7 +199,7 @@ export default function VerifyPage() {
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        bgcolor: "#0f1117",
+                        bgcolor: "#F2F2EE",
                     }}
                 >
                     <CircularProgress sx={{ color: "#ff7759" }} />
