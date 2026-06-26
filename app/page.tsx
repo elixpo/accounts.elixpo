@@ -156,8 +156,9 @@ export default function LandingPage() {
                     muted
                     loop
                     playsInline
+                    preload="auto"
                     className="absolute inset-0 object-cover w-full h-full -z-10 pointer-events-none select-none"
-                    src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260518_003132_8b7edcb6-c64d-4a52-a9ca-879942e122ad.mp4"
+                    src="/hero-bg.mp4"
                 />
                 
                 {/* Subtle Overlay to enhance text readability */}
@@ -244,16 +245,17 @@ export default function LandingPage() {
                         {/* Heading */}
                         <h1 className="font-heading text-[clamp(1.65rem,5vw,3rem)] leading-[1.05] tracking-[-0.01em] text-[#192837] mb-6 font-bold gsap-hero-animate">
                             <Zap className="inline-block w-6 h-6 sm:w-8 sm:h-8 text-[#192837] align-middle relative -top-[2px] mr-2" />
-                            One Login for
+                            Single sign-on,
                             <LockKeyhole className="inline-block w-6 h-6 sm:w-8 sm:h-8 text-[#192837] align-middle relative -top-[2px] mx-2" />
-                            Everything Elixpo
+                            in two steps
                             <Fingerprint className="inline-block w-6 h-6 sm:w-8 sm:h-8 text-[#192837] align-middle relative -top-[2px] ml-2" />
                         </h1>
 
                         {/* Subtext */}
                         <p className="font-body text-[clamp(0.9rem,2.5vw,1.1rem)] leading-[1.65] text-[#192837] opacity-80 mb-8 max-w-[560px] gsap-hero-animate">
-                            Elixpo Accounts is your single login for every Elixpo product — chat, art,
-                            blogs, sketch, URL shortener, and anything else we build. Make one account, signed in everywhere.
+                            Open OAuth 2.0 single sign-on — <strong className="font-semibold opacity-100">not just for Elixpo</strong>. Add
+                            “Sign in with Elixpo” to any app, yours or ours, in two steps: register
+                            your app, then drop in the button. One account, signed in everywhere.
                         </p>
 
                         {/* CTA Button */}
