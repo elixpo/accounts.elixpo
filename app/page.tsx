@@ -370,7 +370,7 @@ export default function LandingPage() {
                                 </Link>
                                 <Link
                                     href="/login"
-                                    className="inline-flex items-center text-sm font-semibold text-[#192837] opacity-80 hover:opacity-100 transition-opacity"
+                                    className="inline-flex items-center text-sm font-semibold text-[var(--fg)] opacity-80 hover:opacity-100 transition-opacity"
                                 >
                                     Sign in
                                 </Link>
@@ -378,7 +378,7 @@ export default function LandingPage() {
                         </div>
 
                         {/* Step 2 — register the app */}
-                        <div className="relative bg-[#F2F2EE] border border-[#192837]/10 rounded-2xl p-8 flex flex-col gsap-card-animate">
+                        <div className="relative bg-[var(--bg)] border border-[var(--border)] rounded-2xl p-8 flex flex-col gsap-card-animate">
                             <div className="flex items-center gap-3 mb-6">
                                 <span className="font-heading text-sm font-bold w-9 h-9 grid place-items-center rounded-full bg-[#ff7759] text-white">
                                     02
@@ -390,7 +390,7 @@ export default function LandingPage() {
                             <h3 className="font-heading text-xl font-bold mb-2">
                                 Register your app
                             </h3>
-                            <p className="text-[#192837]/75 leading-relaxed text-sm sm:text-base font-body mb-6">
+                            <p className="text-[var(--fg-muted)] leading-relaxed text-sm sm:text-base font-body mb-6">
                                 Add your app in the dashboard to get OAuth
                                 client credentials, then drop in the “Sign in
                                 with Elixpo” button. That&apos;s it.

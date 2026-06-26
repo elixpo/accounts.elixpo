@@ -152,13 +152,13 @@ export default function Navbar() {
                                         alt="Elixpo Mascot"
                                         className="w-8 h-8 rounded-lg object-contain bg-[var(--surface)]/80 p-0.5"
                                     />
-                                    <span className="font-heading text-lg font-bold text-[#192837]">
+                                    <span className="font-heading text-lg font-bold text-[var(--fg)]">
                                         Elixpo
                                     </span>
                                 </Link>
                                 <button
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="p-1 hover:bg-[#192837]/10 rounded-full transition-colors text-[#192837]"
+                                    className="p-1 hover:bg-[var(--overlay)] rounded-full transition-colors text-[var(--fg)]"
                                     aria-label="Close menu"
                                 >
                                     <X className="w-6 h-6" />
@@ -196,7 +196,7 @@ export default function Navbar() {
                             </div>
 
                             {/* Bottom Call to Actions */}
-                            <div className="border-t border-[#192837]/10 pt-6 flex flex-col gap-3">
+                            <div className="border-t border-[var(--border)] pt-6 flex flex-col gap-3">
                                 {me === undefined ? null : authed ? (
                                     <>
                                         <Link

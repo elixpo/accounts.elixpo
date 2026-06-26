@@ -42,6 +42,12 @@ const darkTheme = createTheme({
             default: "transparent",
             paper: "var(--surface)",
         },
+        text: {
+            primary: "var(--fg)",
+            secondary: "var(--fg-muted)",
+            disabled: "var(--fg-faint)",
+        },
+        divider: "var(--border)",
     },
     typography: {
         fontFamily: "var(--font-geist-sans), Arial, sans-serif",

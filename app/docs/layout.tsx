@@ -486,13 +486,13 @@ export default function DocsLayout({
                                             alt="Elixpo Mascot"
                                             className="w-7.5 h-7.5 rounded-lg object-contain bg-[var(--surface)]/80 p-0.5"
                                         />
-                                        <span className="font-heading text-lg font-bold text-[#192837]">
+                                        <span className="font-heading text-lg font-bold text-[var(--fg)]">
                                             Elixpo
                                         </span>
                                     </div>
                                     <button
                                         onClick={() => setMobileOpen(false)}
-                                        className="p-1 hover:bg-[#192837]/10 rounded-full transition-colors text-[#192837]"
+                                        className="p-1 hover:bg-[var(--overlay)] rounded-full transition-colors text-[var(--fg)]"
                                         aria-label="Close menu"
                                     >
                                         <X className="w-5 h-5" />
@@ -515,14 +515,14 @@ export default function DocsLayout({
                     </div>
 
                     <div>
-                        <div className="border-t border-[#192837]/10 my-8" />
+                        <div className="border-t border-[var(--border)] my-8" />
 
                         {/* Page Pagination buttons */}
                         <div className="flex justify-between items-center gap-4 flex-wrap">
                             {prevPage ? (
                                 <Link
                                     href={prevPage.href}
-                                    className="flex items-center gap-2 border border-[#ff7759]/25 hover:border-[#ff7759] bg-white hover:bg-[#ff7759]/5 text-[#ff7759] px-5 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98]"
+                                    className="flex items-center gap-2 border border-[#ff7759]/25 hover:border-[#ff7759] bg-[var(--surface)] hover:bg-[#ff7759]/5 text-[#ff7759] px-5 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98]"
                                 >
                                     <ArrowLeft className="w-4 h-4" />
                                     <span>{prevPage.label}</span>
@@ -534,7 +534,7 @@ export default function DocsLayout({
                             {nextPage ? (
                                 <Link
                                     href={nextPage.href}
-                                    className="flex items-center gap-2 border border-[#ff7759]/25 hover:border-[#ff7759] bg-white hover:bg-[#ff7759]/5 text-[#ff7759] px-5 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98]"
+                                    className="flex items-center gap-2 border border-[#ff7759]/25 hover:border-[#ff7759] bg-[var(--surface)] hover:bg-[#ff7759]/5 text-[#ff7759] px-5 py-2.5 rounded-xl text-sm font-semibold tracking-wide transition-all active:scale-[0.98]"
                                 >
                                     <span>{nextPage.label}</span>
                                     <ArrowRight className="w-4 h-4" />
