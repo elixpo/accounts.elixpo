@@ -39,7 +39,7 @@ const TIER_META: Record<
 > = {
     hobby: {
         name: "Hobby",
-        accent: "rgba(25,40,55,0.85)",
+        accent: "var(--fg-muted)",
         description: "Free. 1,000 MAU per app · 3 OAuth apps.",
     },
     indie: {
@@ -111,14 +111,14 @@ export default function SubscriptionsPage() {
                     fontSize: "1.7rem",
                     letterSpacing: "-0.02em",
                     mb: 0.5,
-                    color: "#192837",
+                    color: "var(--fg)",
                 }}
             >
                 Subscriptions
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25,40,55,0.55)",
+                    color: "var(--fg-faint)",
                     fontSize: "0.92rem",
                     mb: 3,
                 }}
@@ -130,8 +130,8 @@ export default function SubscriptionsPage() {
                 sx={{
                     p: { xs: 3, sm: 3.5 },
                     borderRadius: "16px",
-                    border: "1px solid rgba(25,40,55,0.10)",
-                    background: "#ffffff",
+                    border: "1px solid var(--border)",
+                    background: "var(--surface)",
                     backdropFilter: "blur(12px)",
                 }}
             >
@@ -174,23 +174,23 @@ export default function SubscriptionsPage() {
                                         ? "#b91c1c"
                                         : isPaid
                                           ? "#15803d"
-                                          : "rgba(25,40,55,0.7)",
+                                          : "var(--fg-muted)",
                                     bgcolor: isCancelled
                                         ? "rgba(248,113,113,0.10)"
                                         : isPaid
                                           ? "rgba(134,239,172,0.12)"
-                                          : "rgba(25,40,55,0.04)",
+                                          : "var(--overlay)",
                                     border: isCancelled
                                         ? "1px solid rgba(248,113,113,0.3)"
                                         : isPaid
                                           ? "1px solid rgba(134,239,172,0.3)"
-                                          : "1px solid rgba(25,40,55,0.10)",
+                                          : "1px solid var(--border)",
                                 }}
                             />
                         </Stack>
                         <Typography
                             sx={{
-                                color: "rgba(25,40,55,0.65)",
+                                color: "var(--fg-muted)",
                                 fontSize: "0.9rem",
                             }}
                         >
@@ -229,7 +229,7 @@ export default function SubscriptionsPage() {
                     <Box
                         sx={{
                             pt: 2,
-                            borderTop: "1px solid rgba(25,40,55,0.10)",
+                            borderTop: "1px solid var(--border)",
                             display: "grid",
                             gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
                             gap: 1.5,
@@ -280,7 +280,7 @@ export default function SubscriptionsPage() {
                 <Typography
                     sx={{
                         mt: 3,
-                        color: "rgba(25,40,55,0.5)",
+                        color: "var(--fg-faint)",
                         fontSize: "0.85rem",
                     }}
                 >
@@ -372,20 +372,20 @@ function CancelSection({
                     fontWeight: 700,
                     fontSize: "1rem",
                     mb: 0.5,
-                    color: "#192837",
+                    color: "var(--fg)",
                 }}
             >
                 Cancel subscription
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25,40,55,0.55)",
+                    color: "var(--fg-faint)",
                     fontSize: "0.88rem",
                     mb: 1.5,
                 }}
             >
                 Cancel any time. You'll keep paid access until{" "}
-                <strong style={{ color: "#192837" }}>
+                <strong style={{ color: "var(--fg)" }}>
                     {renewsAt ?? "the end of your current period"}
                 </strong>
                 , then your account moves to the free Hobby tier. No further
@@ -458,9 +458,9 @@ function CancelSection({
                             px: 2.2,
                             py: 0.9,
                             borderRadius: "10px",
-                            color: "rgba(25,40,55,0.7)",
-                            border: "1px solid rgba(25,40,55,0.10)",
-                            "&:hover": { background: "rgba(25,40,55,0.04)" },
+                            color: "var(--fg-muted)",
+                            border: "1px solid var(--border)",
+                            "&:hover": { background: "var(--overlay)" },
                         }}
                     >
                         Keep my plan
@@ -476,7 +476,7 @@ function Row({ label, value }: { label: string; value: string }) {
         <Stack spacing={0.3}>
             <Typography
                 sx={{
-                    color: "rgba(25,40,55,0.45)",
+                    color: "var(--fg-faint)",
                     fontSize: "0.74rem",
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
@@ -486,7 +486,7 @@ function Row({ label, value }: { label: string; value: string }) {
             </Typography>
             <Typography
                 sx={{
-                    color: "rgba(25,40,55,0.9)",
+                    color: "var(--fg-muted)",
                     fontSize: "0.95rem",
                     fontWeight: 600,
                 }}

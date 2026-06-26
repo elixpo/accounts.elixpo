@@ -262,16 +262,16 @@ export default function DocsLayout({
     }, []);
 
     const sidebarContent = (
-        <div className="flex flex-col h-full text-[#192837] font-body p-4 md:p-0">
+        <div className="flex flex-col h-full text-[var(--fg)] font-body p-4 md:p-0">
             {/* Search */}
             <div className="relative mb-6">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#192837]/50" />
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--fg-faint)]" />
                 <input
                     type="text"
                     placeholder="Search docs..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-[#192837]/15 bg-white rounded-xl text-sm font-medium focus:outline-none focus:border-[#ff7759] focus:ring-1 focus:ring-[#ff7759]"
+                    className="w-full pl-10 pr-4 py-2 border border-[var(--border)] bg-[var(--surface)] rounded-xl text-sm font-medium focus:outline-none focus:border-[#ff7759] focus:ring-1 focus:ring-[#ff7759]"
                 />
             </div>
 
@@ -287,7 +287,7 @@ export default function DocsLayout({
                             className={`flex items-center px-4 py-2 rounded-xl text-sm font-semibold tracking-wide transition-all ${
                                 active
                                     ? "bg-[#ff7759]/10 text-[#ff7759]"
-                                    : "text-[#192837]/70 hover:bg-[#192837]/5 hover:text-[#192837]"
+                                    : "text-[var(--fg-muted)] hover:bg-[var(--overlay)] hover:text-[var(--fg)]"
                             }`}
                         >
                             {item.label}
@@ -295,7 +295,7 @@ export default function DocsLayout({
                     );
                 })}
                 {filteredNav.length === 0 && (
-                    <p className="text-[#192837]/50 text-xs text-center py-4">
+                    <p className="text-[var(--fg-faint)] text-xs text-center py-4">
                         No results found
                     </p>
                 )}
@@ -304,7 +304,7 @@ export default function DocsLayout({
     );
 
     return (
-        <div className="relative w-full min-h-screen font-body text-[#192837] bg-[#F2F2EE] selection:bg-[#ff7759] selection:text-white flex flex-col overflow-x-hidden">
+        <div className="relative w-full min-h-screen font-body text-[var(--fg)] bg-[var(--bg)] selection:bg-[#ff7759] selection:text-white flex flex-col overflow-x-hidden">
             <style>{`
                 .font-heading { font-family: var(--font-heading), sans-serif; }
                 .font-body { font-family: var(--font-body), sans-serif; }
@@ -313,7 +313,7 @@ export default function DocsLayout({
                     font-size: 2.2rem;
                     font-weight: 800;
                     margin-bottom: 1.5rem;
-                    color: #192837;
+                    color: var(--fg);
                     letter-spacing: -0.02em;
                 }
                 #docs-content h2 {
@@ -322,7 +322,7 @@ export default function DocsLayout({
                     font-weight: 700;
                     margin-top: 2.5rem;
                     margin-bottom: 1rem;
-                    color: #192837;
+                    color: var(--fg);
                     letter-spacing: -0.015em;
                 }
                 #docs-content h3 {
@@ -331,39 +331,39 @@ export default function DocsLayout({
                     font-weight: 700;
                     margin-top: 2rem;
                     margin-bottom: 0.75rem;
-                    color: #192837;
+                    color: var(--fg);
                 }
                 #docs-content p {
                     font-family: var(--font-body), sans-serif;
                     line-height: 1.7;
                     margin-bottom: 1.25rem;
-                    color: rgba(25, 40, 55, 0.85);
+                    color: var(--fg-muted);
                 }
                 #docs-content ul, #docs-content ol {
                     margin-bottom: 1.5rem;
                     padding-left: 1.5rem;
                     list-style-type: disc;
-                    color: rgba(25, 40, 55, 0.85);
+                    color: var(--fg-muted);
                 }
                 #docs-content li {
                     margin-bottom: 0.5rem;
                     line-height: 1.6;
                 }
                 #docs-content code {
-                    background: rgba(25, 40, 55, 0.06);
+                    background: var(--overlay);
                     padding: 0.15rem 0.4rem;
                     border-radius: 6px;
                     font-size: 0.9em;
                     font-family: var(--font-geist-mono), monospace;
                 }
                 #docs-content pre {
-                    background: #F4F3EF;
-                    color: #192837;
+                    background: var(--surface-2);
+                    color: var(--fg);
                     padding: 1.25rem;
                     border-radius: 14px;
                     overflow-x: auto;
                     margin-bottom: 1.5rem;
-                    border: 1px solid rgba(25, 40, 55, 0.10);
+                    border: 1px solid var(--border);
                 }
                 #docs-content pre code {
                     background: transparent;
@@ -375,13 +375,13 @@ export default function DocsLayout({
             `}</style>
 
             {/* Header / Navbar */}
-            <header className="border-b border-[#192837]/10 bg-white/75 backdrop-blur-md sticky top-0 z-40 w-full text-[#192837]">
+            <header className="border-b border-[var(--border)] bg-[var(--surface)]/75 backdrop-blur-md sticky top-0 z-40 w-full text-[var(--fg)]">
                 <div className="max-w-[1400px] w-full mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         {/* Mobile Menu Icon */}
                         <button
                             onClick={() => setMobileOpen(true)}
-                            className="md:hidden p-2 text-[#192837] hover:bg-[#192837]/5 rounded-full transition-colors"
+                            className="md:hidden p-2 text-[var(--fg)] hover:bg-[var(--overlay)] rounded-full transition-colors"
                             aria-label="Open sidebar"
                         >
                             <Menu className="w-5 h-5" />
@@ -395,7 +395,7 @@ export default function DocsLayout({
                             <img
                                 src="/LOGO/logo.png"
                                 alt="Elixpo Mascot"
-                                className="w-7.5 h-7.5 rounded-lg object-contain bg-white/80 p-0.5"
+                                className="w-7.5 h-7.5 rounded-lg object-contain bg-[var(--surface)]/80 p-0.5"
                             />
                             <span className="font-heading text-lg font-bold tracking-tight">
                                 Elixpo{" "}
@@ -409,7 +409,7 @@ export default function DocsLayout({
                         {/* Copy for LLM */}
                         <button
                             onClick={handleCopyForLlm}
-                            className="flex items-center gap-2 border border-[#192837]/15 bg-white hover:bg-[#192837]/5 px-3 py-1.5 rounded-xl text-xs font-semibold tracking-wide transition-all shadow-sm active:scale-[0.98]"
+                            className="flex items-center gap-2 border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--overlay)] px-3 py-1.5 rounded-xl text-xs font-semibold tracking-wide transition-all shadow-sm active:scale-[0.98]"
                         >
                             {copied ? (
                                 <>
@@ -420,7 +420,7 @@ export default function DocsLayout({
                                 </>
                             ) : (
                                 <>
-                                    <Copy className="w-3.5 h-3.5 text-[#192837]" />
+                                    <Copy className="w-3.5 h-3.5 text-[var(--fg)]" />
                                     <span>Copy for LLM</span>
                                 </>
                             )}
@@ -429,7 +429,7 @@ export default function DocsLayout({
                         {/* Dashboard Link */}
                         <Link
                             href="/dashboard/oauth-apps"
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-[#192837]/5 transition-colors text-[#192837]/80 hover:text-[#192837]"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-[var(--overlay)] transition-colors text-[var(--fg-muted)] hover:text-[var(--fg)]"
                         >
                             <LayoutDashboard className="w-3.5 h-3.5" />
                             <span>Dashboard</span>
@@ -440,7 +440,7 @@ export default function DocsLayout({
                             href="https://github.com/elixpo/accounts.elixpo"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="p-2 border border-[#192837]/10 bg-white hover:bg-[#192837]/5 rounded-xl transition-all active:scale-[0.96] text-[#192837]"
+                            className="p-2 border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--overlay)] rounded-xl transition-all active:scale-[0.96] text-[var(--fg)]"
                             aria-label="View on GitHub"
                         >
                             <Github className="w-4 h-4" />
@@ -452,7 +452,7 @@ export default function DocsLayout({
             {/* Layout Wrapper */}
             <div className="flex-1 flex max-w-[1400px] w-full mx-auto px-5 sm:px-8 relative">
                 {/* Desktop Left Sidebar */}
-                <aside className="w-[260px] flex-shrink-0 hidden md:block border-r border-[#192837]/10 sticky top-16 h-[calc(100vh-64px)] overflow-y-auto pt-8 pr-6">
+                <aside className="w-[260px] flex-shrink-0 hidden md:block border-r border-[var(--border)] sticky top-16 h-[calc(100vh-64px)] overflow-y-auto pt-8 pr-6">
                     {sidebarContent}
                 </aside>
 
@@ -477,14 +477,14 @@ export default function DocsLayout({
                                     ease: [0.22, 1, 0.36, 1] as const,
                                     duration: 0.45,
                                 }}
-                                className="fixed left-0 top-0 w-[min(88vw,280px)] h-[100dvh] bg-[#CFC8C5] shadow-[12px_0_48px_rgba(25,40,55,0.18)] z-50 flex flex-col p-6 text-[#192837]"
+                                className="fixed left-0 top-0 w-[min(88vw,280px)] h-[100dvh] bg-[var(--surface)] shadow-[12px_0_48px_rgba(25,40,55,0.18)] z-50 flex flex-col p-6 text-[var(--fg)]"
                             >
-                                <div className="flex items-center justify-between pb-4 border-b border-[#192837]/10 mb-6">
+                                <div className="flex items-center justify-between pb-4 border-b border-[var(--border)] mb-6">
                                     <div className="flex items-center gap-2">
                                         <img
                                             src="/LOGO/logo.png"
                                             alt="Elixpo Mascot"
-                                            className="w-7.5 h-7.5 rounded-lg object-contain bg-white/80 p-0.5"
+                                            className="w-7.5 h-7.5 rounded-lg object-contain bg-[var(--surface)]/80 p-0.5"
                                         />
                                         <span className="font-heading text-lg font-bold text-[#192837]">
                                             Elixpo

@@ -40,7 +40,7 @@ const darkTheme = createTheme({
         primary: { main: "#ff7759" },
         background: {
             default: "transparent",
-            paper: "#ffffff",
+            paper: "var(--surface)",
         },
     },
     typography: {
@@ -50,20 +50,20 @@ const darkTheme = createTheme({
         MuiCard: {
             styleOverrides: {
                 root: {
-                    background: "#ffffff",
+                    background: "var(--surface)",
                     backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(25,40,55,0.10)",
+                    border: "1px solid var(--border)",
                     borderRadius: "16px",
-                    boxShadow: "0 8px 32px 0 rgba(25,40,55,0.06)",
+                    boxShadow: "0 8px 32px 0 var(--overlay)",
                 },
             },
         },
         MuiPaper: {
             styleOverrides: {
                 root: {
-                    background: "#ffffff",
+                    background: "var(--surface)",
                     backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(25,40,55,0.10)",
+                    border: "1px solid var(--border)",
                     borderRadius: "16px",
                 },
             },
@@ -156,7 +156,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    bgcolor: "#F2F2EE",
+                    bgcolor: "var(--bg)",
                 }}
             >
                 <CircularProgress sx={{ color: "#ff7759" }} />
@@ -176,7 +176,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         sx={{
                             bgcolor: "rgba(242,242,238,0.8)",
                             backdropFilter: "blur(16px)",
-                            borderBottom: "1px solid rgba(25,40,55,0.10)",
+                            borderBottom: "1px solid var(--border)",
                         }}
                     >
                         <Toolbar
@@ -214,7 +214,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     sx={{
                                         fontWeight: 700,
                                         fontSize: "1.1rem",
-                                        color: "#192837",
+                                        color: "var(--fg)",
                                         display: { xs: "none", sm: "block" },
                                         letterSpacing: "-0.01em",
                                     }}
@@ -244,7 +244,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         sx={{
                                             color: isActive(item.href)
                                                 ? "#ff7759"
-                                                : "rgba(25,40,55,0.45)",
+                                                : "var(--fg-faint)",
                                             bgcolor: isActive(item.href)
                                                 ? "rgba(255, 119, 89,0.1)"
                                                 : "transparent",
@@ -255,10 +255,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                             "&:hover": {
                                                 bgcolor: isActive(item.href)
                                                     ? "rgba(255, 119, 89,0.15)"
-                                                    : "rgba(25,40,55,0.04)",
+                                                    : "var(--overlay)",
                                                 color: isActive(item.href)
                                                     ? "#ff7759"
-                                                    : "rgba(25,40,55,0.8)",
+                                                    : "var(--fg-muted)",
                                             },
                                         }}
                                     >
@@ -278,7 +278,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     gap: 1,
                                     cursor: "pointer",
                                     background: "transparent",
-                                    border: "1px solid rgba(25,40,55,0.1)",
+                                    border: "1px solid var(--border)",
                                     borderRadius: "10px",
                                     pl: 0.6,
                                     pr: { xs: 0.6, sm: 1.1 },
@@ -339,7 +339,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         sx={{
                                             fontSize: "0.82rem",
                                             fontWeight: 600,
-                                            color: "#192837",
+                                            color: "var(--fg)",
                                             maxWidth: 160,
                                             overflow: "hidden",
                                             textOverflow: "ellipsis",
@@ -352,7 +352,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         <Typography
                                             sx={{
                                                 fontSize: "0.7rem",
-                                                color: "rgba(25,40,55,0.55)",
+                                                color: "var(--fg-faint)",
                                                 maxWidth: 160,
                                                 overflow: "hidden",
                                                 textOverflow: "ellipsis",
@@ -383,11 +383,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                             mt: 1,
                                             bgcolor: "rgba(255,255,255,0.95)",
                                             backdropFilter: "blur(16px)",
-                                            border: "1px solid rgba(25,40,55,0.10)",
+                                            border: "1px solid var(--border)",
                                             borderRadius: "12px",
                                             minWidth: 220,
                                             boxShadow:
-                                                "0 8px 32px rgba(25,40,55,0.06)",
+                                                "0 8px 32px var(--overlay)",
                                         },
                                     },
                                 }}
@@ -395,7 +395,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                 <Box sx={{ px: 2, py: 1.5 }}>
                                     <Typography
                                         sx={{
-                                            color: "#192837",
+                                            color: "var(--fg)",
                                             fontWeight: 600,
                                             fontSize: "0.9rem",
                                         }}
@@ -404,7 +404,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     </Typography>
                                     <Typography
                                         sx={{
-                                            color: "rgba(25,40,55,0.4)",
+                                            color: "var(--fg-faint)",
                                             fontSize: "0.8rem",
                                         }}
                                     >
@@ -413,7 +413,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                 </Box>
                                 <Divider
                                     sx={{
-                                        borderColor: "rgba(25,40,55,0.10)",
+                                        borderColor: "var(--border)",
                                     }}
                                 />
                                 {/* Account group */}
@@ -446,10 +446,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         onClick={() => setAnchorEl(null)}
                                         sx={{
                                             py: 1.25,
-                                            color: "rgba(25,40,55,0.7)",
+                                            color: "var(--fg-muted)",
                                             "&:hover": {
-                                                bgcolor: "rgba(25,40,55,0.04)",
-                                                color: "#192837",
+                                                bgcolor: "var(--overlay)",
+                                                color: "var(--fg)",
                                             },
                                         }}
                                     >
@@ -473,7 +473,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
                                 <Divider
                                     sx={{
-                                        borderColor: "rgba(25,40,55,0.10)",
+                                        borderColor: "var(--border)",
                                     }}
                                 />
 
@@ -507,10 +507,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                         onClick={() => setAnchorEl(null)}
                                         sx={{
                                             py: 1.25,
-                                            color: "rgba(25,40,55,0.7)",
+                                            color: "var(--fg-muted)",
                                             "&:hover": {
-                                                bgcolor: "rgba(25,40,55,0.04)",
-                                                color: "#192837",
+                                                bgcolor: "var(--overlay)",
+                                                color: "var(--fg)",
                                             },
                                         }}
                                     >
@@ -534,7 +534,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
                                 <Divider
                                     sx={{
-                                        borderColor: "rgba(25,40,55,0.10)",
+                                        borderColor: "var(--border)",
                                     }}
                                 />
 
@@ -543,10 +543,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     onClick={toggleAppTheme}
                                     sx={{
                                         py: 1.25,
-                                        color: "rgba(25,40,55,0.7)",
+                                        color: "var(--fg-muted)",
                                         "&:hover": {
-                                            bgcolor: "rgba(25,40,55,0.04)",
-                                            color: "#192837",
+                                            bgcolor: "var(--overlay)",
+                                            color: "var(--fg)",
                                         },
                                     }}
                                 >
@@ -572,7 +572,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
                                 <Divider
                                     sx={{
-                                        borderColor: "rgba(25,40,55,0.10)",
+                                        borderColor: "var(--border)",
                                     }}
                                 />
 
@@ -580,7 +580,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                                     onClick={handleLogout}
                                     sx={{
                                         py: 1.25,
-                                        color: "rgba(25,40,55,0.5)",
+                                        color: "var(--fg-faint)",
                                         "&:hover": {
                                             bgcolor: "rgba(239, 68, 68, 0.08)",
                                             color: "#b91c1c",

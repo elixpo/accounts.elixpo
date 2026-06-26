@@ -30,8 +30,8 @@ const AVAILABLE_EVENTS = [
 ];
 
 const cardSx = {
-    background: "#ffffff",
-    border: "1px solid rgba(25,40,55,0.10)",
+    background: "var(--surface)",
+    border: "1px solid var(--border)",
     borderRadius: "16px",
     p: 3,
     mb: 3,
@@ -39,12 +39,12 @@ const cardSx = {
 
 const textFieldSx = {
     "& .MuiOutlinedInput-root": {
-        color: "#192837",
-        "& fieldset": { borderColor: "rgba(25,40,55,0.10)" },
-        "&:hover fieldset": { borderColor: "rgba(25,40,55,0.10)" },
+        color: "var(--fg)",
+        "& fieldset": { borderColor: "var(--border)" },
+        "&:hover fieldset": { borderColor: "var(--border)" },
         "&.Mui-focused fieldset": { borderColor: "#ff7759" },
     },
-    "& .MuiInputLabel-root": { color: "rgba(25,40,55,0.7)" },
+    "& .MuiInputLabel-root": { color: "var(--fg-muted)" },
     "& .MuiInputLabel-root.Mui-focused": { color: "#ff7759" },
 };
 
@@ -186,23 +186,23 @@ export default function WebhookDetailPage() {
                         startIcon={<ArrowBackIcon />}
                         onClick={() => router.push("/dashboard/webhooks")}
                         sx={{
-                            color: "rgba(25,40,55,0.5)",
+                            color: "var(--fg-faint)",
                             mb: 2,
                             textTransform: "none",
-                            "&:hover": { color: "#192837" },
+                            "&:hover": { color: "var(--fg)" },
                         }}
                     >
                         Back to Webhooks
                     </Button>
                     <Typography
                         variant="h5"
-                        sx={{ fontWeight: 700, color: "#192837", mb: 0.5 }}
+                        sx={{ fontWeight: 700, color: "var(--fg)", mb: 0.5 }}
                     >
                         Webhook Settings
                     </Typography>
                     <Typography
                         sx={{
-                            color: "rgba(25,40,55,0.5)",
+                            color: "var(--fg-faint)",
                             fontSize: "0.85rem",
                             fontFamily: "monospace",
                         }}
@@ -249,13 +249,13 @@ export default function WebhookDetailPage() {
                     >
                         <Box>
                             <Typography
-                                sx={{ color: "#192837", fontWeight: 600 }}
+                                sx={{ color: "var(--fg)", fontWeight: 600 }}
                             >
                                 Active
                             </Typography>
                             <Typography
                                 variant="caption"
-                                sx={{ color: "rgba(25,40,55,0.5)" }}
+                                sx={{ color: "var(--fg-faint)" }}
                             >
                                 Pause delivery without deleting the webhook
                             </Typography>
@@ -283,7 +283,7 @@ export default function WebhookDetailPage() {
                 <Box sx={cardSx}>
                     <Typography
                         sx={{
-                            color: "#192837",
+                            color: "var(--fg)",
                             fontWeight: 600,
                             mb: 2,
                             fontSize: "1rem",
@@ -303,7 +303,7 @@ export default function WebhookDetailPage() {
 
                     <Typography
                         sx={{
-                            color: "rgba(25,40,55,0.7)",
+                            color: "var(--fg-muted)",
                             mb: 1,
                             fontSize: "0.9rem",
                             fontWeight: 600,
@@ -328,7 +328,7 @@ export default function WebhookDetailPage() {
                                         onChange={() => handleEventToggle(ev)}
                                         size="small"
                                         sx={{
-                                            color: "rgba(25,40,55,0.3)",
+                                            color: "var(--fg-faint)",
                                             "&.Mui-checked": {
                                                 color: "#ff7759",
                                             },
@@ -338,7 +338,7 @@ export default function WebhookDetailPage() {
                                 label={
                                     <Typography
                                         sx={{
-                                            color: "#192837",
+                                            color: "var(--fg)",
                                             fontFamily: "monospace",
                                             fontSize: "0.85rem",
                                         }}
@@ -373,13 +373,13 @@ export default function WebhookDetailPage() {
                 {/* Test */}
                 <Box sx={cardSx}>
                     <Typography
-                        sx={{ color: "#192837", fontWeight: 600, mb: 1 }}
+                        sx={{ color: "var(--fg)", fontWeight: 600, mb: 1 }}
                     >
                         Send Test Payload
                     </Typography>
                     <Typography
                         variant="body2"
-                        sx={{ color: "rgba(25,40,55,0.5)", mb: 2 }}
+                        sx={{ color: "var(--fg-faint)", mb: 2 }}
                     >
                         Sends a <code style={{ color: "#ff7759" }}>ping</code>{" "}
                         event to verify your endpoint is reachable.
@@ -424,13 +424,13 @@ export default function WebhookDetailPage() {
                     >
                         <Box>
                             <Typography
-                                sx={{ color: "#192837", fontWeight: 500 }}
+                                sx={{ color: "var(--fg)", fontWeight: 500 }}
                             >
                                 Delete webhook
                             </Typography>
                             <Typography
                                 variant="caption"
-                                sx={{ color: "rgba(25,40,55,0.5)" }}
+                                sx={{ color: "var(--fg-faint)" }}
                             >
                                 Permanently remove this webhook and stop all
                                 deliveries

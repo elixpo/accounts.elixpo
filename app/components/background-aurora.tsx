@@ -28,7 +28,7 @@ const BackgroundAurora = ({ variant = "default" }: Props) => {
                 pointerEvents: "none",
                 overflow: "hidden",
                 background:
-                    "linear-gradient(180deg, #F2F2EE 0%, #F2F2EE 50%, #F2F2EE 100%)",
+                    "linear-gradient(180deg, var(--bg) 0%, var(--bg) 50%, var(--bg) 100%)",
                 "&::before, &::after": {
                     content: '""',
                     position: "absolute",

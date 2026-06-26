@@ -62,21 +62,21 @@ interface NotificationPreferences {
 }
 
 const cardSx = {
-    bgcolor: "#ffffff",
-    border: "1px solid rgba(25,40,55,0.10)",
+    bgcolor: "var(--surface)",
+    border: "1px solid var(--border)",
     borderRadius: "16px",
     p: 3,
 };
 
 const textFieldSx = {
     "& .MuiOutlinedInput-root": {
-        color: "#192837",
+        color: "var(--fg)",
         background: "transparent",
-        "& fieldset": { borderColor: "rgba(25,40,55,0.10)" },
-        "&:hover fieldset": { borderColor: "rgba(25,40,55,0.10)" },
+        "& fieldset": { borderColor: "var(--border)" },
+        "&:hover fieldset": { borderColor: "var(--border)" },
         "&.Mui-focused fieldset": { borderColor: "#ff7759" },
     },
-    "& .MuiInputLabel-root": { color: "rgba(25,40,55,0.7)" },
+    "& .MuiInputLabel-root": { color: "var(--fg-muted)" },
     "& .MuiInputLabel-root.Mui-focused": { color: "#ff7759" },
 };
 
@@ -89,7 +89,7 @@ const switchSx = {
 
 const sectionTitleSx = {
     fontWeight: 700,
-    color: "#192837",
+    color: "var(--fg)",
     mb: 0.5,
     display: "flex",
     alignItems: "center",
@@ -97,13 +97,13 @@ const sectionTitleSx = {
 };
 
 const sectionSubtitleSx = {
-    color: "rgba(25,40,55,0.5)",
+    color: "var(--fg-faint)",
     fontSize: "0.9rem",
     mb: 3,
 };
 
 const _dividerSx = {
-    borderColor: "rgba(25,40,55,0.10)",
+    borderColor: "var(--border)",
     my: 2.5,
 };
 
@@ -581,11 +581,11 @@ const ProfilePage = () => {
             <Box sx={{ mb: 4 }}>
                 <Typography
                     variant="h4"
-                    sx={{ fontWeight: 700, color: "#192837", mb: 1 }}
+                    sx={{ fontWeight: 700, color: "var(--fg)", mb: 1 }}
                 >
                     Profile
                 </Typography>
-                <Typography sx={{ color: "rgba(25,40,55,0.5)" }}>
+                <Typography sx={{ color: "var(--fg-faint)" }}>
                     Manage your account information and preferences
                 </Typography>
             </Box>
@@ -616,7 +616,7 @@ const ProfilePage = () => {
                                 display: "flex",
                                 alignItems: "center",
                                 gap: 2,
-                                color: "rgba(25,40,55,0.5)",
+                                color: "var(--fg-faint)",
                             }}
                         >
                             <CircularProgress
@@ -625,7 +625,7 @@ const ProfilePage = () => {
                             />
                             <Typography
                                 sx={{
-                                    color: "rgba(25,40,55,0.5)",
+                                    color: "var(--fg-faint)",
                                     fontSize: "0.9rem",
                                 }}
                             >
@@ -695,7 +695,7 @@ const ProfilePage = () => {
                                 <Box>
                                     <Typography
                                         sx={{
-                                            color: "#192837",
+                                            color: "var(--fg)",
                                             fontWeight: 600,
                                             fontSize: "1rem",
                                         }}
@@ -754,7 +754,7 @@ const ProfilePage = () => {
                             <Box sx={{ mb: 3 }}>
                                 <Typography
                                     sx={{
-                                        color: "rgba(25,40,55,0.55)",
+                                        color: "var(--fg-faint)",
                                         fontSize: "0.8rem",
                                         mb: 0.8,
                                         textTransform: "uppercase",
@@ -777,14 +777,14 @@ const ProfilePage = () => {
                                         alignItems: "center",
                                         gap: 1.5,
                                         p: 1.5,
-                                        background: "#ffffff",
-                                        border: "1px solid rgba(25,40,55,0.10)",
+                                        background: "var(--surface)",
+                                        border: "1px solid var(--border)",
                                         borderRadius: "10px",
                                     }}
                                 >
                                     <Typography
                                         sx={{
-                                            color: "#192837",
+                                            color: "var(--fg)",
                                             fontWeight: 500,
                                             flex: 1,
                                         }}
@@ -825,7 +825,7 @@ const ProfilePage = () => {
                             <Box>
                                 <Typography
                                     sx={{
-                                        color: "rgba(25,40,55,0.55)",
+                                        color: "var(--fg-faint)",
                                         fontSize: "0.8rem",
                                         mb: 0.8,
                                         textTransform: "uppercase",
@@ -867,14 +867,14 @@ const ProfilePage = () => {
                                             alignItems: "center",
                                             gap: 1.5,
                                             p: 1.5,
-                                            background: "#ffffff",
-                                            border: "1px solid rgba(25,40,55,0.10)",
+                                            background: "var(--surface)",
+                                            border: "1px solid var(--border)",
                                             borderRadius: "10px",
                                         }}
                                     >
                                         <Typography
                                             sx={{
-                                                color: "#192837",
+                                                color: "var(--fg)",
                                                 fontWeight: 500,
                                                 flex: 1,
                                             }}
@@ -882,7 +882,7 @@ const ProfilePage = () => {
                                             {profile.displayName || (
                                                 <span
                                                     style={{
-                                                        color: "rgba(25,40,55,0.3)",
+                                                        color: "var(--fg-faint)",
                                                         fontStyle: "italic",
                                                     }}
                                                 >
@@ -961,7 +961,7 @@ const ProfilePage = () => {
                                                             "rgba(255, 119, 89,0.25)",
                                                     },
                                                     "&:disabled": {
-                                                        color: "rgba(25,40,55,0.3)",
+                                                        color: "var(--fg-faint)",
                                                     },
                                                 }}
                                             >
@@ -976,7 +976,7 @@ const ProfilePage = () => {
                                                 }}
                                                 disabled={nameLoading}
                                                 sx={{
-                                                    color: "rgba(25,40,55,0.5)",
+                                                    color: "var(--fg-faint)",
                                                     textTransform: "none",
                                                     fontSize: "0.85rem",
                                                     py: 0.8,
@@ -987,7 +987,7 @@ const ProfilePage = () => {
                                         </Box>
                                         <Typography
                                             sx={{
-                                                color: "rgba(25,40,55,0.3)",
+                                                color: "var(--fg-faint)",
                                                 fontSize: "0.75rem",
                                                 mt: 0.8,
                                             }}
@@ -1003,7 +1003,7 @@ const ProfilePage = () => {
                             <Box>
                                 <Typography
                                     sx={{
-                                        color: "rgba(25,40,55,0.55)",
+                                        color: "var(--fg-faint)",
                                         fontSize: "0.8rem",
                                         mb: 0.8,
                                         textTransform: "uppercase",
@@ -1018,8 +1018,8 @@ const ProfilePage = () => {
                                         alignItems: "center",
                                         gap: 1.5,
                                         p: 1.5,
-                                        background: "#ffffff",
-                                        border: "1px solid rgba(25,40,55,0.10)",
+                                        background: "var(--surface)",
+                                        border: "1px solid var(--border)",
                                         borderRadius: "10px",
                                     }}
                                 >
@@ -1053,7 +1053,7 @@ const ProfilePage = () => {
                                             width="20"
                                             height="20"
                                             viewBox="0 0 24 24"
-                                            fill="#fff"
+                                            fill="var(--fg)"
                                         >
                                             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                                         </svg>
@@ -1069,7 +1069,7 @@ const ProfilePage = () => {
                                     )}
                                     <Typography
                                         sx={{
-                                            color: "#192837",
+                                            color: "var(--fg)",
                                             fontWeight: 500,
                                             textTransform: "capitalize",
                                         }}
@@ -1133,7 +1133,7 @@ const ProfilePage = () => {
                                         <Box>
                                             <Typography
                                                 sx={{
-                                                    color: "rgba(25,40,55,0.5)",
+                                                    color: "var(--fg-faint)",
                                                     fontSize: "0.83rem",
                                                     mb: 1.5,
                                                 }}
@@ -1161,7 +1161,7 @@ const ProfilePage = () => {
                                                             "rgba(245,158,11,0.25)",
                                                     },
                                                     "&:disabled": {
-                                                        color: "rgba(25,40,55,0.3)",
+                                                        color: "var(--fg-faint)",
                                                     },
                                                 }}
                                             >
@@ -1177,7 +1177,7 @@ const ProfilePage = () => {
                                         <Box>
                                             <Typography
                                                 sx={{
-                                                    color: "rgba(25,40,55,0.5)",
+                                                    color: "var(--fg-faint)",
                                                     fontSize: "0.83rem",
                                                     mb: 1.5,
                                                 }}
@@ -1253,7 +1253,7 @@ const ProfilePage = () => {
                                                                 "rgba(255, 119, 89,0.25)",
                                                         },
                                                         "&:disabled": {
-                                                            color: "rgba(25,40,55,0.3)",
+                                                            color: "var(--fg-faint)",
                                                         },
                                                     }}
                                                 >
@@ -1270,7 +1270,7 @@ const ProfilePage = () => {
                                                 }
                                                 sx={{
                                                     mt: 1,
-                                                    color: "rgba(25,40,55,0.4)",
+                                                    color: "var(--fg-faint)",
                                                     textTransform: "none",
                                                     fontSize: "0.8rem",
                                                     "&:hover": {
@@ -1291,7 +1291,7 @@ const ProfilePage = () => {
                             <Box>
                                 <Typography
                                     sx={{
-                                        color: "rgba(25,40,55,0.55)",
+                                        color: "var(--fg-faint)",
                                         fontSize: "0.8rem",
                                         mb: 0.8,
                                         textTransform: "uppercase",
@@ -1304,9 +1304,9 @@ const ProfilePage = () => {
                                     sx={{
                                         fontFamily: "monospace",
                                         fontSize: "0.88rem",
-                                        color: "rgba(25,40,55,0.75)",
-                                        background: "#ffffff",
-                                        border: "1px solid rgba(25,40,55,0.10)",
+                                        color: "var(--fg-muted)",
+                                        background: "var(--surface)",
+                                        border: "1px solid var(--border)",
                                         borderRadius: "8px",
                                         px: 2,
                                         py: 1,
@@ -1322,7 +1322,7 @@ const ProfilePage = () => {
                             <Box>
                                 <Typography
                                     sx={{
-                                        color: "rgba(25,40,55,0.55)",
+                                        color: "var(--fg-faint)",
                                         fontSize: "0.8rem",
                                         mb: 0.8,
                                         textTransform: "uppercase",
@@ -1386,7 +1386,7 @@ const ProfilePage = () => {
                             </Typography>
                             <Typography
                                 sx={{
-                                    color: "rgba(25,40,55,0.3)",
+                                    color: "var(--fg-faint)",
                                     fontSize: "0.78rem",
                                     mt: 0.25,
                                 }}
@@ -1437,13 +1437,13 @@ const ProfilePage = () => {
                             <DevicesOtherIcon
                                 sx={{
                                     fontSize: "2rem",
-                                    color: "rgba(25,40,55,0.1)",
+                                    color: "var(--border)",
                                     mb: 1,
                                 }}
                             />
                             <Typography
                                 sx={{
-                                    color: "rgba(25,40,55,0.25)",
+                                    color: "var(--fg-faint)",
                                     fontSize: "0.85rem",
                                 }}
                             >
@@ -1460,7 +1460,7 @@ const ProfilePage = () => {
                                 flex: 1,
                                 "&::-webkit-scrollbar": { width: 4 },
                                 "&::-webkit-scrollbar-thumb": {
-                                    bgcolor: "rgba(25,40,55,0.10)",
+                                    bgcolor: "var(--border)",
                                     borderRadius: 2,
                                 },
                             }}
@@ -1474,8 +1474,8 @@ const ProfilePage = () => {
                                         key={svc.client_id}
                                         sx={{
                                             borderRadius: "10px",
-                                            bgcolor: "#ffffff",
-                                            border: "1px solid rgba(25,40,55,0.10)",
+                                            bgcolor: "var(--surface)",
+                                            border: "1px solid var(--border)",
                                             overflow: "hidden",
                                             transition: "border-color 0.2s",
                                             "&:hover": {
@@ -1516,7 +1516,7 @@ const ProfilePage = () => {
                                             >
                                                 <Typography
                                                     sx={{
-                                                        color: "rgba(25,40,55,0.85)",
+                                                        color: "var(--fg-muted)",
                                                         fontWeight: 600,
                                                         fontSize: "0.82rem",
                                                         overflow: "hidden",
@@ -1529,7 +1529,7 @@ const ProfilePage = () => {
                                                 </Typography>
                                                 <Typography
                                                     sx={{
-                                                        color: "rgba(25,40,55,0.25)",
+                                                        color: "var(--fg-faint)",
                                                         fontSize: "0.7rem",
                                                         overflow: "hidden",
                                                         textOverflow:
@@ -1555,7 +1555,7 @@ const ProfilePage = () => {
                                             <ExpandMoreIcon
                                                 sx={{
                                                     fontSize: "1rem",
-                                                    color: "rgba(25,40,55,0.15)",
+                                                    color: "var(--fg-faint)",
                                                     transform: isExpanded
                                                         ? "rotate(180deg)"
                                                         : "rotate(0)",
@@ -1573,13 +1573,13 @@ const ProfilePage = () => {
                                                     pb: 1.25,
                                                     pt: 0.5,
                                                     borderTop:
-                                                        "1px solid rgba(25,40,55,0.10)",
+                                                        "1px solid var(--border)",
                                                 }}
                                             >
                                                 {svc.description && (
                                                     <Typography
                                                         sx={{
-                                                            color: "rgba(25,40,55,0.35)",
+                                                            color: "var(--fg-faint)",
                                                             fontSize: "0.75rem",
                                                             lineHeight: 1.5,
                                                             mb: 0.75,
@@ -1614,7 +1614,7 @@ const ProfilePage = () => {
                                                 )}
                                                 <Typography
                                                     sx={{
-                                                        color: "rgba(25,40,55,0.2)",
+                                                        color: "var(--fg-faint)",
                                                         fontSize: "0.68rem",
                                                     }}
                                                 >
@@ -1638,7 +1638,7 @@ const ProfilePage = () => {
                                     href="/dashboard/services"
                                     size="small"
                                     sx={{
-                                        color: "rgba(25,40,55,0.3)",
+                                        color: "var(--fg-faint)",
                                         textTransform: "none",
                                         fontSize: "0.75rem",
                                         mt: 0.25,
@@ -1713,7 +1713,7 @@ const ProfilePage = () => {
                             sx={{
                                 ...textFieldSx,
                                 "& .MuiFormHelperText-root": {
-                                    color: "rgba(25,40,55,0.3)",
+                                    color: "var(--fg-faint)",
                                     textAlign: "right",
                                 },
                             }}
@@ -1738,7 +1738,7 @@ const ProfilePage = () => {
                                 sx={{
                                     ...textFieldSx,
                                     "& .MuiFormHelperText-root": {
-                                        color: "rgba(25,40,55,0.45)",
+                                        color: "var(--fg-faint)",
                                     },
                                 }}
                                 disabled={updateLoading}
@@ -1752,7 +1752,7 @@ const ProfilePage = () => {
                                 sx={{
                                     ...textFieldSx,
                                     "& .MuiFormHelperText-root": {
-                                        color: "rgba(25,40,55,0.45)",
+                                        color: "var(--fg-faint)",
                                     },
                                 }}
                                 disabled={updateLoading}
@@ -1768,7 +1768,7 @@ const ProfilePage = () => {
                             sx={{
                                 ...textFieldSx,
                                 "& .MuiFormHelperText-root": {
-                                    color: "rgba(25,40,55,0.45)",
+                                    color: "var(--fg-faint)",
                                 },
                             }}
                             disabled={updateLoading}
@@ -1793,7 +1793,7 @@ const ProfilePage = () => {
                                 sx={{
                                     ...textFieldSx,
                                     "& .MuiFormHelperText-root": {
-                                        color: "rgba(25,40,55,0.45)",
+                                        color: "var(--fg-faint)",
                                     },
                                 }}
                                 disabled={updateLoading}
@@ -1808,7 +1808,7 @@ const ProfilePage = () => {
                                 sx={{
                                     ...textFieldSx,
                                     "& .MuiFormHelperText-root": {
-                                        color: "rgba(25,40,55,0.45)",
+                                        color: "var(--fg-faint)",
                                     },
                                 }}
                                 disabled={updateLoading}
@@ -1835,7 +1835,7 @@ const ProfilePage = () => {
                                     borderColor: "rgba(255, 119, 89,0.5)",
                                 },
                                 "&:disabled": {
-                                    color: "rgba(25,40,55,0.35)",
+                                    color: "var(--fg-faint)",
                                 },
                             }}
                         >
@@ -1913,7 +1913,7 @@ const ProfilePage = () => {
                             />
                             <Typography
                                 sx={{
-                                    color: "rgba(25,40,55,0.5)",
+                                    color: "var(--fg-faint)",
                                     fontSize: "0.9rem",
                                 }}
                             >
@@ -1954,7 +1954,7 @@ const ProfilePage = () => {
                                         justifyContent: "space-between",
                                         py: 1.5,
                                         borderBottom:
-                                            "1px solid rgba(25,40,55,0.10)",
+                                            "1px solid var(--border)",
                                         "&:last-child": {
                                             borderBottom: "none",
                                         },
@@ -1963,7 +1963,7 @@ const ProfilePage = () => {
                                     <Box>
                                         <Typography
                                             sx={{
-                                                color: "#192837",
+                                                color: "var(--fg)",
                                                 fontWeight: 500,
                                                 fontSize: "0.95rem",
                                             }}
@@ -1972,7 +1972,7 @@ const ProfilePage = () => {
                                         </Typography>
                                         <Typography
                                             sx={{
-                                                color: "rgba(25,40,55,0.45)",
+                                                color: "var(--fg-faint)",
                                                 fontSize: "0.83rem",
                                                 mt: 0.2,
                                             }}
@@ -2011,7 +2011,7 @@ const ProfilePage = () => {
                                         borderColor: "rgba(255, 119, 89,0.5)",
                                     },
                                     "&:disabled": {
-                                        color: "rgba(25,40,55,0.35)",
+                                        color: "var(--fg-faint)",
                                     },
                                 }}
                             >
@@ -2097,7 +2097,7 @@ const ProfilePage = () => {
                             <Box>
                                 <Typography
                                     sx={{
-                                        color: "#192837",
+                                        color: "var(--fg)",
                                         fontWeight: 600,
                                         fontSize: "0.95rem",
                                     }}
@@ -2106,7 +2106,7 @@ const ProfilePage = () => {
                                 </Typography>
                                 <Typography
                                     sx={{
-                                        color: "rgba(25,40,55,0.45)",
+                                        color: "var(--fg-faint)",
                                         fontSize: "0.83rem",
                                         mt: 0.2,
                                     }}
@@ -2152,7 +2152,7 @@ const ProfilePage = () => {
                             <Box>
                                 <Typography
                                     sx={{
-                                        color: "#192837",
+                                        color: "var(--fg)",
                                         fontWeight: 600,
                                         fontSize: "0.95rem",
                                     }}
@@ -2161,7 +2161,7 @@ const ProfilePage = () => {
                                 </Typography>
                                 <Typography
                                     sx={{
-                                        color: "rgba(25,40,55,0.45)",
+                                        color: "var(--fg-faint)",
                                         fontSize: "0.83rem",
                                         mt: 0.2,
                                     }}
@@ -2199,14 +2199,14 @@ const ProfilePage = () => {
                     sx: {
                         background: "rgba(255,255,255,0.95)",
                         backdropFilter: "blur(16px)",
-                        border: "1px solid rgba(25,40,55,0.10)",
+                        border: "1px solid var(--border)",
                         borderRadius: "14px",
                         width: "100%",
                         maxWidth: 420,
                     },
                 }}
             >
-                <DialogTitle sx={{ color: "#192837", fontWeight: 700 }}>
+                <DialogTitle sx={{ color: "var(--fg)", fontWeight: 700 }}>
                     Change username
                 </DialogTitle>
                 <DialogContent>
@@ -2253,7 +2253,7 @@ const ProfilePage = () => {
                                         ? "#4ade80"
                                         : usernameCheck.state === "taken"
                                           ? "#f87171"
-                                          : "rgba(25,40,55,0.4)",
+                                          : "var(--fg-faint)",
                             },
                         }}
                         sx={textFieldSx}
@@ -2264,7 +2264,7 @@ const ProfilePage = () => {
                         onClick={() => setUsernameDialogOpen(false)}
                         disabled={usernameLoading}
                         sx={{
-                            color: "rgba(25,40,55,0.6)",
+                            color: "var(--fg-faint)",
                             textTransform: "none",
                         }}
                     >
@@ -2284,8 +2284,8 @@ const ProfilePage = () => {
                             fontWeight: 600,
                             "&:hover": { background: "#ff7759" },
                             "&:disabled": {
-                                background: "rgba(25,40,55,0.10)",
-                                color: "rgba(25,40,55,0.3)",
+                                background: "var(--border)",
+                                color: "var(--fg-faint)",
                             },
                         }}
                     >
@@ -2323,13 +2323,13 @@ const ProfilePage = () => {
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Typography
-                        sx={{ color: "#192837", mb: 1.5, fontWeight: 500 }}
+                        sx={{ color: "var(--fg)", mb: 1.5, fontWeight: 500 }}
                     >
                         Are you sure?
                     </Typography>
                     <Typography
                         sx={{
-                            color: "rgba(25,40,55,0.6)",
+                            color: "var(--fg-faint)",
                             fontSize: "0.92rem",
                             lineHeight: 1.6,
                         }}
@@ -2365,11 +2365,11 @@ const ProfilePage = () => {
                         onClick={() => setDeleteDialogOpen(false)}
                         disabled={deleteLoading}
                         sx={{
-                            color: "rgba(25,40,55,0.6)",
+                            color: "var(--fg-faint)",
                             textTransform: "none",
                             fontWeight: 500,
                             "&:hover": {
-                                backgroundColor: "rgba(25,40,55,0.04)",
+                                backgroundColor: "var(--overlay)",
                             },
                         }}
                     >
@@ -2390,7 +2390,7 @@ const ProfilePage = () => {
                                 background: "rgba(239,68,68,0.3)",
                                 borderColor: "#ef4444",
                             },
-                            "&:disabled": { color: "rgba(25,40,55,0.35)" },
+                            "&:disabled": { color: "var(--fg-faint)" },
                         }}
                     >
                         {deleteLoading ? (

@@ -52,15 +52,15 @@ interface CreateAppResponse {
 
 const textFieldSx = {
     "& .MuiOutlinedInput-root": {
-        color: "#192837",
+        color: "var(--fg)",
         background: "transparent",
-        "& fieldset": { borderColor: "rgba(25,40,55,0.10)" },
-        "&:hover fieldset": { borderColor: "rgba(25,40,55,0.10)" },
+        "& fieldset": { borderColor: "var(--border)" },
+        "&:hover fieldset": { borderColor: "var(--border)" },
         "&.Mui-focused fieldset": { borderColor: "#ff7759" },
     },
-    "& .MuiInputLabel-root": { color: "rgba(25,40,55,0.7)" },
+    "& .MuiInputLabel-root": { color: "var(--fg-muted)" },
     "& .MuiInputLabel-root.Mui-focused": { color: "#ff7759" },
-    "& .MuiFormHelperText-root": { color: "rgba(25,40,55,0.4)" },
+    "& .MuiFormHelperText-root": { color: "var(--fg-faint)" },
 };
 
 const tableHeadSx = {
@@ -74,11 +74,11 @@ const tableHeadSx = {
 
 const tableBodySx = {
     "& .MuiTableCell-body": {
-        color: "#192837",
-        borderColor: "rgba(25,40,55,0.10)",
+        color: "var(--fg)",
+        borderColor: "var(--border)",
     },
     "& .MuiTableRow-root:hover": {
-        backgroundColor: "rgba(25,40,55,0.04)",
+        backgroundColor: "var(--overlay)",
     },
 };
 
@@ -114,7 +114,7 @@ function AppIcon({ app, size = 28 }: { app: OAuthApp; size?: number }) {
                 height: size,
                 borderRadius: "6px",
                 flexShrink: 0,
-                background: "#ffffff",
+                background: "var(--surface)",
             }}
             onError={() => stage < sources.length && setStage((s) => s + 1)}
         />
@@ -314,7 +314,7 @@ const OAuthAppsPage = () => {
         backdropFilter: "blur(20px)",
         background:
             "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.95) 100%)",
-        border: "1px solid rgba(25,40,55,0.10)",
+        border: "1px solid var(--border)",
         borderRadius: "16px",
     };
 
@@ -333,11 +333,11 @@ const OAuthAppsPage = () => {
                     <Box>
                         <Typography
                             variant="h4"
-                            sx={{ fontWeight: 700, color: "#192837", mb: 1 }}
+                            sx={{ fontWeight: 700, color: "var(--fg)", mb: 1 }}
                         >
                             OAuth Applications
                         </Typography>
-                        <Typography sx={{ color: "rgba(25,40,55,0.6)" }}>
+                        <Typography sx={{ color: "var(--fg-faint)" }}>
                             Register applications to allow users to sign in with
                             their SSO based Account.
                         </Typography>
@@ -423,8 +423,8 @@ const OAuthAppsPage = () => {
                 <Box
                     sx={{
                         backdropFilter: "blur(20px)",
-                        background: "#ffffff",
-                        border: "1px solid rgba(25,40,55,0.10)",
+                        background: "var(--surface)",
+                        border: "1px solid var(--border)",
                         borderRadius: "16px",
                         overflow: "hidden",
                     }}
@@ -434,7 +434,7 @@ const OAuthAppsPage = () => {
                             sx={{
                                 p: 4,
                                 textAlign: "center",
-                                color: "rgba(25,40,55,0.5)",
+                                color: "var(--fg-faint)",
                             }}
                         >
                             Loading applications...
@@ -443,7 +443,7 @@ const OAuthAppsPage = () => {
                         <Box sx={{ p: 6, textAlign: "center" }}>
                             <Typography
                                 sx={{
-                                    color: "rgba(25,40,55,0.5)",
+                                    color: "var(--fg-faint)",
                                     mb: 1,
                                 }}
                             >
@@ -451,7 +451,7 @@ const OAuthAppsPage = () => {
                             </Typography>
                             <Typography
                                 variant="caption"
-                                sx={{ color: "rgba(25,40,55,0.3)" }}
+                                sx={{ color: "var(--fg-faint)" }}
                             >
                                 Click "New OAuth App" to register your first
                                 application.
@@ -498,7 +498,7 @@ const OAuthAppsPage = () => {
                                                             href={`/dashboard/oauth-apps/${app.client_id}`}
                                                             sx={{
                                                                 fontWeight: 500,
-                                                                color: "#192837",
+                                                                color: "var(--fg)",
                                                                 textDecoration:
                                                                     "none",
                                                                 cursor: "pointer",
@@ -525,7 +525,7 @@ const OAuthAppsPage = () => {
                                                                 sx={{
                                                                     display:
                                                                         "block",
-                                                                    color: "rgba(25,40,55,0.4)",
+                                                                    color: "var(--fg-faint)",
                                                                     fontFamily:
                                                                         "monospace",
                                                                     fontSize:
@@ -605,7 +605,7 @@ const OAuthAppsPage = () => {
                                                                 : "rgba(107, 114, 128, 0.2)",
                                                         color: app.is_active
                                                             ? "#ff7759"
-                                                            : "rgba(25,40,55,0.6)",
+                                                            : "var(--fg-faint)",
                                                         border: "1px solid",
                                                         borderColor:
                                                             app.is_active
@@ -617,7 +617,7 @@ const OAuthAppsPage = () => {
                                             <TableCell
                                                 sx={{
                                                     fontSize: "0.9rem",
-                                                    color: "rgba(25,40,55,0.6)",
+                                                    color: "var(--fg-faint)",
                                                 }}
                                             >
                                                 {new Date(
@@ -639,11 +639,11 @@ const OAuthAppsPage = () => {
                                                         href={`/dashboard/oauth-apps/${app.client_id}`}
                                                         title="Settings"
                                                         sx={{
-                                                            color: "rgba(25,40,55,0.5)",
+                                                            color: "var(--fg-faint)",
                                                             "&:hover": {
-                                                                color: "#192837",
+                                                                color: "var(--fg)",
                                                                 bgcolor:
-                                                                    "rgba(25,40,55,0.04)",
+                                                                    "var(--overlay)",
                                                             },
                                                         }}
                                                     >
@@ -692,9 +692,9 @@ const OAuthAppsPage = () => {
             >
                 <DialogTitle
                     sx={{
-                        color: "#192837",
+                        color: "var(--fg)",
                         fontWeight: 700,
-                        borderBottom: "1px solid rgba(25,40,55,0.10)",
+                        borderBottom: "1px solid var(--border)",
                     }}
                 >
                     Register a new OAuth application
@@ -703,7 +703,7 @@ const OAuthAppsPage = () => {
                     <Typography
                         variant="caption"
                         sx={{
-                            color: "rgba(25,40,55,0.4)",
+                            color: "var(--fg-faint)",
                             display: "block",
                             mb: 2,
                         }}
@@ -761,7 +761,7 @@ const OAuthAppsPage = () => {
                     />
                     <Typography
                         sx={{
-                            color: "rgba(25,40,55,0.7)",
+                            color: "var(--fg-muted)",
                             fontSize: "0.85rem",
                             mt: 2,
                             mb: 0.5,
@@ -772,7 +772,7 @@ const OAuthAppsPage = () => {
                     <Typography
                         variant="caption"
                         sx={{
-                            color: "rgba(25,40,55,0.4)",
+                            color: "var(--fg-faint)",
                             display: "block",
                             mb: 1,
                         }}
@@ -872,13 +872,13 @@ const OAuthAppsPage = () => {
                 </DialogContent>
                 <DialogActions
                     sx={{
-                        borderTop: "1px solid rgba(25,40,55,0.10)",
+                        borderTop: "1px solid var(--border)",
                         p: 2,
                     }}
                 >
                     <Button
                         onClick={handleCloseDialog}
-                        sx={{ color: "rgba(25,40,55,0.6)" }}
+                        sx={{ color: "var(--fg-faint)" }}
                         disabled={loading}
                     >
                         Cancel
@@ -896,7 +896,7 @@ const OAuthAppsPage = () => {
                             "&:hover": {
                                 background: "rgba(255, 119, 89,0.25)",
                             },
-                            "&:disabled": { color: "rgba(25,40,55,0.4)" },
+                            "&:disabled": { color: "var(--fg-faint)" },
                         }}
                     >
                         {loading ? "Registering..." : "Register application"}
@@ -914,9 +914,9 @@ const OAuthAppsPage = () => {
             >
                 <DialogTitle
                     sx={{
-                        color: "#192837",
+                        color: "var(--fg)",
                         fontWeight: 700,
-                        borderBottom: "1px solid rgba(25,40,55,0.10)",
+                        borderBottom: "1px solid var(--border)",
                     }}
                 >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -925,16 +925,16 @@ const OAuthAppsPage = () => {
                     </Box>
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
-                    <Typography sx={{ color: "rgba(25,40,55,0.7)", mb: 1 }}>
+                    <Typography sx={{ color: "var(--fg-muted)", mb: 1 }}>
                         Are you sure you want to deactivate{" "}
-                        <strong style={{ color: "#192837" }}>
+                        <strong style={{ color: "var(--fg)" }}>
                             {deleteConfirm.appName}
                         </strong>
                         ?
                     </Typography>
                     <Typography
                         variant="body2"
-                        sx={{ color: "rgba(25,40,55,0.4)" }}
+                        sx={{ color: "var(--fg-faint)" }}
                     >
                         This will immediately stop all OAuth authentication
                         requests for this application. This action cannot be
@@ -943,7 +943,7 @@ const OAuthAppsPage = () => {
                 </DialogContent>
                 <DialogActions
                     sx={{
-                        borderTop: "1px solid rgba(25,40,55,0.10)",
+                        borderTop: "1px solid var(--border)",
                         p: 2,
                     }}
                 >
@@ -955,7 +955,7 @@ const OAuthAppsPage = () => {
                                 appName: "",
                             })
                         }
-                        sx={{ color: "rgba(25,40,55,0.6)" }}
+                        sx={{ color: "var(--fg-faint)" }}
                     >
                         Cancel
                     </Button>
@@ -988,9 +988,9 @@ const OAuthAppsPage = () => {
             >
                 <DialogTitle
                     sx={{
-                        color: "#192837",
+                        color: "var(--fg)",
                         fontWeight: 700,
-                        borderBottom: "1px solid rgba(25,40,55,0.10)",
+                        borderBottom: "1px solid var(--border)",
                     }}
                 >
                     Your new client secret
@@ -1020,7 +1020,7 @@ const OAuthAppsPage = () => {
                             <Box>
                                 <Typography
                                     sx={{
-                                        color: "rgba(25,40,55,0.6)",
+                                        color: "var(--fg-faint)",
                                         fontSize: "0.8rem",
                                         mb: 0.75,
                                     }}
@@ -1032,7 +1032,7 @@ const OAuthAppsPage = () => {
                                         display: "flex",
                                         alignItems: "center",
                                         gap: 1,
-                                        background: "#ffffff",
+                                        background: "var(--surface)",
                                         p: 1.5,
                                         borderRadius: "8px",
                                         border: "1px solid rgba(255, 119, 89,0.2)",
@@ -1078,7 +1078,7 @@ const OAuthAppsPage = () => {
                             <Box>
                                 <Typography
                                     sx={{
-                                        color: "rgba(25,40,55,0.6)",
+                                        color: "var(--fg-faint)",
                                         fontSize: "0.8rem",
                                         mb: 0.75,
                                     }}
@@ -1090,7 +1090,7 @@ const OAuthAppsPage = () => {
                                         display: "flex",
                                         alignItems: "center",
                                         gap: 1,
-                                        background: "#ffffff",
+                                        background: "var(--surface)",
                                         p: 1.5,
                                         borderRadius: "8px",
                                         border: "1px solid rgba(239, 68, 68, 0.2)",
@@ -1136,7 +1136,7 @@ const OAuthAppsPage = () => {
                             <Box>
                                 <Typography
                                     sx={{
-                                        color: "rgba(25,40,55,0.6)",
+                                        color: "var(--fg-faint)",
                                         fontSize: "0.8rem",
                                         mb: 0.75,
                                     }}
@@ -1170,7 +1170,7 @@ const OAuthAppsPage = () => {
                 </DialogContent>
                 <DialogActions
                     sx={{
-                        borderTop: "1px solid rgba(25,40,55,0.10)",
+                        borderTop: "1px solid var(--border)",
                         p: 2,
                     }}
                 >

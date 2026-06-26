@@ -44,15 +44,15 @@ export default function Navbar() {
     const authed = !!me?.email;
 
     return (
-        <header className="w-full max-w-[1280px] mx-auto px-5 sm:px-8 py-4 sm:py-5 flex items-center justify-between z-50 relative bg-transparent text-[#192837] font-body">
+        <header className="w-full max-w-[1280px] mx-auto px-5 sm:px-8 py-4 sm:py-5 flex items-center justify-between z-50 relative bg-transparent text-[var(--fg)] font-body">
             {/* Left: Panda Mascot Logo + App Title */}
             <Link href="/" className="flex items-center gap-3">
                 <img
                     src="/LOGO/logo.png"
                     alt="Elixpo Mascot"
-                    className="w-8 h-8 rounded-lg object-contain bg-white/80 p-0.5"
+                    className="w-8 h-8 rounded-lg object-contain bg-[var(--surface)]/80 p-0.5"
                 />
-                <span className="font-heading text-xl font-bold tracking-tight text-[#192837]">
+                <span className="font-heading text-xl font-bold tracking-tight text-[var(--fg)]">
                     Elixpo <span className="text-[#ff7759]">Accounts</span>
                 </span>
             </Link>
@@ -63,7 +63,7 @@ export default function Navbar() {
                     <Link
                         key={link.label}
                         href={link.href}
-                        className="text-sm font-semibold tracking-wide hover:opacity-70 transition-opacity text-[#192837]"
+                        className="text-sm font-semibold tracking-wide hover:opacity-70 transition-opacity text-[var(--fg)]"
                     >
                         {link.label}
                     </Link>
@@ -85,7 +85,7 @@ export default function Navbar() {
                         </Link>
                         <Link
                             href="/dashboard/profile"
-                            className="bg-[#F2F2EE] text-[#192837] px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 border border-black/5"
+                            className="bg-[var(--bg)] text-[var(--fg)] px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 border border-[var(--border)]"
                         >
                             Profile
                         </Link>
@@ -100,7 +100,7 @@ export default function Navbar() {
                         </Link>
                         <Link
                             href="/login"
-                            className="bg-[#F2F2EE] text-[#192837] px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 border border-black/5"
+                            className="bg-[var(--bg)] text-[var(--fg)] px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] hover:brightness-110 active:scale-[0.96] transition-all duration-200 border border-[var(--border)]"
                         >
                             Sign In
                         </Link>
@@ -111,7 +111,7 @@ export default function Navbar() {
             {/* Mobile Hamburger Button */}
             <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="md:hidden p-2 text-[#192837] hover:bg-[#192837]/5 rounded-full transition-colors"
+                className="md:hidden p-2 text-[var(--fg)] hover:bg-[var(--overlay)] rounded-full transition-colors"
                 aria-label="Open menu"
             >
                 <Menu className="w-6 h-6" />
@@ -138,10 +138,10 @@ export default function Navbar() {
                                 ease: [0.22, 1, 0.36, 1] as const,
                                 duration: 0.45,
                             }}
-                            className="fixed right-0 top-0 w-[min(88vw,360px)] h-[100dvh] bg-[#CFC8C5] shadow-[-12px_0_48px_rgba(25,40,55,0.18)] z-50 flex flex-col p-6 text-[#192837]"
+                            className="fixed right-0 top-0 w-[min(88vw,360px)] h-[100dvh] bg-[var(--surface-2)] shadow-[-12px_0_48px_rgba(25,40,55,0.18)] z-50 flex flex-col p-6 text-[var(--fg)]"
                         >
                             {/* Header */}
-                            <div className="flex items-center justify-between pb-4 border-b border-[#192837]/10">
+                            <div className="flex items-center justify-between pb-4 border-b border-[var(--border)]">
                                 <Link
                                     href="/"
                                     className="flex items-center gap-2"
@@ -150,7 +150,7 @@ export default function Navbar() {
                                     <img
                                         src="/LOGO/logo.png"
                                         alt="Elixpo Mascot"
-                                        className="w-8 h-8 rounded-lg object-contain bg-white/80 p-0.5"
+                                        className="w-8 h-8 rounded-lg object-contain bg-[var(--surface)]/80 p-0.5"
                                     />
                                     <span className="font-heading text-lg font-bold text-[#192837]">
                                         Elixpo
@@ -213,7 +213,7 @@ export default function Navbar() {
                                             onClick={() =>
                                                 setIsMobileMenuOpen(false)
                                             }
-                                            className="w-full bg-[#F2F2EE] text-[#192837] py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all border border-black/5"
+                                            className="w-full bg-[var(--bg)] text-[var(--fg)] py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all border border-[var(--border)]"
                                         >
                                             Profile
                                         </Link>
@@ -234,7 +234,7 @@ export default function Navbar() {
                                             onClick={() =>
                                                 setIsMobileMenuOpen(false)
                                             }
-                                            className="w-full bg-[#F2F2EE] text-[#192837] py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all border border-black/5"
+                                            className="w-full bg-[var(--bg)] text-[var(--fg)] py-3 rounded-full font-semibold text-center hover:brightness-110 active:scale-[0.98] transition-all border border-[var(--border)]"
                                         >
                                             Sign In
                                         </Link>

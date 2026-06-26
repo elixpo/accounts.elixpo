@@ -139,7 +139,7 @@ export default function LandingPage() {
     };
 
     return (
-        <div className="relative w-full min-h-screen font-body text-[#192837] bg-[#F2F2EE] selection:bg-[#ff7759] selection:text-white overflow-x-hidden">
+        <div className="relative w-full min-h-screen font-body text-[var(--fg)] bg-[var(--bg)] selection:bg-[#ff7759] selection:text-white overflow-x-hidden">
             <style>{`
                 .font-heading { font-family: var(--font-heading), sans-serif; }
                 .font-body { font-family: var(--font-body), sans-serif; }
@@ -160,7 +160,10 @@ export default function LandingPage() {
                 />
 
                 {/* Cream wash — dims the video so the text leads */}
-                <div className="absolute inset-0 bg-[#F2F2EE]/55 -z-10 pointer-events-none" />
+                <div
+                    className="absolute inset-0 -z-10 pointer-events-none opacity-[0.55]"
+                    style={{ background: "var(--bg)" }}
+                />
                 {/* Vignette — darkens the edges toward the centre */}
                 <div
                     className="absolute inset-0 -z-10 pointer-events-none"
@@ -170,7 +173,13 @@ export default function LandingPage() {
                     }}
                 />
                 {/* Bottom fade — flows the hero into the sections below */}
-                <div className="absolute bottom-0 left-0 right-0 h-44 -z-10 pointer-events-none bg-gradient-to-b from-transparent to-[#F2F2EE]" />
+                <div
+                    className="absolute bottom-0 left-0 right-0 h-44 -z-10 pointer-events-none"
+                    style={{
+                        backgroundImage:
+                            "linear-gradient(to bottom, transparent, var(--bg))",
+                    }}
+                />
 
                 {/* Navbar */}
                 <header className="w-full max-w-[1280px] mx-auto px-5 sm:px-8 py-4 sm:py-5 flex items-center justify-between z-25">
@@ -181,7 +190,7 @@ export default function LandingPage() {
                             alt="Elixpo Mascot"
                             className="w-8 h-8 rounded-lg object-contain bg-white/80 p-0.5"
                         />
-                        <span className="font-heading text-xl font-bold tracking-tight text-[#192837]">
+                        <span className="font-heading text-xl font-bold tracking-tight text-[var(--fg)]">
                             Elixpo{" "}
                             <span className="text-[#ff7759]">Accounts</span>
                         </span>
@@ -202,7 +211,7 @@ export default function LandingPage() {
                                 </Link>
                                 <Link
                                     href="/dashboard/profile"
-                                    className="bg-white text-[#192837] px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] active:scale-[0.96] transition-all duration-200 border border-[#192837]/10"
+                                    className="bg-[var(--surface)] text-[var(--fg)] px-6 py-2.5 rounded-full font-semibold text-sm hover:scale-[1.04] active:scale-[0.96] transition-all duration-200 border border-[var(--border)]"
                                 >
                                     Profile
                                 </Link>
@@ -220,7 +229,7 @@ export default function LandingPage() {
                     {/* Mobile Hamburger Button */}
                     <button
                         onClick={() => setIsMobileMenuOpen(true)}
-                        className="md:hidden p-2 text-[#192837] hover:bg-[#192837]/5 rounded-full transition-colors"
+                        className="md:hidden p-2 text-[var(--fg)] hover:bg-[var(--overlay)] rounded-full transition-colors"
                         aria-label="Open menu"
                     >
                         <Menu className="w-6 h-6" />
@@ -231,16 +240,16 @@ export default function LandingPage() {
                 <main className="w-full max-w-[1280px] mx-auto px-5 sm:px-8 flex-1 flex flex-col justify-center py-12">
                     <div className="max-w-[720px] mx-auto flex flex-col items-center text-center">
                         {/* Heading */}
-                        <h1 className="font-heading text-[clamp(1.9rem,6vw,3.4rem)] leading-[1.05] tracking-[-0.01em] text-[#192837] mb-6 font-bold gsap-hero-animate">
-                            <Zap className="inline-block w-6 h-6 sm:w-8 sm:h-8 text-[#192837] align-middle relative -top-[2px] mr-2" />
+                        <h1 className="font-heading text-[clamp(1.9rem,6vw,3.4rem)] leading-[1.05] tracking-[-0.01em] text-[var(--fg)] mb-6 font-bold gsap-hero-animate">
+                            <Zap className="inline-block w-6 h-6 sm:w-8 sm:h-8 text-[var(--fg)] align-middle relative -top-[2px] mr-2" />
                             Single sign-on,
-                            <LockKeyhole className="inline-block w-6 h-6 sm:w-8 sm:h-8 text-[#192837] align-middle relative -top-[2px] mx-2" />
+                            <LockKeyhole className="inline-block w-6 h-6 sm:w-8 sm:h-8 text-[var(--fg)] align-middle relative -top-[2px] mx-2" />
                             in two steps
-                            <Fingerprint className="inline-block w-6 h-6 sm:w-8 sm:h-8 text-[#192837] align-middle relative -top-[2px] ml-2" />
+                            <Fingerprint className="inline-block w-6 h-6 sm:w-8 sm:h-8 text-[var(--fg)] align-middle relative -top-[2px] ml-2" />
                         </h1>
 
                         {/* Subtext */}
-                        <p className="font-body text-[clamp(0.95rem,2.5vw,1.15rem)] leading-[1.65] text-[#192837] opacity-80 mb-9 max-w-[600px] mx-auto gsap-hero-animate">
+                        <p className="font-body text-[clamp(0.95rem,2.5vw,1.15rem)] leading-[1.65] text-[var(--fg)] opacity-80 mb-9 max-w-[600px] mx-auto gsap-hero-animate">
                             Open OAuth 2.0 single sign-on —{" "}
                             <strong className="font-semibold opacity-100">
                                 not just for Elixpo
@@ -279,7 +288,7 @@ export default function LandingPage() {
                             >
                                 <Link
                                     href="/docs"
-                                    className="bg-white/85 backdrop-blur-sm text-[#192837] rounded-full py-[15px] px-7 font-body font-semibold text-[clamp(0.9rem,2vw,1rem)] border border-[#192837]/10 flex items-center gap-2.5"
+                                    className="bg-[var(--surface)]/85 backdrop-blur-sm text-[var(--fg)] rounded-full py-[15px] px-7 font-body font-semibold text-[clamp(0.9rem,2vw,1rem)] border border-[var(--border)] flex items-center gap-2.5"
                                 >
                                     Docs
                                 </Link>
@@ -290,7 +299,7 @@ export default function LandingPage() {
 
                 {/* Arrow to scroll down */}
                 <div
-                    className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 opacity-60 text-xs font-semibold tracking-widest text-[#192837] cursor-pointer animate-bounce select-none"
+                    className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-1 opacity-60 text-xs font-semibold tracking-widest text-[var(--fg)] cursor-pointer animate-bounce select-none"
                     onClick={() =>
                         document
                             .getElementById("features")
@@ -316,7 +325,7 @@ export default function LandingPage() {
             </section>
 
             {/* TWO STEPS SECTION */}
-            <section className="bg-[#F2F2EE] text-[#192837] py-24 relative z-10">
+            <section className="bg-[var(--bg)] text-[var(--fg)] py-24 relative z-10">
                 <div className="max-w-[1280px] mx-auto px-5 sm:px-8">
                     <div className="text-center max-w-[720px] mx-auto mb-16">
                         <span className="inline-block text-[11px] font-bold uppercase tracking-[0.18em] text-[#ff7759] mb-4">
@@ -334,7 +343,7 @@ export default function LandingPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-[940px] mx-auto">
                         {/* Step 1 — account */}
-                        <div className="relative bg-[#F2F2EE] border border-[#192837]/10 rounded-2xl p-8 flex flex-col gsap-card-animate">
+                        <div className="relative bg-[var(--bg)] border border-[var(--border)] rounded-2xl p-8 flex flex-col gsap-card-animate">
                             <div className="flex items-center gap-3 mb-6">
                                 <span className="font-heading text-sm font-bold w-9 h-9 grid place-items-center rounded-full bg-[#ff7759] text-white">
                                     01
@@ -346,7 +355,7 @@ export default function LandingPage() {
                             <h3 className="font-heading text-xl font-bold mb-2">
                                 Create your account
                             </h3>
-                            <p className="text-[#192837]/75 leading-relaxed text-sm sm:text-base font-body mb-6">
+                            <p className="text-[var(--fg-muted)] leading-relaxed text-sm sm:text-base font-body mb-6">
                                 Register a free Elixpo account — or sign in if
                                 you already have one. One identity that works
                                 everywhere.

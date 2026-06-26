@@ -57,28 +57,28 @@ interface Webhook {
 
 const cardSx = {
     backdropFilter: "blur(20px)",
-    background: "#ffffff",
-    border: "1px solid rgba(25,40,55,0.10)",
+    background: "var(--surface)",
+    border: "1px solid var(--border)",
     borderRadius: "16px",
 };
 
 const dialogSx = {
     backdropFilter: "blur(20px)",
     background: "rgba(255,255,255,0.95)",
-    border: "1px solid rgba(25,40,55,0.10)",
+    border: "1px solid var(--border)",
     borderRadius: "16px",
 };
 
 const textFieldSx = {
     "& .MuiOutlinedInput-root": {
-        color: "#192837",
-        "& fieldset": { borderColor: "rgba(25,40,55,0.10)" },
-        "&:hover fieldset": { borderColor: "rgba(25,40,55,0.10)" },
+        color: "var(--fg)",
+        "& fieldset": { borderColor: "var(--border)" },
+        "&:hover fieldset": { borderColor: "var(--border)" },
         "&.Mui-focused fieldset": { borderColor: "#ff7759" },
     },
-    "& .MuiInputLabel-root": { color: "rgba(25,40,55,0.7)" },
+    "& .MuiInputLabel-root": { color: "var(--fg-muted)" },
     "& .MuiInputLabel-root.Mui-focused": { color: "#ff7759" },
-    "& .MuiFormHelperText-root": { color: "rgba(25,40,55,0.5)" },
+    "& .MuiFormHelperText-root": { color: "var(--fg-faint)" },
 };
 
 export default function WebhooksPage() {
@@ -312,11 +312,11 @@ export default function WebhooksPage() {
                     <Box>
                         <Typography
                             variant="h4"
-                            sx={{ fontWeight: 700, color: "#192837", mb: 1 }}
+                            sx={{ fontWeight: 700, color: "var(--fg)", mb: 1 }}
                         >
                             Webhooks
                         </Typography>
-                        <Typography sx={{ color: "rgba(25,40,55,0.6)" }}>
+                        <Typography sx={{ color: "var(--fg-faint)" }}>
                             Receive real-time HTTP notifications for platform
                             events
                         </Typography>
@@ -351,7 +351,7 @@ export default function WebhooksPage() {
                             sx={{
                                 p: 4,
                                 textAlign: "center",
-                                color: "rgba(25,40,55,0.4)",
+                                color: "var(--fg-faint)",
                             }}
                         >
                             No webhooks configured yet. Click "Add Webhook" to
@@ -394,13 +394,13 @@ export default function WebhooksPage() {
                                             key={webhook.id}
                                             sx={{
                                                 "& .MuiTableCell-body": {
-                                                    color: "#192837",
+                                                    color: "var(--fg)",
                                                     borderColor:
-                                                        "rgba(25,40,55,0.10)",
+                                                        "var(--border)",
                                                 },
                                                 "&:hover": {
                                                     bgcolor:
-                                                        "rgba(25,40,55,0.04)",
+                                                        "var(--overlay)",
                                                 },
                                             }}
                                         >
@@ -467,7 +467,7 @@ export default function WebhooksPage() {
                                             </TableCell>
                                             <TableCell
                                                 sx={{
-                                                    color: "rgba(25,40,55,0.5)",
+                                                    color: "var(--fg-faint)",
                                                     fontSize: "0.85rem",
                                                 }}
                                             >
@@ -510,11 +510,11 @@ export default function WebhooksPage() {
                                                         component={Link}
                                                         href={`/dashboard/webhooks/${webhook.id}`}
                                                         sx={{
-                                                            color: "rgba(25,40,55,0.5)",
+                                                            color: "var(--fg-faint)",
                                                             "&:hover": {
-                                                                color: "#192837",
+                                                                color: "var(--fg)",
                                                                 bgcolor:
-                                                                    "rgba(25,40,55,0.04)",
+                                                                    "var(--overlay)",
                                                             },
                                                         }}
                                                     >
@@ -559,9 +559,9 @@ export default function WebhooksPage() {
             >
                 <DialogTitle
                     sx={{
-                        color: "#192837",
+                        color: "var(--fg)",
                         fontWeight: 700,
-                        borderBottom: "1px solid rgba(25,40,55,0.10)",
+                        borderBottom: "1px solid var(--border)",
                     }}
                 >
                     Add Webhook
@@ -577,15 +577,15 @@ export default function WebhooksPage() {
                         sx={{
                             ...textFieldSx,
                             "& .MuiInputLabel-root": {
-                                color: "rgba(25,40,55,0.7)",
+                                color: "var(--fg-muted)",
                             },
                             "& .MuiInputLabel-root.Mui-focused": {
                                 color: "#ff7759",
                             },
                             "& .MuiOutlinedInput-root": {
-                                color: "#192837",
+                                color: "var(--fg)",
                                 "& fieldset": {
-                                    borderColor: "rgba(25,40,55,0.10)",
+                                    borderColor: "var(--border)",
                                 },
                                 "&:hover fieldset": {
                                     borderColor: "rgba(255, 119, 89,0.4)",
@@ -595,7 +595,7 @@ export default function WebhooksPage() {
                                 },
                             },
                             "& .MuiSelect-icon": {
-                                color: "rgba(25,40,55,0.6)",
+                                color: "var(--fg-faint)",
                             },
                         }}
                     >
@@ -619,7 +619,7 @@ export default function WebhooksPage() {
                                         <Box
                                             component="span"
                                             sx={{
-                                                color: "rgba(25,40,55,0.4)",
+                                                color: "var(--fg-faint)",
                                             }}
                                         >
                                             Choose an endpoint from one of your
@@ -638,8 +638,8 @@ export default function WebhooksPage() {
                                     sx: {
                                         background: "rgba(255,255,255,0.95)",
                                         backdropFilter: "blur(20px)",
-                                        border: "1px solid rgba(25,40,55,0.10)",
-                                        color: "#192837",
+                                        border: "1px solid var(--border)",
+                                        color: "var(--fg)",
                                     },
                                 },
                             }}
@@ -687,7 +687,7 @@ export default function WebhooksPage() {
                                                     fontFamily:
                                                         "var(--font-geist-mono), monospace",
                                                     fontSize: "0.72rem",
-                                                    color: "rgba(25,40,55,0.5)",
+                                                    color: "var(--fg-faint)",
                                                 }}
                                             >
                                                 {ep.url}
@@ -714,7 +714,7 @@ export default function WebhooksPage() {
                             <Box
                                 component="div"
                                 sx={{
-                                    color: "rgba(25,40,55,0.45)",
+                                    color: "var(--fg-faint)",
                                     fontSize: "0.7rem",
                                     textTransform: "uppercase",
                                     letterSpacing: "0.05em",
@@ -751,7 +751,7 @@ export default function WebhooksPage() {
                     />
                     <Typography
                         sx={{
-                            color: "rgba(25,40,55,0.7)",
+                            color: "var(--fg-muted)",
                             mt: 2,
                             mb: 1,
                             fontSize: "0.9rem",
@@ -778,7 +778,7 @@ export default function WebhooksPage() {
                                         }
                                         size="small"
                                         sx={{
-                                            color: "rgba(25,40,55,0.3)",
+                                            color: "var(--fg-faint)",
                                             "&.Mui-checked": {
                                                 color: "#ff7759",
                                             },
@@ -788,7 +788,7 @@ export default function WebhooksPage() {
                                 label={
                                     <Typography
                                         sx={{
-                                            color: "#192837",
+                                            color: "var(--fg)",
                                             fontSize: "0.9rem",
                                         }}
                                     >
@@ -809,11 +809,11 @@ export default function WebhooksPage() {
                     </Box>
                 </DialogContent>
                 <DialogActions
-                    sx={{ borderTop: "1px solid rgba(25,40,55,0.10)", p: 2 }}
+                    sx={{ borderTop: "1px solid var(--border)", p: 2 }}
                 >
                     <Button
                         onClick={() => setOpenDialog(false)}
-                        sx={{ color: "rgba(25,40,55,0.6)" }}
+                        sx={{ color: "var(--fg-faint)" }}
                         disabled={creating}
                     >
                         Cancel

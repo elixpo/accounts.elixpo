@@ -32,8 +32,8 @@ interface ServiceDetail {
 const cardSx = {
     p: 3,
     borderRadius: "14px",
-    bgcolor: "#ffffff",
-    border: "1px solid rgba(25,40,55,0.10)",
+    bgcolor: "var(--surface)",
+    border: "1px solid var(--border)",
 };
 
 const ServiceDetailPage = ({
@@ -123,7 +123,7 @@ const ServiceDetailPage = ({
                     startIcon={<ArrowBackIcon />}
                     onClick={() => router.push("/dashboard/services")}
                     sx={{
-                        color: "rgba(25,40,55,0.7)",
+                        color: "var(--fg-muted)",
                         textTransform: "none",
                         mb: 3,
                     }}
@@ -131,7 +131,7 @@ const ServiceDetailPage = ({
                     Back to Services
                 </Button>
                 <Box sx={cardSx}>
-                    <Typography sx={{ color: "rgba(25,40,55,0.7)" }}>
+                    <Typography sx={{ color: "var(--fg-muted)" }}>
                         {error || "Not found"}
                     </Typography>
                 </Box>
@@ -164,12 +164,12 @@ const ServiceDetailPage = ({
                 startIcon={<ArrowBackIcon />}
                 onClick={() => router.push("/dashboard/services")}
                 sx={{
-                    color: "rgba(25,40,55,0.6)",
+                    color: "var(--fg-faint)",
                     textTransform: "none",
                     mb: 3,
                     "&:hover": {
-                        color: "#192837",
-                        background: "rgba(25,40,55,0.04)",
+                        color: "var(--fg)",
+                        background: "var(--overlay)",
                     },
                 }}
             >
@@ -192,8 +192,8 @@ const ServiceDetailPage = ({
                             height: 56,
                             borderRadius: "12px",
                             overflow: "hidden",
-                            bgcolor: "rgba(25,40,55,0.04)",
-                            border: "1px solid rgba(25,40,55,0.10)",
+                            bgcolor: "var(--overlay)",
+                            border: "1px solid var(--border)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
@@ -209,7 +209,7 @@ const ServiceDetailPage = ({
                     <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                         <Typography
                             sx={{
-                                color: "#192837",
+                                color: "var(--fg)",
                                 fontWeight: 700,
                                 fontSize: "1.4rem",
                                 lineHeight: 1.2,
@@ -224,7 +224,7 @@ const ServiceDetailPage = ({
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 sx={{
-                                    color: "rgba(25,40,55,0.4)",
+                                    color: "var(--fg-faint)",
                                     fontSize: "0.85rem",
                                     fontFamily:
                                         "var(--font-geist-mono), monospace",
@@ -247,10 +247,10 @@ const ServiceDetailPage = ({
                         onClick={revoke}
                         disabled={revoking}
                         sx={{
-                            color: "rgba(25,40,55,0.5)",
+                            color: "var(--fg-faint)",
                             textTransform: "none",
                             borderRadius: "8px",
-                            border: "1px solid rgba(25,40,55,0.10)",
+                            border: "1px solid var(--border)",
                             px: 1.5,
                             "&:hover": {
                                 color: "#b91c1c",
@@ -266,7 +266,7 @@ const ServiceDetailPage = ({
                 {svc.description && (
                     <Typography
                         sx={{
-                            color: "rgba(25,40,55,0.55)",
+                            color: "var(--fg-faint)",
                             fontSize: "0.95rem",
                             lineHeight: 1.6,
                             mb: 2.5,
@@ -278,7 +278,7 @@ const ServiceDetailPage = ({
 
                 <Divider
                     sx={{
-                        borderColor: "rgba(25,40,55,0.10)",
+                        borderColor: "var(--border)",
                         mb: 2.5,
                     }}
                 />
@@ -287,7 +287,7 @@ const ServiceDetailPage = ({
                 <Box>
                     <Typography
                         sx={{
-                            color: "rgba(25,40,55,0.45)",
+                            color: "var(--fg-faint)",
                             fontSize: "0.72rem",
                             fontWeight: 700,
                             letterSpacing: "0.08em",
@@ -317,7 +317,7 @@ const ServiceDetailPage = ({
                         ) : (
                             <Typography
                                 sx={{
-                                    color: "rgba(25,40,55,0.4)",
+                                    color: "var(--fg-faint)",
                                     fontSize: "0.85rem",
                                 }}
                             >
@@ -370,7 +370,7 @@ const ServiceDetailPage = ({
             <Box sx={cardSx}>
                 <Typography
                     sx={{
-                        color: "rgba(25,40,55,0.45)",
+                        color: "var(--fg-faint)",
                         fontSize: "0.72rem",
                         fontWeight: 700,
                         letterSpacing: "0.08em",
@@ -383,7 +383,7 @@ const ServiceDetailPage = ({
                 {svc.sign_in_timeline.length === 0 ? (
                     <Typography
                         sx={{
-                            color: "rgba(25,40,55,0.35)",
+                            color: "var(--fg-faint)",
                             fontStyle: "italic",
                             fontSize: "0.9rem",
                             py: 3,
@@ -487,7 +487,7 @@ function StatTile({ label, value }: { label: string; value: number | string }) {
         <Box sx={cardSx}>
             <Typography
                 sx={{
-                    color: "rgba(25,40,55,0.45)",
+                    color: "var(--fg-faint)",
                     fontSize: "0.7rem",
                     fontWeight: 700,
                     letterSpacing: "0.06em",
@@ -499,7 +499,7 @@ function StatTile({ label, value }: { label: string; value: number | string }) {
             </Typography>
             <Typography
                 sx={{
-                    color: "#192837",
+                    color: "var(--fg)",
                     fontWeight: 700,
                     fontSize: "1.5rem",
                     fontVariantNumeric: "tabular-nums",
