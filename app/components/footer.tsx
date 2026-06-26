@@ -26,12 +26,11 @@ const PRODUCT = {
 
 const COLUMNS: { title: string; links: { label: string; href: string; external?: boolean }[] }[] = [
     {
-        title: "Product",
+        title: "Navigate",
         links: [
             { label: "Sign in", href: "/login" },
             { label: "Dashboard", href: "/dashboard" },
             { label: "OAuth apps", href: "/dashboard/oauth-apps" },
-            { label: "Pricing", href: "/pricing" },
         ],
     },
     {
@@ -41,6 +40,7 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
             { label: "Quickstart", href: "/docs/quickstart" },
             { label: "OAuth 2.0", href: "/docs/oauth" },
             { label: "Webhooks", href: "/docs/webhooks" },
+            { label: "Pricing", href: "/pricing" },
         ],
     },
     {
@@ -48,7 +48,6 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
         links: [
             { label: "Privacy Policy", href: "/privacy" },
             { label: "Terms of Service", href: "/terms" },
-            { label: "Security", href: "/dashboard/security" },
         ],
     },
 ];
@@ -165,9 +164,10 @@ export default function Footer() {
                         </Link>
                         <p className="text-sm leading-relaxed opacity-80">{PRODUCT.description}</p>
 
-                        <div className="mt-6 flex flex-wrap items-center gap-3">
-                            <GithubStarsButton repo={PRODUCT.repo} />
+                        {/* Email, then the GitHub-stars CTA stacked beneath it */}
+                        <div className="mt-6 flex flex-col items-start gap-3">
                             <EmailButton email={PRODUCT.email} />
+                            <GithubStarsButton repo={PRODUCT.repo} />
                         </div>
                     </div>
 

@@ -215,7 +215,7 @@ export default function LandingPage() {
 
                 {/* Hero Content Area — fully centered */}
                 <main className="w-full max-w-[1280px] mx-auto px-5 sm:px-8 flex-1 flex flex-col justify-center py-12">
-                    <div className="max-w-[720px] mx-auto pt-[clamp(40px,8vw,72px)] flex flex-col items-center text-center">
+                    <div className="max-w-[720px] mx-auto flex flex-col items-center text-center">
                         {/* Heading */}
                         <h1 className="font-heading text-[clamp(1.9rem,6vw,3.4rem)] leading-[1.05] tracking-[-0.01em] text-[#192837] mb-6 font-bold gsap-hero-animate">
                             <Zap className="inline-block w-6 h-6 sm:w-8 sm:h-8 text-[#192837] align-middle relative -top-[2px] mr-2" />
