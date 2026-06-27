@@ -4,9 +4,15 @@ import BackgroundAurora from "../components/background-aurora";
 import Navbar from "../components/navbar";
 
 export const metadata: Metadata = {
-    title: "Terms of Service — Elixpo Accounts",
+    title: "Terms of Service",
     description:
-        "The terms governing your use of Elixpo Accounts and the Elixpo product suite.",
+        "The terms and legal agreements governing your use of Elixpo Accounts, the developer portal, webhook dispatch services, and OAuth integrations.",
+    openGraph: {
+        title: "Terms of Service — Elixpo Accounts",
+        description:
+            "The terms and legal agreements governing your use of Elixpo Accounts.",
+        images: ["/og-image.png"],
+    },
 };
 
 /**
