@@ -14,8 +14,8 @@ export const metadata: Metadata = {
         images: [
             {
                 url: "/og-image.png",
-                width: 1845,
-                height: 880,
+                width: 1280,
+                height: 720,
                 alt: "About Elixpo Accounts",
             },
         ],
