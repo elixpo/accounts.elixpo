@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
             payload.sub,
             payload.email,
             payload.provider,
-            15,
+            parseInt(process.env.JWT_EXPIRATION_MINUTES || "15", 10),
             payload.scopes,
         );
 
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
         const newRefreshToken = await createRefreshToken(
             payload.sub,
             payload.provider,
-            30,
+            parseInt(process.env.REFRESH_TOKEN_EXPIRATION_DAYS || "30", 10),
             payload.scopes,
         );
 

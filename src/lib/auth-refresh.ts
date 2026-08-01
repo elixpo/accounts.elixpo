@@ -13,7 +13,7 @@
  *   const result = await tryRefreshSession(request, refreshToken);
  *   if (!result.ok) return NextResponse.redirect(loginUrl);
  *   const response = NextResponse.redirect(nextUrl);
- *   applyRefreshedCookies(response, result);
+ *   await applyRefreshedCookies(response, result, request);
  *   return response;
  *
  * The DB rotation (revoke old, store new) and device-fingerprint carry
