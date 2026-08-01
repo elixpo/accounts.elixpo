@@ -121,17 +121,19 @@ export async function GET(request: NextRequest) {
 
         const requestedScopes = parseOAuthScopes(scope);
         const registeredScopes: string[] = JSON.parse(client.scopes || "[]");
-        const unsupported = unsupportedOAuthScopes(requestedScopes);
-        const unregistered = requestedScopes.filter(
-            (requestedScope) => !registeredScopes.includes(requestedScope),
-        );
-        if (unsupported.length > 0 || unregistered.length > 0) {
+        const invalidScopes = [
+            ...unsupportedOAuthScopes(requestedScopes),
+            ...requestedScopes.filter(
+                (requestedScope) =>
+                    !registeredScopes.includes(requestedScope),
+            ),
+        ];
+        if (invalidScopes.length > 0) {
             parsedRedirect.searchParams.set("error", "invalid_scope");
             parsedRedirect.searchParams.set(
                 "error_description",
                 `Unsupported or unregistered scopes: ${[
-                    ...unsupported,
-                    ...unregistered,
+                    ...new Set(invalidScopes),
                 ].join(", ")}`,
             );
             parsedRedirect.searchParams.set("state", state);
@@ -260,7 +262,7 @@ export async function GET(request: NextRequest) {
             );
         }
         return consentResponse;
-    } catch (err) {
+    } catch (err)
         console.error("[OAuth Authorize] Error:", err);
         return NextResponse.json(
             {
@@ -269,5 +271,4 @@ export async function GET(request: NextRequest) {
             },
             { status: 500 },
         );
-    }
 }
