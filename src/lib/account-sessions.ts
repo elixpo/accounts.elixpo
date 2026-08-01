@@ -7,6 +7,7 @@ export const MAX_ACCOUNT_SESSIONS = 5;
 type AccountSession = {
     userId: string;
     refreshToken: string;
+    expiresAt: number;
 };
 
 function readStoredTokens(request: NextRequest): string[] {
@@ -39,7 +40,11 @@ export async function getAccountSessions(
     for (const refreshToken of candidates) {
         const payload = await verifyJWT(refreshToken);
         if (payload?.type === "refresh" && !sessions.has(payload.sub)) {
-            sessions.set(payload.sub, { userId: payload.sub, refreshToken });
+            sessions.set(payload.sub, {
+                userId: payload.sub,
+                refreshToken,
+                expiresAt: payload.exp,
+            });
         }
     }
 
@@ -62,12 +67,17 @@ export async function setAccountSessionsCookie(
             .filter((session) => session.userId !== nextPayload.sub)
             .map((session) => session.refreshToken),
     ].slice(0, MAX_ACCOUNT_SESSIONS);
+    const now = Math.floor(Date.now() / 1000);
+    const cookieMaxAge = Math.max(
+        maxAge,
+        ...existing.map((session) => Math.max(session.expiresAt - now, 1)),
+    );
 
     response.cookies.set(ACCOUNT_SESSIONS_COOKIE, JSON.stringify(tokens), {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge,
+        maxAge: cookieMaxAge,
         path: "/",
     });
 }

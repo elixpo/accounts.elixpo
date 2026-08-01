@@ -9,6 +9,7 @@ import {
 import { getDatabase } from "@/lib/d1-client";
 import { getRefreshTokenByHash, getUserById } from "@/lib/db";
 import { createAccessToken, verifyJWT } from "@/lib/jwt";
+import { createAccountSwitchRateLimiter } from "@/lib/rate-limit";
 import { hashString } from "@/lib/webcrypto";
 
 type AccountSummary = {
@@ -95,6 +96,27 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+    const ipAddress =
+        request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+        request.headers.get("cf-connecting-ip") ||
+        "unknown";
+    const rateLimit = await createAccountSwitchRateLimiter().check(
+        await getDatabase(),
+        ipAddress,
+        "account_switch",
+    );
+    if (!rateLimit.allowed) {
+        return NextResponse.json(
+            { error: "Too many account switches. Please try again shortly." },
+            {
+                status: 429,
+                headers: {
+                    "Retry-After": String(rateLimit.retryAfter || 60),
+                },
+            },
+        );
+    }
+
     const body = (await request.json().catch(() => null)) as {
         userId?: string;
     } | null;
