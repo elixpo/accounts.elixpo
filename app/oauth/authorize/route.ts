@@ -230,7 +230,11 @@ export async function GET(request: NextRequest) {
             const { applyRefreshedCookies } = await import(
                 "@/lib/auth-refresh"
             );
-            applyRefreshedCookies(consentResponse, rotatedTokens);
+            await applyRefreshedCookies(
+                consentResponse,
+                rotatedTokens,
+                request,
+            );
         }
         return consentResponse;
     } catch (err) {

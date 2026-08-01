@@ -21,6 +21,7 @@
  */
 
 import type { NextRequest, NextResponse } from "next/server";
+import { setAccountSessionsCookie } from "./account-sessions";
 import { getDatabase } from "./d1-client";
 import {
     getRefreshTokenByHash,
@@ -179,10 +180,11 @@ export async function tryRefreshSession(
  * sets. Mutates the response in place; returns the same reference for
  * chaining ergonomics.
  */
-export function applyRefreshedCookies(
+export async function applyRefreshedCookies(
     response: NextResponse,
     refresh: RefreshSuccess,
-): NextResponse {
+    request?: NextRequest,
+): Promise<NextResponse> {
     const isProd = process.env.NODE_ENV === "production";
     response.cookies.set("access_token", refresh.newAccessToken, {
         httpOnly: true,
@@ -205,5 +207,13 @@ export function applyRefreshedCookies(
         maxAge: refresh.refreshMaxAge,
         path: "/",
     });
+    if (request) {
+        await setAccountSessionsCookie(
+            request,
+            response,
+            refresh.newRefreshToken,
+            refresh.refreshMaxAge,
+        );
+    }
     return response;
 }

@@ -2,6 +2,7 @@ export const runtime = "edge";
 
 import type { D1Database } from "@cloudflare/workers-types";
 import { type NextRequest, NextResponse } from "next/server";
+import { setAccountSessionsCookie } from "@/lib/account-sessions";
 import { getDatabase } from "@/lib/d1-client";
 import {
     getRefreshTokenByHash,
@@ -152,6 +153,12 @@ async function tryAutoRefresh(request: NextRequest, refreshToken: string) {
             maxAge: refreshDays * 86400,
             path: "/",
         });
+        await setAccountSessionsCookie(
+            request,
+            response,
+            newRefreshToken,
+            refreshDays * 86400,
+        );
 
         console.log("[Me] Auto-refreshed session for user %s", payload.sub);
         return response;
