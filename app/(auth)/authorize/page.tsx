@@ -108,7 +108,9 @@ function AuthorizeContent() {
             }
 
             // 1. Check if user is logged in
-            const meRes = await fetch("/api/auth/me", { credentials: "include" });
+            const meRes = await fetch("/api/auth/me", {
+                credentials: "include",
+            });
             if (!meRes.ok) {
                 // Not logged in — redirect to login with ?next= pointing back here
                 const currentUrl = `/authorize?${searchParams.toString()}`;
@@ -255,7 +257,9 @@ function AuthorizeContent() {
             }
             window.location.reload();
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Unable to switch account");
+            setError(
+                err instanceof Error ? err.message : "Unable to switch account",
+            );
             setIsSwitching(false);
         }
     };

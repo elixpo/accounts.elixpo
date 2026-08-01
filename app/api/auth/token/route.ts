@@ -324,9 +324,7 @@ export async function POST(request: NextRequest) {
                     "profile",
                     "email",
                 ];
-                const scopes = scope
-                    ? parseOAuthScopes(scope)
-                    : originalScopes;
+                const scopes = scope ? parseOAuthScopes(scope) : originalScopes;
                 if (
                     scopes.some(
                         (requestedScope) =>

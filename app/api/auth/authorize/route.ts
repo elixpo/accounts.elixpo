@@ -8,10 +8,7 @@ import {
     getOAuthClientById,
 } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
-import {
-    parseOAuthScopes,
-    unsupportedOAuthScopes,
-} from "@/lib/oauth-scopes";
+import { parseOAuthScopes, unsupportedOAuthScopes } from "@/lib/oauth-scopes";
 import { generateRandomString, generateUUID } from "@/lib/webcrypto";
 
 // Built-in/trusted domains auto-whitelisted

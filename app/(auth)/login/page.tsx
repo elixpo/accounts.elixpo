@@ -238,7 +238,9 @@ const LoginContent = () => {
                             />
                         </div>
                         <h2 className="font-heading text-2xl sm:text-3xl font-bold tracking-tight mb-1.5">
-                            {addAccount ? "Add another account" : "Welcome Back"}
+                            {addAccount
+                                ? "Add another account"
+                                : "Welcome Back"}
                         </h2>
                         <p className="text-sm opacity-60 font-semibold tracking-wide">
                             {addAccount

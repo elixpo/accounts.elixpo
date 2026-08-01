@@ -15,16 +15,13 @@ describe("OAuth scopes", () => {
     });
 
     it("reports scopes that do not have implemented claims", () => {
-        expect(unsupportedOAuthScopes(["openid", "phone", "address"])).toEqual(
-            ["phone", "address"],
-        );
+        expect(unsupportedOAuthScopes(["openid", "phone", "address"])).toEqual([
+            "phone",
+            "address",
+        ]);
     });
 
     it("only exposes scopes backed by the user-info response", () => {
-        expect(SUPPORTED_OAUTH_SCOPES).toEqual([
-            "openid",
-            "profile",
-            "email",
-        ]);
+        expect(SUPPORTED_OAUTH_SCOPES).toEqual(["openid", "profile", "email"]);
     });
 });

@@ -4,10 +4,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
 import { createAuthRequest, getOAuthClientById, getUserById } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
-import {
-    parseOAuthScopes,
-    unsupportedOAuthScopes,
-} from "@/lib/oauth-scopes";
+import { parseOAuthScopes, unsupportedOAuthScopes } from "@/lib/oauth-scopes";
 import { generateRandomString, generateUUID } from "@/lib/webcrypto";
 
 /**
@@ -124,8 +121,7 @@ export async function GET(request: NextRequest) {
         const invalidScopes = [
             ...unsupportedOAuthScopes(requestedScopes),
             ...requestedScopes.filter(
-                (requestedScope) =>
-                    !registeredScopes.includes(requestedScope),
+                (requestedScope) => !registeredScopes.includes(requestedScope),
             ),
         ];
         if (invalidScopes.length > 0) {

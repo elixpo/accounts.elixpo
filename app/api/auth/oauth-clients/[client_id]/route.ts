@@ -112,7 +112,8 @@ export async function PUT(
 
         if (
             scopes !== undefined &&
-            (!Array.isArray(scopes) || unsupportedOAuthScopes(scopes).length > 0)
+            (!Array.isArray(scopes) ||
+                unsupportedOAuthScopes(scopes).length > 0)
         ) {
             return NextResponse.json(
                 {
