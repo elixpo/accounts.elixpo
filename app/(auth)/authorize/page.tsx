@@ -732,8 +732,9 @@ function AuthorizeContent() {
                                     margin: 0,
                                 }}
                             >
-                                Only verified apps can request access. Revoke
-                                anytime from settings.
+                                This app can stay signed in using a renewable
+                                token. You can revoke access anytime from your
+                                connected services.
                             </p>
                         </div>
 

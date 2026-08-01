@@ -2,7 +2,10 @@ export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 import { type NextRequest, NextResponse } from "next/server";
-import { getAccountSessions, setAccountSessionsCookie } from "@/lib/account-sessions";
+import {
+    getAccountSessions,
+    setAccountSessionsCookie,
+} from "@/lib/account-sessions";
 import { getDatabase } from "@/lib/d1-client";
 import { getRefreshTokenByHash, getUserById } from "@/lib/db";
 import { createAccessToken, verifyJWT } from "@/lib/jwt";
@@ -23,7 +26,13 @@ async function validAccounts(request: NextRequest) {
     const accounts: Array<{
         summary: AccountSummary;
         refreshToken: string;
-        provider: "google" | "github" | "discord" | "microsoft" | "email" | undefined;
+        provider:
+            | "google"
+            | "github"
+            | "discord"
+            | "microsoft"
+            | "email"
+            | undefined;
         expiresAt: number;
     }> = [];
 
@@ -90,7 +99,10 @@ export async function POST(request: NextRequest) {
         userId?: string;
     } | null;
     if (!body?.userId) {
-        return NextResponse.json({ error: "userId is required" }, { status: 400 });
+        return NextResponse.json(
+            { error: "userId is required" },
+            { status: 400 },
+        );
     }
 
     const account = (await validAccounts(request)).find(

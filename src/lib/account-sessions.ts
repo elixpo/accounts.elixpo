@@ -18,7 +18,9 @@ function readStoredTokens(request: NextRequest): string[] {
         if (!Array.isArray(parsed)) return [];
         return parsed.filter(
             (token): token is string =>
-                typeof token === "string" && token.length > 0 && token.length < 2048,
+                typeof token === "string" &&
+                token.length > 0 &&
+                token.length < 2048,
         );
     } catch {
         return [];
