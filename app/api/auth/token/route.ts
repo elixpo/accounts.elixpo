@@ -130,28 +130,6 @@ export async function POST(request: NextRequest) {
                     );
                 }
 
-                const authorizedScopes = parseOAuthScopes(
-                    authRequest.scopes || "openid profile email",
-                );
-                const _scopes = scope
-                    ? parseOAuthScopes(scope)
-                    : authorizedScopes;
-                if (
-                    scopes.some(
-                        (requestedScope) =>
-                            !authorizedScopes.includes(requestedScope),
-                    )
-                ) {
-                    return NextResponse.json(
-                        {
-                            error: "invalid_scope",
-                            error_description:
-                                "Requested scope exceeds the user's authorization grant",
-                        },
-                        { status: 400 },
-                    );
-                }
-
                 // 5. Mark code as used (single-use)
                 await db
                     .prepare("UPDATE auth_requests SET used = 1 WHERE code = ?")

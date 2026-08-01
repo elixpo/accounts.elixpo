@@ -262,7 +262,7 @@ export async function GET(request: NextRequest) {
             );
         }
         return consentResponse;
-    } catch (err)
+    } catch (err) {
         console.error("[OAuth Authorize] Error:", err);
         return NextResponse.json(
             {
@@ -271,4 +271,5 @@ export async function GET(request: NextRequest) {
             },
             { status: 500 },
         );
+    }
 }
