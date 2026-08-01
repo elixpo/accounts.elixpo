@@ -118,6 +118,11 @@ function AuthorizeContent() {
             try {
                 const meData: any = await meRes.clone().json();
                 if (meData?.email) {
+                    if (!meData.username) {
+                        const currentUrl = `/authorize?${searchParams.toString()}`;
+                        window.location.href = `/setup-name?next=${encodeURIComponent(currentUrl)}`;
+                        return;
+                    }
                     setAccount({
                         id: meData.id,
                         email: meData.email,

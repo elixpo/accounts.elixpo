@@ -8,6 +8,10 @@ import {
     getOAuthClientById,
 } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
+import {
+    parseOAuthScopes,
+    unsupportedOAuthScopes,
+} from "@/lib/oauth-scopes";
 import { generateRandomString, generateUUID } from "@/lib/webcrypto";
 
 // Built-in/trusted domains auto-whitelisted
@@ -66,6 +70,17 @@ export async function GET(request: NextRequest) {
 
         const isBuiltinClient = BUILTIN_DOMAINS.includes(redirectUrl.hostname);
         const db = await getDatabase();
+        const requestedScopes = parseOAuthScopes(scope);
+        const unsupported = unsupportedOAuthScopes(requestedScopes);
+        if (unsupported.length > 0) {
+            return NextResponse.json(
+                {
+                    error: "invalid_scope",
+                    error_description: `Unsupported scopes: ${unsupported.join(", ")}`,
+                },
+                { status: 400 },
+            );
+        }
 
         if (!isBuiltinClient) {
             try {
@@ -99,6 +114,22 @@ export async function GET(request: NextRequest) {
                             error_description: "Client is not active",
                         },
                         { status: 401 },
+                    );
+                }
+                const registeredScopes: string[] = JSON.parse(
+                    (client as any).scopes || "[]",
+                );
+                const unregistered = requestedScopes.filter(
+                    (requestedScope) =>
+                        !registeredScopes.includes(requestedScope),
+                );
+                if (unregistered.length > 0) {
+                    return NextResponse.json(
+                        {
+                            error: "invalid_scope",
+                            error_description: `Unregistered scopes: ${unregistered.join(", ")}`,
+                        },
+                        { status: 400 },
                     );
                 }
             } catch (error) {
@@ -239,16 +270,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (!approved) {
-            redirectUrl.searchParams.append("error", "access_denied");
-            redirectUrl.searchParams.append(
-                "error_description",
-                "User denied access",
-            );
-            redirectUrl.searchParams.append("state", state);
-            return NextResponse.json({ redirect_uri: redirectUrl.toString() });
-        }
-
         const db = await getDatabase();
         const authRequest = await getAuthRequestByState(db, state);
         if (!authRequest) {
@@ -274,6 +295,16 @@ export async function POST(request: NextRequest) {
                 },
                 { status: 400 },
             );
+        }
+
+        if (!approved) {
+            redirectUrl.searchParams.append("error", "access_denied");
+            redirectUrl.searchParams.append(
+                "error_description",
+                "User denied access",
+            );
+            redirectUrl.searchParams.append("state", state);
+            return NextResponse.json({ redirect_uri: redirectUrl.toString() });
         }
 
         // ── MAU hard ceiling ─────────────────────────────────────────

@@ -317,7 +317,14 @@ export async function POST(request: NextRequest) {
                 // Get fresh user data
                 const user = (await getUserById(db, payload.sub)) as any;
                 const email = user ? user.email : payload.email;
-                const originalScopes = payload.scopes || [];
+                // Tokens issued before scope claims were introduced carried
+                // the documented default grant. Preserve those sessions
+                // during their normal refresh lifetime.
+                const originalScopes = payload.scopes || [
+                    "openid",
+                    "profile",
+                    "email",
+                ];
                 const scopes = scope
                     ? parseOAuthScopes(scope)
                     : originalScopes;
