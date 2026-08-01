@@ -4,6 +4,10 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
 import { createAuthRequest, getOAuthClientById, getUserById } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
+import {
+    parseOAuthScopes,
+    unsupportedOAuthScopes,
+} from "@/lib/oauth-scopes";
 import { generateRandomString, generateUUID } from "@/lib/webcrypto";
 
 /**
@@ -113,6 +117,25 @@ export async function GET(request: NextRequest) {
                 },
                 { status: 400 },
             );
+        }
+
+        const requestedScopes = parseOAuthScopes(scope);
+        const registeredScopes: string[] = JSON.parse(client.scopes || "[]");
+        const unsupported = unsupportedOAuthScopes(requestedScopes);
+        const unregistered = requestedScopes.filter(
+            (requestedScope) => !registeredScopes.includes(requestedScope),
+        );
+        if (unsupported.length > 0 || unregistered.length > 0) {
+            parsedRedirect.searchParams.set("error", "invalid_scope");
+            parsedRedirect.searchParams.set(
+                "error_description",
+                `Unsupported or unregistered scopes: ${[
+                    ...unsupported,
+                    ...unregistered,
+                ].join(", ")}`,
+            );
+            parsedRedirect.searchParams.set("state", state);
+            return NextResponse.redirect(parsedRedirect);
         }
 
         // --- 3. Check if user is authenticated ---

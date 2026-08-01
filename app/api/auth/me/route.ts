@@ -80,11 +80,13 @@ async function tryAutoRefresh(request: NextRequest, refreshToken: string) {
             user.email,
             payload.provider,
             parseInt(process.env.JWT_EXPIRATION_MINUTES || "15", 10),
+            payload.scopes,
         );
         const newRefreshToken = await createRefreshToken(
             payload.sub,
             payload.provider,
             refreshDays,
+            payload.scopes,
         );
         const newRefreshTokenHash = await hashString(newRefreshToken);
 
@@ -222,6 +224,32 @@ export async function GET(request: NextRequest) {
 
             const identity = await getUserIdentity(db, payload.sub);
 
+            // Third-party OAuth tokens carry an explicit scope list. Return
+            // only the claims the user approved; first-party session tokens
+            // omit `scopes` and retain the full dashboard response.
+            if (Array.isArray(payload.scopes)) {
+                const scopedProfile: Record<string, unknown> = {
+                    sub: payload.sub,
+                    id: payload.sub,
+                    userId: payload.sub,
+                    scopes: payload.scopes,
+                    expiresAt: new Date(payload.exp * 1000),
+                };
+                if (payload.scopes.includes("profile")) {
+                    scopedProfile.displayName =
+                        (dbUser as any).display_name || null;
+                    scopedProfile.username = (dbUser as any).username || null;
+                    scopedProfile.avatar =
+                        (identity as any)?.provider_profile_url || null;
+                }
+                if (payload.scopes.includes("email")) {
+                    scopedProfile.email = (dbUser as any).email;
+                    scopedProfile.emailVerified = !!(dbUser as any)
+                        .email_verified;
+                }
+                return NextResponse.json(scopedProfile);
+            }
+
             // MFA status + setup-required signal. mfa_setup_required is
             // true when the user owns ≥3 OAuth apps but hasn't enabled
             // 2FA — the dashboard layout uses this flag to redirect to
@@ -269,13 +297,22 @@ export async function GET(request: NextRequest) {
         } catch (dbError) {
             // Fallback to JWT payload if DB unavailable
             console.error("[Me] DB lookup failed, using JWT payload:", dbError);
-            return NextResponse.json({
+            const fallback: Record<string, unknown> = {
                 id: payload.sub,
                 userId: payload.sub,
-                email: payload.email,
-                provider: payload.provider,
                 expiresAt: new Date(payload.exp * 1000),
-            });
+            };
+            if (Array.isArray(payload.scopes)) {
+                fallback.sub = payload.sub;
+                fallback.scopes = payload.scopes;
+                if (payload.scopes.includes("email")) {
+                    fallback.email = payload.email;
+                }
+            } else {
+                fallback.email = payload.email;
+                fallback.provider = payload.provider;
+            }
+            return NextResponse.json(fallback);
         }
     } catch (error) {
         console.error("Get me error:", error);

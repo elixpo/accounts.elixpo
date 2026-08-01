@@ -58,12 +58,16 @@ export async function POST(request: NextRequest) {
             payload.sub,
             payload.email,
             payload.provider,
+            15,
+            payload.scopes,
         );
 
         // Rotate refresh token
         const newRefreshToken = await createRefreshToken(
             payload.sub,
             payload.provider,
+            30,
+            payload.scopes,
         );
 
         // Store new refresh token and revoke old one

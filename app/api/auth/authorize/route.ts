@@ -262,6 +262,20 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        if (
+            (authRequest as any).client_id !== clientId ||
+            (authRequest as any).redirect_uri !== redirectUri
+        ) {
+            return NextResponse.json(
+                {
+                    error: "invalid_request",
+                    error_description:
+                        "Authorization request parameters do not match",
+                },
+                { status: 400 },
+            );
+        }
+
         // ── MAU hard ceiling ─────────────────────────────────────────
         // The app owner's tier caps how many monthly-active users their
         // OAuth app can serve. We allow up to 2× the soft cap (gives a

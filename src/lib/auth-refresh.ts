@@ -118,11 +118,13 @@ export async function tryRefreshSession(
             user.email,
             payload.provider,
             parseInt(process.env.JWT_EXPIRATION_MINUTES || "15", 10),
+            payload.scopes,
         );
         const newRefreshToken = await createRefreshToken(
             payload.sub,
             payload.provider,
             refreshDays,
+            payload.scopes,
         );
         const newRefreshTokenHash = await hashString(newRefreshToken);
 
