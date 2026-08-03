@@ -197,6 +197,21 @@ export function createPasswordResetRateLimiter(): DatabaseRateLimiter {
         blockDurationMs: 60 * 60 * 1000,
     });
 }
+export function createDeviceAuthRateLimiter(): DatabaseRateLimiter {
+    return new DatabaseRateLimiter({
+        windowMs: 60 * 1000,
+        maxRequests: 10,
+        blockDurationMs: 5 * 60 * 1000,
+    });
+}
+
+export function createDeviceVerifyRateLimiter(): DatabaseRateLimiter {
+    return new DatabaseRateLimiter({
+        windowMs: 60 * 1000,
+        maxRequests: 20,
+        blockDurationMs: 10 * 60 * 1000,
+    });
+}
 
 export function createAccountSwitchRateLimiter(): DatabaseRateLimiter {
     return new DatabaseRateLimiter({

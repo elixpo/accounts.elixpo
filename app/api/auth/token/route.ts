@@ -14,6 +14,13 @@ import { createAccessToken, createRefreshToken, verifyJWT } from "@/lib/jwt";
 import { parseOAuthScopes } from "@/lib/oauth-scopes";
 import { generateUUID, hashString } from "@/lib/webcrypto";
 
+import { getOAuthClientById } from "@/lib/db";
+    import {
+        getDeviceAuthorizationByDeviceCode,
+        consumeDeviceAuthorization,
+        registerPollAndCheckRate,
+    } from "@/lib/device-flow";
+
 export async function POST(request: NextRequest) {
     try {
         const body: any = await request.json();
@@ -25,6 +32,7 @@ export async function POST(request: NextRequest) {
             redirect_uri,
             refresh_token,
             scope,
+            device_code
         } = body;
 
         if (!grant_type) {
@@ -251,6 +259,154 @@ export async function POST(request: NextRequest) {
                         error: "server_error",
                         error_description: "Failed to process token request",
                     },
+                    { status: 500 },
+                );
+            }
+        }
+
+        if (grant_type === "urn:ietf:params:oauth:grant-type:device_code") {
+            if (!device_code || !client_id) {
+                return NextResponse.json(
+                    {
+                        error: "invalid_request",
+                        error_description: "Missing required parameters: device_code, client_id",
+                    },
+                    { status: 400 },
+                );
+            }
+
+            const db = await getDatabase();
+
+            try {
+                const client = await getOAuthClientById(db, client_id);
+                if (!client || !(client as any).is_active) {
+                    return NextResponse.json(
+                        { error: "invalid_client", error_description: "Client not found or not active" },
+                        { status: 401 },
+                    );
+                }
+                // Public clients never present (or need) a client_secret here —
+                // this is the one branch of the token endpoint that must NOT
+                // call validateOAuthClient()/check client_secret, by design.
+                // client_secret is intentionally ignored even if a caller sends one.
+
+                const row = await getDeviceAuthorizationByDeviceCode(db, device_code);
+                if (!row) {
+                    return NextResponse.json(
+                        { error: "invalid_grant", error_description: "Unknown device_code" },
+                        { status: 400 },
+                    );
+                }
+
+                // Reject client substitution: the device_code must have been
+                // issued to THIS client_id.
+                if (row.client_id !== client_id) {
+                    return NextResponse.json(
+                        { error: "invalid_grant", error_description: "device_code was not issued to this client" },
+                        { status: 400 },
+                    );
+                }
+
+                if (new Date(row.expires_at).getTime() < Date.now()) {
+                    return NextResponse.json(
+                        { error: "expired_token", error_description: "device_code has expired" },
+                        { status: 400 },
+                    );
+                }
+
+                if (row.status === "denied") {
+                    return NextResponse.json(
+                        { error: "access_denied", error_description: "User denied the authorization request" },
+                        { status: 400 },
+                    );
+                }
+
+                if (row.status === "consumed") {
+                    // Already minted once — reject the replay, don't mint again.
+                    return NextResponse.json(
+                        { error: "invalid_grant", error_description: "device_code has already been used" },
+                        { status: 400 },
+                    );
+                }
+
+                if (row.status === "pending") {
+                    const { tooFast, newInterval } = await registerPollAndCheckRate(db, row);
+                    if (tooFast) {
+                        return NextResponse.json(
+                            { error: "slow_down", error_description: `Polling too fast; wait ${newInterval}s` },
+                            { status: 400 },
+                        );
+                    }
+                    return NextResponse.json(
+                        { error: "authorization_pending", error_description: "User has not yet approved this request" },
+                        { status: 400 },
+                    );
+                }
+
+                // status === "approved" — mint tokens exactly once. The atomic
+                // approved -> consumed flip is the single-use guarantee: if two
+                // poll requests race here, only one UPDATE affects a row, and the
+                // loser falls through to invalid_grant below.
+                const consumed = await consumeDeviceAuthorization(db, row.id);
+                if (!consumed) {
+                    return NextResponse.json(
+                        { error: "invalid_grant", error_description: "device_code has already been used" },
+                        { status: 400 },
+                    );
+                }
+
+                const user = (await getUserById(db, row.user_id)) as any;
+                if (!user) {
+                    return NextResponse.json(
+                        { error: "invalid_grant", error_description: "Authorizing user no longer exists" },
+                        { status: 400 },
+                    );
+                }
+
+                try {
+                    const { recordMauHit } = await import("@/lib/mau");
+                    await recordMauHit(db, client_id, row.user_id);
+                } catch {
+                    /* best-effort */
+                }
+
+                const accessToken = await createAccessToken(
+                    row.user_id,
+                    user.email,
+                    "email",
+                    parseInt(process.env.JWT_EXPIRATION_MINUTES || "15", 10),
+                );
+                const refreshTokenJWT = await createRefreshToken(row.user_id, "email");
+                const refreshTokenHash = await hashString(refreshTokenJWT);
+
+                await storeRefreshToken(db, {
+                    id: generateUUID(),
+                    userId: row.user_id,
+                    tokenHash: refreshTokenHash,
+                    clientId: client_id,
+                    ipHash: row.ip_hash,
+                    uaShort: row.ua_short,
+                    expiresAt: new Date(
+                        Date.now() +
+                            parseInt(process.env.REFRESH_TOKEN_EXPIRATION_DAYS || "30", 10) *
+                                24 * 60 * 60 * 1000,
+                    ),
+                });
+
+                return NextResponse.json(
+                    {
+                        access_token: accessToken,
+                        token_type: "Bearer",
+                        expires_in: parseInt(process.env.JWT_EXPIRATION_MINUTES || "15", 10) * 60,
+                        refresh_token: refreshTokenJWT,
+                        scope: row.scopes,
+                    },
+                    { status: 200 },
+                );
+            } catch (error) {
+                console.error("[Token] Device code flow error:", error);
+                return NextResponse.json(
+                    { error: "server_error", error_description: "Failed to process device token request" },
                     { status: 500 },
                 );
             }
