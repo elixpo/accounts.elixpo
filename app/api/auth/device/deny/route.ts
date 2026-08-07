@@ -2,8 +2,10 @@ export const runtime = "edge";
 
 import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
+import { logAuditEvent } from "@/lib/db";
 import { denyDeviceAuthorization } from "@/lib/device-auth-service";
 import { verifyJWT } from "@/lib/jwt";
+import { generateUUID } from "@/lib/webcrypto";
 
 // Auth pattern copied verbatim from app/api/auth/oauth-clients/[client_id]/route.ts —
 // httpOnly, sameSite=lax access_token cookie + verifyJWT(). No separate CSRF
@@ -50,6 +52,14 @@ export async function POST(request: NextRequest) {
         );
     }
 
+    // Same IP/user-agent extraction as app/api/auth/mfa/challenge/verify/route.ts,
+    // used below for the audit log entry.
+    const ipAddress =
+        request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+        request.headers.get("cf-connecting-ip") ||
+        "unknown";
+    const userAgent = request.headers.get("user-agent") || "unknown";
+
     // payload.sub is the user id — per the oauth-clients precedent, not
     // payload.id or payload.userId. user_id is never accepted from the
     // request body: a client-supplied user_id would let anyone deny (or,
@@ -74,6 +84,24 @@ export async function POST(request: NextRequest) {
             { status },
         );
     }
+
+    // Audit trail — accounts.elixpo#80. status: "failure" here mirrors
+    // mfa.challenge_failed's convention of `status` tracking whether the
+    // underlying security action succeeded, not whether the code path ran
+    // without error — a user declining a device request is the
+    // authorization failing to complete, not a successful "deny action".
+    // Flagged as a judgment call in the absence of an exact precedent for
+    // "user explicitly declines"; easy to flip to "success" if that's not
+    // the convention this team wants.
+    await logAuditEvent(db, {
+        id: generateUUID(),
+        userId: payload.sub,
+        eventType: "device.denied",
+        provider: result.clientId,
+        ipAddress,
+        userAgent,
+        status: "failure",
+    }).catch(() => {});
 
     return NextResponse.json({ ok: true }, { status: 200 });
 }

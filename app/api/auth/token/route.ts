@@ -9,6 +9,7 @@ import {
     revokeRefreshToken,
     createRefreshToken as storeRefreshToken,
     validateOAuthClient,
+    logAuditEvent,
 } from "@/lib/db";
 import { classifyDevicePollAttempt } from "@/lib/device-auth-service";
 import { createAccessToken, createRefreshToken, verifyJWT } from "@/lib/jwt";
@@ -432,6 +433,17 @@ export async function POST(request: NextRequest) {
                 );
             }
 
+            // Same IP/user-agent extraction as
+            // app/api/auth/mfa/challenge/verify/route.ts, used for the
+            // device.poll_abuse / device.exchange_success audit events
+            // below. Scoped to this block only — authorization_code and
+            // refresh_token above are untouched.
+            const ipAddress =
+                request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+                request.headers.get("cf-connecting-ip") ||
+                "unknown";
+            const userAgent = request.headers.get("user-agent") || "unknown";
+
             const db = await getDatabase();
 
             try {
@@ -569,6 +581,23 @@ export async function POST(request: NextRequest) {
                             )
                             .bind(classification.newIntervalSeconds, row.id)
                             .run();
+
+                        // Audit trail (accounts.elixpo#80): only log once
+                        // a device_code first crosses the poll-violation
+                        // threshold, not on every single slow_down, so a
+                        // merely-eager CLI does not spam the audit log.
+                        if (row.poll_count + 1 === 5) {
+                            await logAuditEvent(db, {
+                                id: generateUUID(),
+                                userId: row.user_id ?? undefined,
+                                eventType: "device.poll_abuse",
+                                provider: client_id,
+                                ipAddress,
+                                userAgent,
+                                status: "failure",
+                            }).catch(() => {});
+                        }
+
                         return NextResponse.json(
                             {
                                 error: "slow_down",
@@ -647,6 +676,19 @@ export async function POST(request: NextRequest) {
                         { status: 400 },
                     );
                 }
+
+                // Audit trail (accounts.elixpo#80) for a successful
+                // device_code exchange, fire-and-forget, same shape as
+                // mfa.challenge_passed.
+                await logAuditEvent(db, {
+                    id: generateUUID(),
+                    userId: row.user_id as string,
+                    eventType: "device.exchange_success",
+                    provider: client_id,
+                    ipAddress,
+                    userAgent,
+                    status: "success",
+                }).catch(() => {});
 
                 // Token issuance mirrors the authorization_code block's
                 // createAccessToken/createRefreshToken/storeRefreshToken
