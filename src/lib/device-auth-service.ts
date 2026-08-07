@@ -386,7 +386,7 @@ export interface ResolveDeviceAuthorizationInput {
 }
 
 export type DeviceAuthorizationResolutionResult =
-    | { ok: true }
+    | { ok: true; clientId: string }
     | { ok: false; reason: "not_found" | "already_resolved" | "expired" };
 
 export async function approveDeviceAuthorization(
@@ -397,10 +397,10 @@ export async function approveDeviceAuthorization(
 
     const row = (await db
         .prepare(
-            "SELECT id, status, expires_at FROM device_authorizations WHERE user_code_hash = ?",
+            "SELECT id, client_id, status, expires_at FROM device_authorizations WHERE user_code_hash = ?",
         )
         .bind(userCodeHash)
-        .first()) as { id: string; status: string; expires_at: string } | null;
+        .first()) as { id: string; client_id: string; status: string; expires_at: string } | null;
 
     if (!row) {
         return { ok: false, reason: "not_found" };
@@ -427,7 +427,7 @@ export async function approveDeviceAuthorization(
         return { ok: false, reason: "already_resolved" };
     }
 
-    return { ok: true };
+    return { ok: true, clientId: row.client_id };
 }
 
 export async function denyDeviceAuthorization(
@@ -438,10 +438,10 @@ export async function denyDeviceAuthorization(
 
     const row = (await db
         .prepare(
-            "SELECT id, status, expires_at FROM device_authorizations WHERE user_code_hash = ?",
+            "SELECT id, client_id, status, expires_at FROM device_authorizations WHERE user_code_hash = ?",
         )
         .bind(userCodeHash)
-        .first()) as { id: string; status: string; expires_at: string } | null;
+        .first()) as { id: string; client_id: string; status: string; expires_at: string } | null;
 
     if (!row) {
         return { ok: false, reason: "not_found" };
@@ -463,7 +463,7 @@ export async function denyDeviceAuthorization(
         return { ok: false, reason: "already_resolved" };
     }
 
-    return { ok: true };
+    return { ok: true, clientId: row.client_id };
 }
 
 /**
