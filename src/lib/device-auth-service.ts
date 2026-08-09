@@ -545,3 +545,19 @@ export function classifyDevicePollAttempt(
 
     return { kind: "not_exchangeable" };
 }
+
+/**
+ * PURE FUNCTION: Verifies if a requested audience is permitted for this client.
+ * Prevents confused-deputy attacks where a public client requests tokens for an unapproved resource.
+ */
+export function isRequestedAudienceAllowed(
+    requestedAudience: string | null | undefined,
+    clientApprovedAudience: string | null | undefined
+): boolean {
+    // If no specific audience is requested, it defaults safely to the client's registered audience
+    if (!requestedAudience) return true;
+    // If requested, but the client has no approved audience at all, deny
+    if (!clientApprovedAudience) return false;
+    // Require exact string match
+    return requestedAudience === clientApprovedAudience;
+}
