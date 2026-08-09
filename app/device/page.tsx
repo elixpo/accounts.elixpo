@@ -26,7 +26,7 @@
  */
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import {
     isHighImpactScope,
     LIXBLOGS_SCOPE_DETAILS,
@@ -54,7 +54,7 @@ function currentUrlForNext(userCode: string): string {
     return `/device${qs ? `?${qs}` : ""}`;
 }
 
-export default function DeviceVerificationPage() {
+function DeviceVerificationContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const prefill = searchParams.get("user_code") || "";
@@ -331,5 +331,13 @@ export default function DeviceVerificationPage() {
                 ) : null}
             </div>
         </main>
+    );
+}
+
+export default function DeviceVerificationPage() {
+    return (
+        <Suspense>
+            <DeviceVerificationContent />
+        </Suspense>
     );
 }
