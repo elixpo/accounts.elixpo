@@ -281,30 +281,63 @@ export async function getRefreshTokenByHash(db: D1Database, tokenHash: string) {
     return await stmt.bind(tokenHash).first();
 }
 
-export async function getRefreshTokenByHashIncludingRevoked(db: D1Database, tokenHash: string) {
+export async function getRefreshTokenByHashIncludingRevoked(
+    db: D1Database,
+    tokenHash: string,
+) {
     const stmt = db.prepare(
         "SELECT * FROM refresh_tokens WHERE token_hash = ?",
     );
     return await stmt.bind(tokenHash).first();
 }
 
-export async function revokeRefreshToken(db: D1Database, tokenHash: string, reason?: string) {
+export async function revokeRefreshToken(
+    db: D1Database,
+    tokenHash: string,
+    reason?: string,
+) {
     const stmt = db.prepare(
         "UPDATE refresh_tokens SET revoked = 1, revoked_at = CURRENT_TIMESTAMP, revoked_reason = ? WHERE token_hash = ?",
     );
     return await stmt.bind(reason || null, tokenHash).run();
 }
 
-export async function revokeRefreshTokenFamily(db: D1Database, familyId: string, reason: string) {
+export async function markRefreshTokenRotated(
+    db: D1Database,
+    tokenHash: string,
+    familyId: string,
+    sid: string,
+) {
     const stmt = db.prepare(
-        "UPDATE refresh_tokens SET revoked = 1, revoked_at = CURRENT_TIMESTAMP, revoked_reason = ? WHERE family_id = ? AND revoked = 0"
+        `UPDATE refresh_tokens
+         SET revoked = 1,
+             revoked_at = CURRENT_TIMESTAMP,
+             revoked_reason = 'rotated',
+             family_id = COALESCE(family_id, ?),
+             sid = COALESCE(sid, ?)
+         WHERE token_hash = ? AND revoked = 0`,
+    );
+    return await stmt.bind(familyId, sid, tokenHash).run();
+}
+
+export async function revokeRefreshTokenFamily(
+    db: D1Database,
+    familyId: string,
+    reason: string,
+) {
+    const stmt = db.prepare(
+        "UPDATE refresh_tokens SET revoked = 1, revoked_at = CURRENT_TIMESTAMP, revoked_reason = ? WHERE family_id = ? AND revoked = 0",
     );
     return await stmt.bind(reason, familyId).run();
 }
 
-export async function revokeAllRefreshTokensForUser(db: D1Database, userId: string, reason: string) {
+export async function revokeAllRefreshTokensForUser(
+    db: D1Database,
+    userId: string,
+    reason: string,
+) {
     const stmt = db.prepare(
-        "UPDATE refresh_tokens SET revoked = 1, revoked_at = CURRENT_TIMESTAMP, revoked_reason = ? WHERE user_id = ? AND revoked = 0"
+        "UPDATE refresh_tokens SET revoked = 1, revoked_at = CURRENT_TIMESTAMP, revoked_reason = ? WHERE user_id = ? AND revoked = 0",
     );
     return await stmt.bind(reason, userId).run();
 }
@@ -467,7 +500,11 @@ export async function logAuditEvent(
         .run();
 }
 
-export async function redactStaleAuditLogs(db: D1Database, limit: number = 1000, retentionDays: number = 90) {
+export async function redactStaleAuditLogs(
+    db: D1Database,
+    limit: number = 1000,
+    retentionDays: number = 90,
+) {
     const stmt = db.prepare(`
         UPDATE audit_logs 
         SET ip_address = NULL, user_agent = NULL, error_message = NULL 
@@ -482,7 +519,11 @@ export async function redactStaleAuditLogs(db: D1Database, limit: number = 1000,
     return result.meta?.changes ?? 0;
 }
 
-export async function cleanupExpiredOrRevokedRefreshTokens(db: D1Database, limit: number = 1000, revokedRetentionDays: number = 30) {
+export async function cleanupExpiredOrRevokedRefreshTokens(
+    db: D1Database,
+    limit: number = 1000,
+    revokedRetentionDays: number = 30,
+) {
     const stmt = db.prepare(`
         DELETE FROM refresh_tokens 
         WHERE id IN (
@@ -587,21 +628,27 @@ export async function validateOAuthClient(
     return !!result;
 }
 
-export async function authenticateOAuthClient(db: D1Database, clientId: string, clientSecretHash?: string | null) {
-    const stmt = db.prepare("SELECT * FROM oauth_clients WHERE client_id = ? AND is_active = 1");
+export async function authenticateOAuthClient(
+    db: D1Database,
+    clientId: string,
+    clientSecretHash?: string | null,
+) {
+    const stmt = db.prepare(
+        "SELECT * FROM oauth_clients WHERE client_id = ? AND is_active = 1",
+    );
     // Explicitly typed as any because we added audience and client_type directly to the schema
     const client = await stmt.bind(clientId).first<any>();
-    
+
     if (!client) return null;
-    
-    if (client.client_type === 'public') {
+
+    if (client.client_type === "public") {
         return client;
     }
-    
+
     if (!clientSecretHash || client.client_secret_hash !== clientSecretHash) {
         return null;
     }
-    
+
     return client;
 }
 

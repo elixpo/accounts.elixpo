@@ -18,5 +18,5 @@
 
 ## 4. E2E Testing Note
 
-*   The route/logic layers have full Vitest coverage for rotation, reuse, revocation, and scope validation. 
+*   The route/logic layers have full Vitest coverage for rotation, reuse, revocation, and scope validation.
 *   **Limitation:** The cross-repository E2E requirement (running the real LixBlogs CLI against the browser approval flow) cannot be fully executed in this isolated environment. This must be verified manually or via a CI job against a staging deployment once this PR and the LixBlogs CLI components are merged.

@@ -5,23 +5,19 @@ import { getDatabase } from "@/lib/d1-client";
 import {
     authenticateOAuthClient,
     getOAuthClientByIdWithSecret,
-    getRefreshTokenByHash,
-    getRefreshTokenByHashIncludingRevoked,
     getUserById,
     logAuditEvent,
-    revokeRefreshToken,
-    revokeRefreshTokenFamily,
     createRefreshToken as storeRefreshToken,
     validateOAuthClient,
 } from "@/lib/db";
 import { classifyDevicePollAttempt } from "@/lib/device-auth-service";
-import { createAccessToken, createRefreshToken, verifyJWT } from "@/lib/jwt";
+import { createAccessToken, createRefreshToken } from "@/lib/jwt";
 import { parseOAuthScopes } from "@/lib/oauth-scopes";
+import { rotateRefreshToken } from "@/lib/refresh-rotation";
 import { generateUUID, hashString } from "@/lib/webcrypto";
 
 export async function POST(request: NextRequest) {
     try {
-        // 1. Support both JSON and URL-encoded bodies per OAuth 2.0 specs
         const contentType = request.headers.get("content-type") || "";
         let body: any;
         if (contentType.includes("application/x-www-form-urlencoded")) {
@@ -40,12 +36,9 @@ export async function POST(request: NextRequest) {
             refresh_token,
             device_code,
             scope,
-            token // Extracted to support the Git-merged Revoke flow below
         } = body;
 
-        // Because Git mangled the Revoke and Token files together, we must allow 
-        // requests that have a `token` (revoke flow) OR a `grant_type` (token flow)
-        if (!grant_type && !token) {
+        if (!grant_type) {
             return NextResponse.json(
                 {
                     error: "invalid_request",
@@ -55,30 +48,253 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // --- ACCIDENTALLY MERGED REVOKE LOGIC ---
-        if (token && client_id) {
-            const db = await getDatabase();
-            const client = await authenticateOAuthClient(db, client_id, client_secret ? await hashString(client_secret) : null);
-            
-            if (!client) {
-                return NextResponse.json({ error: "invalid_client" }, { status: 401 });
+        // Authorization Code Flow (RFC 6749 Section 4.1)
+        if (grant_type === "authorization_code") {
+            if (!code || !client_id || !client_secret || !redirect_uri) {
+                return NextResponse.json(
+                    {
+                        error: "invalid_request",
+                        error_description:
+                            "Missing required parameters: code, client_id, client_secret, redirect_uri",
+                    },
+                    { status: 400 },
+                );
             }
 
-            const isJwt = token.split('.').length === 3;
-            if (isJwt) {
-                const payload = await verifyJWT(token);
-                if (payload?.sid) {
-                    await revokeRefreshTokenFamily(db, payload.sid, "logout");
-                    await logAuditEvent(db, { id: generateUUID(), userId: payload.sub, eventType: "session_revoked", provider: client_id, status: "success" }).catch(() => {});
+            const db = await getDatabase();
+
+            try {
+                const client = await getOAuthClientByIdWithSecret(
+                    db,
+                    client_id,
+                );
+                const validClient = await validateOAuthClient(
+                    db,
+                    client_id,
+                    await hashString(client_secret),
+                );
+                if (!client || !validClient) {
+                    return NextResponse.json(
+                        {
+                            error: "invalid_client",
+                            error_description: "Invalid client credentials",
+                        },
+                        { status: 401 },
+                    );
                 }
-            } else {
-                const tokenHash = await hashString(token);
-                const record = await getRefreshTokenByHashIncludingRevoked(db, tokenHash) as any;
-                if (record?.family_id && record.client_id === client_id) {
-                    await revokeRefreshTokenFamily(db, record.family_id, "logout");
-                    await logAuditEvent(db, { id: generateUUID(), userId: record.user_id, eventType: "session_revoked", provider: client_id, status: "success" }).catch(() => {});
+
+                const redirectUris = JSON.parse(
+                    (client as { redirect_uris?: string }).redirect_uris ||
+                        "[]",
+                );
+                if (!redirectUris.includes(redirect_uri)) {
+                    return NextResponse.json(
+                        {
+                            error: "invalid_grant",
+                            error_description: "redirect_uri does not match",
+                        },
+                        { status: 400 },
+                    );
                 }
+
+                const authRequest = (await db
+                    .prepare(
+                        "SELECT * FROM auth_requests WHERE code = ? AND client_id = ? AND used = 0 AND expires_at > CURRENT_TIMESTAMP",
+                    )
+                    .bind(code, client_id)
+                    .first()) as {
+                    user_id: string | null;
+                    redirect_uri: string;
+                    scopes: string | null;
+                } | null;
+
+                if (!authRequest || authRequest.redirect_uri !== redirect_uri) {
+                    return NextResponse.json(
+                        {
+                            error: "invalid_grant",
+                            error_description:
+                                "Authorization code not found, expired, used, or mismatched",
+                        },
+                        { status: 400 },
+                    );
+                }
+
+                const claim = await db
+                    .prepare(
+                        "UPDATE auth_requests SET used = 1 WHERE code = ? AND client_id = ? AND used = 0",
+                    )
+                    .bind(code, client_id)
+                    .run();
+                if (claim.meta.changes !== 1 || !authRequest.user_id) {
+                    return NextResponse.json(
+                        {
+                            error: "invalid_grant",
+                            error_description:
+                                "Authorization code is no longer valid",
+                        },
+                        { status: 400 },
+                    );
+                }
+
+                const user = (await getUserById(db, authRequest.user_id)) as {
+                    email: string;
+                } | null;
+                if (!user) {
+                    return NextResponse.json(
+                        {
+                            error: "invalid_grant",
+                            error_description: "User not found",
+                        },
+                        { status: 400 },
+                    );
+                }
+
+                try {
+                    const { recordMauHit } = await import("@/lib/mau");
+                    await recordMauHit(db, client_id, authRequest.user_id);
+                } catch {
+                    /* best-effort */
+                }
+
+                const authorizedScopes = parseOAuthScopes(
+                    authRequest.scopes || "openid profile email",
+                );
+                const scopes = scope
+                    ? parseOAuthScopes(scope)
+                    : authorizedScopes;
+                if (scopes.some((item) => !authorizedScopes.includes(item))) {
+                    return NextResponse.json(
+                        {
+                            error: "invalid_scope",
+                            error_description:
+                                "Requested scope exceeds the user's authorization grant",
+                        },
+                        { status: 400 },
+                    );
+                }
+
+                const sessionId = generateUUID();
+                const oauthClaims = {
+                    clientId: client_id,
+                    audience:
+                        (client as { audience?: string | null }).audience ||
+                        undefined,
+                    sid: sessionId,
+                };
+                const accessToken = await createAccessToken(
+                    authRequest.user_id,
+                    user.email,
+                    "email",
+                    parseInt(process.env.JWT_EXPIRATION_MINUTES || "15", 10),
+                    scopes,
+                    oauthClaims,
+                );
+                const refreshTokenJWT = await createRefreshToken(
+                    authRequest.user_id,
+                    "email",
+                    parseInt(
+                        process.env.REFRESH_TOKEN_EXPIRATION_DAYS || "30",
+                        10,
+                    ),
+                    scopes,
+                    oauthClaims,
+                );
+
+                await storeRefreshToken(db, {
+                    id: generateUUID(),
+                    userId: authRequest.user_id,
+                    tokenHash: await hashString(refreshTokenJWT),
+                    clientId: client_id,
+                    expiresAt: new Date(
+                        Date.now() +
+                            parseInt(
+                                process.env.REFRESH_TOKEN_EXPIRATION_DAYS ||
+                                    "30",
+                                10,
+                            ) *
+                                86_400_000,
+                    ),
+                    familyId: sessionId,
+                    sid: sessionId,
+                });
+
+                return NextResponse.json({
+                    access_token: accessToken,
+                    token_type: "Bearer",
+                    expires_in:
+                        parseInt(
+                            process.env.JWT_EXPIRATION_MINUTES || "15",
+                            10,
+                        ) * 60,
+                    refresh_token: refreshTokenJWT,
+                    scope: scopes.join(" "),
+                });
+            } catch (error) {
+                console.error("[Token] Authorization code flow error:", error);
+                return NextResponse.json(
+                    {
+                        error: "server_error",
+                        error_description: "Failed to process token request",
+                    },
+                    { status: 500 },
+                );
             }
+        }
+
+        // Refresh Token Flow (RFC 6749 Section 6)
+        if (grant_type === "refresh_token") {
+            if (!refresh_token || !client_id) {
+                return NextResponse.json(
+                    {
+                        error: "invalid_request",
+                        error_description:
+                            "Missing required parameters: refresh_token, client_id",
+                    },
+                    { status: 400 },
+                );
+            }
+
+            const db = await getDatabase();
+            const client = await authenticateOAuthClient(
+                db,
+                client_id,
+                client_secret ? await hashString(client_secret) : null,
+            );
+            if (!client) {
+                return NextResponse.json(
+                    {
+                        error: "invalid_client",
+                        error_description: "Invalid client credentials",
+                    },
+                    { status: 401 },
+                );
+            }
+
+            const ipAddress =
+                request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+                request.headers.get("cf-connecting-ip") ||
+                "unknown";
+            const result = await rotateRefreshToken(db, {
+                refreshTokenJWT: refresh_token,
+                clientId: client_id,
+                clientAudience:
+                    (client as { audience?: string | null }).audience ||
+                    undefined,
+                ipAddress,
+                userAgent: request.headers.get("user-agent") || "unknown",
+                scopes: scope ? parseOAuthScopes(scope) : undefined,
+            });
+
+            if ("error" in result) {
+                return NextResponse.json(
+                    {
+                        error: result.error,
+                        error_description: result.error_description,
+                    },
+                    { status: result.status },
+                );
+            }
+            return NextResponse.json(result);
         }
 
         // Device Authorization Grant (RFC 8628) — accounts.elixpo#80.
@@ -167,6 +383,7 @@ export async function POST(request: NextRequest) {
                     poll_count: number;
                     expires_at: string;
                     exchanged_at: string | null;
+                    audience: string | null;
                 } | null;
 
                 if (!row) {
@@ -390,6 +607,12 @@ export async function POST(request: NextRequest) {
                 }
 
                 const scopes = row.scopes.split(" ").filter(Boolean);
+                const sessionId = generateUUID();
+                const oauthClaims = {
+                    clientId: client_id,
+                    audience: row.audience || undefined,
+                    sid: sessionId,
+                };
 
                 // DELIBERATE DIVERGENCE from authorization_code, flagged
                 // for review rather than silently either copied or fixed:
@@ -431,6 +654,7 @@ export async function POST(request: NextRequest) {
                     provider,
                     parseInt(process.env.JWT_EXPIRATION_MINUTES || "15", 10),
                     scopes,
+                    oauthClaims,
                 );
 
                 const refreshToken = await createRefreshToken(
@@ -441,34 +665,27 @@ export async function POST(request: NextRequest) {
                         10,
                     ),
                     scopes,
+                    oauthClaims,
                 );
                 const refreshTokenHash = await hashString(refreshToken);
 
-                try {
-                    await storeRefreshToken(db, {
-                        id: generateUUID(),
-                        userId: row.user_id as string,
-                        tokenHash: refreshTokenHash,
-                        clientId: client_id,
-                        expiresAt: new Date(
-                            Date.now() +
-                                parseInt(
-                                    process.env.REFRESH_TOKEN_EXPIRATION_DAYS ||
-                                        "30",
-                                    10,
-                                ) *
-                                    24 *
-                                    60 *
-                                    60 *
-                                    1000,
-                        ),
-                    });
-                } catch (storageError) {
-                    console.error(
-                        "[Token] Device code refresh token storage error:",
-                        storageError,
-                    );
-                }
+                await storeRefreshToken(db, {
+                    id: generateUUID(),
+                    userId: row.user_id as string,
+                    tokenHash: refreshTokenHash,
+                    clientId: client_id,
+                    expiresAt: new Date(
+                        Date.now() +
+                            parseInt(
+                                process.env.REFRESH_TOKEN_EXPIRATION_DAYS ||
+                                    "30",
+                                10,
+                            ) *
+                                86_400_000,
+                    ),
+                    familyId: sessionId,
+                    sid: sessionId,
+                });
 
                 return NextResponse.json(
                     {
@@ -503,9 +720,21 @@ export async function POST(request: NextRequest) {
         // per the #80 PR discussion; route-level rate limiting for the
         // whole token endpoint is a separate concern from this PR.
 
-        return NextResponse.json({}, { status: 200 });
+        return NextResponse.json(
+            {
+                error: "unsupported_grant_type",
+                error_description: `grant_type '${grant_type}' is not supported`,
+            },
+            { status: 400 },
+        );
     } catch (error) {
-        console.error("[Token/Revoke Endpoint] Error:", error);
-        return NextResponse.json({ error: "server_error" }, { status: 500 });
+        console.error("[Token Endpoint] Error:", error);
+        return NextResponse.json(
+            {
+                error: "server_error",
+                error_description: "Failed to process token request",
+            },
+            { status: 500 },
+        );
     }
 }

@@ -59,7 +59,7 @@ export async function createAccessToken(
         .setProtectedHeader({ alg: "EdDSA" })
         .setIssuedAt()
         .setExpirationTime(`${expiresInMinutes}m`);
-    
+
     if (oauthClaims?.audience) {
         builder = builder.setAudience(oauthClaims.audience);
     }
@@ -90,7 +90,7 @@ export async function createRefreshToken(
         .setProtectedHeader({ alg: "EdDSA" })
         .setIssuedAt()
         .setExpirationTime(`${expiresInDays}d`);
-    
+
     if (oauthClaims?.audience) {
         builder = builder.setAudience(oauthClaims.audience);
     }

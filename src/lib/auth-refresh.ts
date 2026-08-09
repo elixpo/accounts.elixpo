@@ -1,16 +1,22 @@
 import type { NextRequest, NextResponse } from "next/server";
 import { setAccountSessionsCookie } from "./account-sessions";
 import { getDatabase } from "./d1-client";
-import { rotateRefreshToken } from "./refresh-rotation";
-import { verifyJWT } from "./jwt";
 import { getUserById } from "./db";
+import { verifyJWT } from "./jwt";
+import { rotateRefreshToken } from "./refresh-rotation";
 
 export type RefreshSuccess = {
     ok: true;
     userId: string;
     email: string;
     displayName: string | null;
-    provider: "google" | "github" | "discord" | "microsoft" | "email" | undefined;
+    provider:
+        | "google"
+        | "github"
+        | "discord"
+        | "microsoft"
+        | "email"
+        | undefined;
     emailVerified: boolean;
     newAccessToken: string;
     newRefreshToken: string;
@@ -20,7 +26,11 @@ export type RefreshSuccess = {
 
 export type RefreshFailure = {
     ok: false;
-    reason: "invalid_token" | "token_revoked" | "user_not_found" | "internal_error";
+    reason:
+        | "invalid_token"
+        | "token_revoked"
+        | "user_not_found"
+        | "internal_error";
 };
 
 export async function tryRefreshSession(
@@ -34,18 +44,31 @@ export async function tryRefreshSession(
         }
 
         const db = await getDatabase();
-        const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || request.headers.get("cf-connecting-ip") || "unknown";
+        const ipAddress =
+            request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+            request.headers.get("cf-connecting-ip") ||
+            "unknown";
         const userAgent = request.headers.get("user-agent") || "unknown";
+        const refreshRemainingSeconds = Math.max(
+            payload.exp - Math.floor(Date.now() / 1000),
+            0,
+        );
+        const refreshDays = Math.max(
+            Math.ceil(refreshRemainingSeconds / 86_400),
+            1,
+        );
 
         const result = await rotateRefreshToken(db, {
             refreshTokenJWT: refreshToken,
             clientId: "elixpo-web-ui",
             ipAddress,
-            userAgent
+            userAgent,
+            refreshExpiresInDays: refreshDays,
         });
 
-        if ('error' in result) {
-            if (result.error === "invalid_grant") return { ok: false, reason: "token_revoked" };
+        if ("error" in result) {
+            if (result.error === "invalid_grant")
+                return { ok: false, reason: "token_revoked" };
             return { ok: false, reason: "invalid_token" };
         }
 
@@ -59,10 +82,9 @@ export async function tryRefreshSession(
             return { ok: false, reason: "user_not_found" };
         }
 
-        const accessMaxAge = parseInt(process.env.JWT_EXPIRATION_MINUTES || "15", 10) * 60;
-        const refreshRemainingSeconds = Math.max(payload.exp - Math.floor(Date.now() / 1000), 0);
-        const refreshDays = Math.max(Math.ceil(refreshRemainingSeconds / 86400), 1);
-        const refreshMaxAge = refreshDays * 86400;
+        const accessMaxAge =
+            parseInt(process.env.JWT_EXPIRATION_MINUTES || "15", 10) * 60;
+        const refreshMaxAge = refreshDays * 86_400;
 
         return {
             ok: true,
@@ -110,7 +132,12 @@ export async function applyRefreshedCookies(
         path: "/",
     });
     if (request) {
-        await setAccountSessionsCookie(request, response, refresh.newRefreshToken, refresh.refreshMaxAge);
+        await setAccountSessionsCookie(
+            request,
+            response,
+            refresh.newRefreshToken,
+            refresh.refreshMaxAge,
+        );
     }
     return response;
 }
