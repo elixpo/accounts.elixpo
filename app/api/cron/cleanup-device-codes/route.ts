@@ -7,9 +7,8 @@ import { cleanupExpiredDeviceAuthorizations } from "@/lib/device-auth-service";
 /**
  * Deletes expired pending device authorizations in bounded batches.
  *
- * Auth (one of), same pattern as /api/cron/sync-tiers:
+ * Auth:
  *   Authorization: Bearer <DEVICE_CLEANUP_CRON_SECRET>
- *   ?key=<DEVICE_CLEANUP_CRON_SECRET>
  *
  * Runs one bounded batch per call (default 500 rows) so a scheduled trigger
  * with a short timeout can't be starved by an unbounded table scan. The
@@ -29,9 +28,7 @@ async function handle(request: NextRequest) {
     }
 
     const presented =
-        request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ||
-        request.nextUrl.searchParams.get("key") ||
-        "";
+        request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") || "";
     if (!constantTimeEquals(presented, secret)) {
         return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
@@ -58,9 +55,5 @@ function constantTimeEquals(a: string, b: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
-    return handle(request);
-}
-
-export async function GET(request: NextRequest) {
     return handle(request);
 }

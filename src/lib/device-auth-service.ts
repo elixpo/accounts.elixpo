@@ -281,8 +281,7 @@ export async function lookupDeviceAuthorizationByUserCode(
         return { status: "not_found" };
     }
 
-    const expired =
-        row.status === "pending" && new Date(row.expires_at) < new Date();
+    const expired = new Date(row.expires_at) <= new Date();
 
     return {
         status: expired
@@ -296,11 +295,11 @@ export async function lookupDeviceAuthorizationByUserCode(
 }
 
 /**
- * Bounded expiry cleanup. Deletes pending rows past `expires_at` in batches
+ * Bounded expiry cleanup. Deletes rows past `expires_at` in batches
  * so a single cron/cleanup tick can never lock the table for an unbounded
  * scan. Approved/denied rows are left in place for their natural expiry —
  * downstream token-polling logic (separate issue) still needs to answer
- * "was this ever approved" for a short window after expiry.
+ * "expired_token" without retaining resolved grants indefinitely.
  */
 export async function cleanupExpiredDeviceAuthorizations(
     db: D1Database,
@@ -311,7 +310,7 @@ export async function cleanupExpiredDeviceAuthorizations(
             `DELETE FROM device_authorizations
              WHERE id IN (
                 SELECT id FROM device_authorizations
-                WHERE status = 'pending' AND expires_at < CURRENT_TIMESTAMP
+                WHERE expires_at < CURRENT_TIMESTAMP
                 LIMIT ?
              )`,
         )
