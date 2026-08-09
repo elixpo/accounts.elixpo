@@ -9,8 +9,8 @@ import {
     updateOAuthClient,
 } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
-import { sendMail } from "@/lib/mails";
 import { SUPPORTED_LIXBLOGS_SCOPES } from "@/lib/lixblogs-scopes";
+import { sendMail } from "@/lib/mails";
 import {
     SUPPORTED_OAUTH_SCOPES,
     unsupportedOAuthScopes,

@@ -4,8 +4,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
 import { createOAuthClient, getOAuthClientById, getUserById } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
-import { sendMail } from "@/lib/mails";
 import { SUPPORTED_LIXBLOGS_SCOPES } from "@/lib/lixblogs-scopes";
+import { sendMail } from "@/lib/mails";
 import { SUPPORTED_OAUTH_SCOPES } from "@/lib/oauth-scopes";
 import { generateRandomString, hashString } from "@/lib/webcrypto";
 
@@ -181,8 +181,7 @@ export async function POST(request: NextRequest) {
         ) {
             return NextResponse.json(
                 {
-                    error:
-                        "name and redirect_uris are required; confidential clients need at least one redirect URI",
+                    error: "name and redirect_uris are required; confidential clients need at least one redirect URI",
                 },
                 { status: 400 },
             );

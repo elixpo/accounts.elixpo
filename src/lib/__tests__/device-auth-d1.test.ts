@@ -116,7 +116,9 @@ describe("device authorization with D1", () => {
             expires_in: 600,
             interval: 5,
         });
-        expect(row?.device_code_hash).toBe(await hashString(result.device_code));
+        expect(row?.device_code_hash).toBe(
+            await hashString(result.device_code),
+        );
         expect(row?.user_code_hash).toBe(
             await hashString(normalizeUserCode(result.user_code)),
         );
@@ -187,7 +189,11 @@ describe("device authorization with D1", () => {
 
     it("cleans expired grants in bounded batches regardless of status", async () => {
         await insertClient();
-        for (const [index, status] of ["pending", "approved", "denied"].entries()) {
+        for (const [index, status] of [
+            "pending",
+            "approved",
+            "denied",
+        ].entries()) {
             await env.DB.prepare(
                 `INSERT INTO device_authorizations
                  (id, device_code_hash, user_code_hash, client_id, scopes, status, expires_at)
