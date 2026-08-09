@@ -658,7 +658,7 @@ export async function POST(request: NextRequest) {
                 // outcome only exists once you actually run the UPDATE.
                 const claim = await db
                     .prepare(
-                        "UPDATE device_authorizations SET exchanged_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'approved' AND exchanged_at IS NULL",
+                        "UPDATE device_authorizations SET exchanged_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'approved' AND exchanged_at IS NULL AND expires_at > CURRENT_TIMESTAMP",
                     )
                     .bind(row.id)
                     .run();

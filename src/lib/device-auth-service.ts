@@ -369,7 +369,7 @@ export function evaluateDeviceAuthorizationForResolution(
     row: DeviceAuthorizationStatusRow,
     now: Date = new Date(),
 ): DeviceAuthorizationResolutionOutcome {
-    if (row.status === "pending" && new Date(row.expires_at) < now) {
+    if (row.status === "pending" && new Date(row.expires_at) <= now) {
         return { canResolve: false, reason: "expired" };
     }
     if (row.status !== "pending") {
@@ -417,7 +417,7 @@ export async function approveDeviceAuthorization(
     // coverage note at the top of this file.
     const result = await db
         .prepare(
-            "UPDATE device_authorizations SET status = 'approved', user_id = ?, approved_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending'",
+            "UPDATE device_authorizations SET status = 'approved', user_id = ?, approved_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
         )
         .bind(input.userId, row.id)
         .run();
@@ -453,7 +453,7 @@ export async function denyDeviceAuthorization(
 
     const result = await db
         .prepare(
-            "UPDATE device_authorizations SET status = 'denied', denied_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending'",
+            "UPDATE device_authorizations SET status = 'denied', denied_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
         )
         .bind(row.id)
         .run();
@@ -509,16 +509,13 @@ export function classifyDevicePollAttempt(
         return { kind: "client_mismatch" };
     }
 
-    if (row.status === "denied") {
-        return { kind: "access_denied" };
+    const expiresAt = new Date(row.expires_at);
+    if (row.status === "expired" || expiresAt <= now) {
+        return { kind: "expired_token", wasPending: row.status === "pending" };
     }
 
-    const expiresAt = new Date(row.expires_at);
-    if (
-        row.status === "expired" ||
-        (row.status === "pending" && expiresAt < now)
-    ) {
-        return { kind: "expired_token", wasPending: row.status === "pending" };
+    if (row.status === "denied") {
+        return { kind: "access_denied" };
     }
 
     if (row.status === "pending") {
