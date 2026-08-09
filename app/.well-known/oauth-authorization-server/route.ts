@@ -1,5 +1,4 @@
 export const runtime = "edge";
-export const dynamic = "force-static";
 
 import { NextResponse } from "next/server";
 import { SUPPORTED_LIXBLOGS_SCOPES } from "@/lib/lixblogs-scopes";
