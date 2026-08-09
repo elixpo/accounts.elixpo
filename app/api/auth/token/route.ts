@@ -6,10 +6,10 @@ import {
     getOAuthClientByIdWithSecret,
     getRefreshTokenByHash,
     getUserById,
+    logAuditEvent,
     revokeRefreshToken,
     createRefreshToken as storeRefreshToken,
     validateOAuthClient,
-    logAuditEvent,
 } from "@/lib/db";
 import { classifyDevicePollAttempt } from "@/lib/device-auth-service";
 import { createAccessToken, createRefreshToken, verifyJWT } from "@/lib/jwt";

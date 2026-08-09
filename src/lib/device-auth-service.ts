@@ -399,7 +399,12 @@ export async function approveDeviceAuthorization(
             "SELECT id, client_id, status, expires_at FROM device_authorizations WHERE user_code_hash = ?",
         )
         .bind(userCodeHash)
-        .first()) as { id: string; client_id: string; status: string; expires_at: string } | null;
+        .first()) as {
+        id: string;
+        client_id: string;
+        status: string;
+        expires_at: string;
+    } | null;
 
     if (!row) {
         return { ok: false, reason: "not_found" };
@@ -440,7 +445,12 @@ export async function denyDeviceAuthorization(
             "SELECT id, client_id, status, expires_at FROM device_authorizations WHERE user_code_hash = ?",
         )
         .bind(userCodeHash)
-        .first()) as { id: string; client_id: string; status: string; expires_at: string } | null;
+        .first()) as {
+        id: string;
+        client_id: string;
+        status: string;
+        expires_at: string;
+    } | null;
 
     if (!row) {
         return { ok: false, reason: "not_found" };
