@@ -224,6 +224,12 @@ export async function PATCH(
         if (app.owner_id !== payload.sub) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
+        if (app.client_type === "public") {
+            return NextResponse.json(
+                { error: "Public clients do not use client secrets" },
+                { status: 400 },
+            );
+        }
 
         // Generate new secret
         const newSecret = `secret_${generateRandomString(64)}`;

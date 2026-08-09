@@ -166,16 +166,23 @@ export async function POST(request: NextRequest) {
         // multiple endpoints (e.g. localhost + production), each with its
         // own secret and event subscription.
 
-        // Validate required fields
+        if (client_type !== "confidential" && client_type !== "public") {
+            return NextResponse.json(
+                { error: "client_type must be confidential or public" },
+                { status: 400 },
+            );
+        }
+
+        // Device-only public clients do not require browser redirect URIs.
         if (
             !name ||
-            !redirect_uris ||
             !Array.isArray(redirect_uris) ||
-            redirect_uris.length === 0
+            (client_type === "confidential" && redirect_uris.length === 0)
         ) {
             return NextResponse.json(
                 {
-                    error: "name and redirect_uris (non-empty array) are required",
+                    error:
+                        "name and redirect_uris are required; confidential clients need at least one redirect URI",
                 },
                 { status: 400 },
             );
@@ -184,13 +191,6 @@ export async function POST(request: NextRequest) {
         if (redirect_uris.length > 5) {
             return NextResponse.json(
                 { error: "Maximum of 5 redirect URIs allowed" },
-                { status: 400 },
-            );
-        }
-
-        if (client_type !== "confidential" && client_type !== "public") {
-            return NextResponse.json(
-                { error: "client_type must be confidential or public" },
                 { status: 400 },
             );
         }
