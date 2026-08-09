@@ -515,6 +515,7 @@ export async function createOAuthClient(
         webhookUrl,
         webhookSecretHash,
         webhookEvents,
+        clientType = "confidential",
     }: {
         clientId: string;
         clientSecretHash: string;
@@ -527,6 +528,7 @@ export async function createOAuthClient(
         webhookUrl?: string | null;
         webhookSecretHash?: string | null;
         webhookEvents?: string | null; // JSON stringified array
+        clientType?: "confidential" | "public";
     },
 ) {
     const webhookSecretSetAt =
@@ -535,8 +537,9 @@ export async function createOAuthClient(
         `INSERT INTO oauth_clients (
             client_id, client_secret_hash, name, redirect_uris, scopes,
             owner_id, description, homepage_url,
-            webhook_url, webhook_secret_hash, webhook_events, webhook_secret_set_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            webhook_url, webhook_secret_hash, webhook_events, webhook_secret_set_at,
+            client_type
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     );
     return await stmt
         .bind(
@@ -552,13 +555,14 @@ export async function createOAuthClient(
             webhookSecretHash ?? null,
             webhookEvents ?? null,
             webhookSecretSetAt,
+            clientType,
         )
         .run();
 }
 
 export async function getOAuthClientById(db: D1Database, clientId: string) {
     const stmt = db.prepare(
-        "SELECT client_id, name, redirect_uris, scopes, description, homepage_url, created_at, is_active FROM oauth_clients WHERE client_id = ?",
+        "SELECT client_id, name, redirect_uris, scopes, description, homepage_url, created_at, is_active, client_type FROM oauth_clients WHERE client_id = ?",
     );
     return await stmt.bind(clientId).first();
 }

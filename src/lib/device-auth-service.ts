@@ -281,8 +281,7 @@ export async function lookupDeviceAuthorizationByUserCode(
         return { status: "not_found" };
     }
 
-    const expired =
-        row.status === "pending" && new Date(row.expires_at) < new Date();
+    const expired = new Date(row.expires_at) <= new Date();
 
     return {
         status: expired
@@ -296,11 +295,11 @@ export async function lookupDeviceAuthorizationByUserCode(
 }
 
 /**
- * Bounded expiry cleanup. Deletes pending rows past `expires_at` in batches
+ * Bounded expiry cleanup. Deletes rows past `expires_at` in batches
  * so a single cron/cleanup tick can never lock the table for an unbounded
  * scan. Approved/denied rows are left in place for their natural expiry —
  * downstream token-polling logic (separate issue) still needs to answer
- * "was this ever approved" for a short window after expiry.
+ * "expired_token" without retaining resolved grants indefinitely.
  */
 export async function cleanupExpiredDeviceAuthorizations(
     db: D1Database,
@@ -311,7 +310,7 @@ export async function cleanupExpiredDeviceAuthorizations(
             `DELETE FROM device_authorizations
              WHERE id IN (
                 SELECT id FROM device_authorizations
-                WHERE status = 'pending' AND expires_at < CURRENT_TIMESTAMP
+                WHERE expires_at < CURRENT_TIMESTAMP
                 LIMIT ?
              )`,
         )
@@ -370,7 +369,7 @@ export function evaluateDeviceAuthorizationForResolution(
     row: DeviceAuthorizationStatusRow,
     now: Date = new Date(),
 ): DeviceAuthorizationResolutionOutcome {
-    if (row.status === "pending" && new Date(row.expires_at) < now) {
+    if (row.status === "pending" && new Date(row.expires_at) <= now) {
         return { canResolve: false, reason: "expired" };
     }
     if (row.status !== "pending") {
@@ -400,7 +399,12 @@ export async function approveDeviceAuthorization(
             "SELECT id, client_id, status, expires_at FROM device_authorizations WHERE user_code_hash = ?",
         )
         .bind(userCodeHash)
-        .first()) as { id: string; client_id: string; status: string; expires_at: string } | null;
+        .first()) as {
+        id: string;
+        client_id: string;
+        status: string;
+        expires_at: string;
+    } | null;
 
     if (!row) {
         return { ok: false, reason: "not_found" };
@@ -418,7 +422,7 @@ export async function approveDeviceAuthorization(
     // coverage note at the top of this file.
     const result = await db
         .prepare(
-            "UPDATE device_authorizations SET status = 'approved', user_id = ?, approved_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending'",
+            "UPDATE device_authorizations SET status = 'approved', user_id = ?, approved_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
         )
         .bind(input.userId, row.id)
         .run();
@@ -441,7 +445,12 @@ export async function denyDeviceAuthorization(
             "SELECT id, client_id, status, expires_at FROM device_authorizations WHERE user_code_hash = ?",
         )
         .bind(userCodeHash)
-        .first()) as { id: string; client_id: string; status: string; expires_at: string } | null;
+        .first()) as {
+        id: string;
+        client_id: string;
+        status: string;
+        expires_at: string;
+    } | null;
 
     if (!row) {
         return { ok: false, reason: "not_found" };
@@ -454,7 +463,7 @@ export async function denyDeviceAuthorization(
 
     const result = await db
         .prepare(
-            "UPDATE device_authorizations SET status = 'denied', denied_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending'",
+            "UPDATE device_authorizations SET status = 'denied', denied_at = CURRENT_TIMESTAMP WHERE id = ? AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
         )
         .bind(row.id)
         .run();
@@ -510,16 +519,13 @@ export function classifyDevicePollAttempt(
         return { kind: "client_mismatch" };
     }
 
-    if (row.status === "denied") {
-        return { kind: "access_denied" };
+    const expiresAt = new Date(row.expires_at);
+    if (row.status === "expired" || expiresAt <= now) {
+        return { kind: "expired_token", wasPending: row.status === "pending" };
     }
 
-    const expiresAt = new Date(row.expires_at);
-    if (
-        row.status === "expired" ||
-        (row.status === "pending" && expiresAt < now)
-    ) {
-        return { kind: "expired_token", wasPending: row.status === "pending" };
+    if (row.status === "denied") {
+        return { kind: "access_denied" };
     }
 
     if (row.status === "pending") {

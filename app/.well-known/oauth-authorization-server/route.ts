@@ -1,12 +1,23 @@
 export const runtime = "edge";
+
 import { NextResponse } from "next/server";
+import { SUPPORTED_LIXBLOGS_SCOPES } from "@/lib/lixblogs-scopes";
+import { SUPPORTED_OAUTH_SCOPES } from "@/lib/oauth-scopes";
 
+/**
+ * GET /.well-known/oauth-authorization-server
+ *
+ * OAuth 2.0 Authorization Server Metadata (RFC 8414), extended with the
+ * device authorization endpoint and grant type (RFC 8628) per
+ * accounts.elixpo#79. Static per deployment — no per-request DB/auth work,
+ * so it's safe to serve without rate limiting.
+ */
 export async function GET(request: Request) {
-    // Construct the base issuer URL dynamically from the request
+    // Construct the base issuer URL dynamically from the request, 
+    // falling back to the env variable if needed.
     const url = new URL(request.url);
-    const issuer = `${url.protocol}//${url.host}`;
+    const issuer = process.env.NEXT_PUBLIC_APP_URL || `${url.protocol}//${url.host}`;
 
-    // RFC 8414 OAuth 2.0 Authorization Server Metadata
     const metadata = {
         issuer,
         authorization_endpoint: `${issuer}/oauth/authorize`,
@@ -15,6 +26,10 @@ export async function GET(request: Request) {
         revocation_endpoint: `${issuer}/api/auth/revoke`,
         
         // Supported features
+        scopes_supported: [
+            ...SUPPORTED_OAUTH_SCOPES,
+            ...SUPPORTED_LIXBLOGS_SCOPES,
+        ],
         grant_types_supported: [
             "authorization_code",
             "refresh_token",

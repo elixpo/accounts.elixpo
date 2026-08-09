@@ -26,7 +26,7 @@
  */
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import {
     isHighImpactScope,
     LIXBLOGS_SCOPE_DETAILS,
@@ -54,7 +54,7 @@ function currentUrlForNext(userCode: string): string {
     return `/device${qs ? `?${qs}` : ""}`;
 }
 
-export default function DeviceVerificationPage() {
+function DeviceVerificationContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const prefill = searchParams.get("user_code") || "";
@@ -62,16 +62,7 @@ export default function DeviceVerificationPage() {
     const [userCode, setUserCode] = useState(prefill);
     const [view, setView] = useState<ViewState>({ phase: "entering" });
 
-    // Auto-lookup when arriving via verification_uri_complete (?user_code=...).
-    // Read-only — does not approve or deny anything.
-    useEffect(() => {
-        if (prefill) {
-            void doLookup(prefill);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [prefill, doLookup]);
-
-    async function doLookup(rawCode: string) {
+    const doLookup = useCallback(async (rawCode: string) => {
         setView({ phase: "loading" });
         try {
             const res = await fetch(
@@ -115,7 +106,15 @@ export default function DeviceVerificationPage() {
                 message: "Couldn't reach the server. Please try again.",
             });
         }
-    }
+    }, []);
+
+    // Auto-lookup when arriving via verification_uri_complete (?user_code=...).
+    // Read-only — does not approve or deny anything.
+    useEffect(() => {
+        if (prefill) {
+            void doLookup(prefill);
+        }
+    }, [prefill, doLookup]);
 
     function handleSubmitCode(e: React.FormEvent) {
         e.preventDefault();
@@ -332,5 +331,13 @@ export default function DeviceVerificationPage() {
                 ) : null}
             </div>
         </main>
+    );
+}
+
+export default function DeviceVerificationPage() {
+    return (
+        <Suspense>
+            <DeviceVerificationContent />
+        </Suspense>
     );
 }

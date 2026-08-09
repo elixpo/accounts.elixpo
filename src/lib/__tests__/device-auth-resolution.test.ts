@@ -172,6 +172,20 @@ describe("classifyDevicePollAttempt", () => {
         expect(result).toEqual({ kind: "ready_to_exchange" });
     });
 
+    it("returns expired_token for an approved row past its expiry", () => {
+        const result = classifyDevicePollAttempt(
+            {
+                ...baseRow,
+                status: "approved",
+                user_id: "u1",
+                expires_at: PAST,
+            },
+            "cli_test",
+            NOW,
+        );
+        expect(result).toEqual({ kind: "expired_token", wasPending: false });
+    });
+
     it("returns not_exchangeable for an approved row missing user_id (defensive/should-never-happen)", () => {
         const result = classifyDevicePollAttempt(
             { ...baseRow, status: "approved", user_id: null },

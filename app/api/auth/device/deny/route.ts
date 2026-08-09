@@ -17,14 +17,9 @@ export async function POST(request: NextRequest) {
     }
 
     const payload = await verifyJWT(token);
-    if (!payload) {
+    if (payload?.type !== "access") {
         return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
-    // NOTE: matching existing precedent — no route in this codebase checks
-    // payload.type === "access" today (every write route just checks
-    // verifyJWT() truthy). Not adding that check here either; it would be
-    // stricter than the rest of the app, which is a separate call to make
-    // deliberately, not a side effect of this PR.
 
     let body: { user_code?: unknown };
     try {
