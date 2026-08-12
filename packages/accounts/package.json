@@ -43,6 +43,9 @@
   },
   "devDependencies": {
     "tsup": "^8.5.1",
-    "typescript": "^7.0.2"
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "jose": "^5.10.0"
   }
 }
