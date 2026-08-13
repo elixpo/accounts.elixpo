@@ -7,13 +7,15 @@ import {
     getContrastRatio,
     hasSufficientContrast,
     getContrastColor,
+    getSafeUrlForFetch,
+    validateLogoUrl,
 } from "../branding-validation";
 
 describe("Branding Validation and Sanitization", () => {
     describe("sanitizeString", () => {
-        it("should strip HTML and script tags", () => {
-            expect(sanitizeString("My <b>App</b>")).toBe("My App");
-            expect(sanitizeString("<script>alert(1)</script>Safe App")).toBe("alert(1)Safe App");
+        it("should strip HTML tag delimiters", () => {
+            expect(sanitizeString("My <b>App</b>")).toBe("My bApp/b");
+            expect(sanitizeString("<script>alert(1)</script>Safe App")).toBe("scriptalert(1)/scriptSafe App");
         });
 
         it("should trim whitespace", () => {
@@ -106,6 +108,33 @@ describe("Branding Validation and Sanitization", () => {
             expect(getContrastColor("#ffffff")).toBe("#000000"); // White background needs black text
             expect(getContrastColor("#000000")).toBe("#FFFFFF"); // Black background needs white text
             expect(getContrastColor("#ff7759")).toBe("#000000"); // Light orange background needs black text
+        });
+    });
+
+    describe("getSafeUrlForFetch", () => {
+        it("should allow safe public https URLs", () => {
+            expect(getSafeUrlForFetch("https://example.com/logo.png")).toBe("https://example.com/logo.png");
+            expect(getSafeUrlForFetch("https://sub.domain.co.uk/image")).toBe("https://sub.domain.co.uk/image");
+        });
+
+        it("should reject private IPs", () => {
+            expect(getSafeUrlForFetch("https://192.168.1.1/logo.png")).toBeNull();
+            expect(getSafeUrlForFetch("https://10.0.0.5/logo.png")).toBeNull();
+            expect(getSafeUrlForFetch("https://172.16.5.5/logo.png")).toBeNull();
+            expect(getSafeUrlForFetch("https://169.254.169.254/metadata")).toBeNull();
+        });
+
+        it("should reject invalid protocols", () => {
+            expect(getSafeUrlForFetch("ftp://example.com/logo.png")).toBeNull();
+            expect(getSafeUrlForFetch("gopher://example.com")).toBeNull();
+        });
+    });
+
+    describe("validateLogoUrl", () => {
+        it("should return error for unsafe hosts", async () => {
+            const res = await validateLogoUrl("https://192.168.1.1/logo.png");
+            expect(res.valid).toBe(false);
+            expect(res.error).toBe("Invalid or unsafe URL host");
         });
     });
 });
