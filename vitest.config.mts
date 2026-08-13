@@ -14,5 +14,6 @@ export default defineConfig({
     ],
     test: {
         include: ["src/**/__tests__/**/*.test.ts"],
+        setupFiles: ["src/lib/__tests__/setup.ts"],
     },
 });

@@ -1,6 +1,7 @@
 -- Migration 0002: Add missing columns and tables to existing schema
 
--- Columns role and is_admin already exist in users table (added manually)
+ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'user';
+ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT 0;
 
 -- Recreate oauth_clients table with all columns
 -- First, create a new table with the correct schema

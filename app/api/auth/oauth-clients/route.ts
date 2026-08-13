@@ -373,6 +373,13 @@ export async function GET(request: NextRequest) {
             created_at: (client as any).created_at,
             is_active: (client as any).is_active,
             client_type: (client as any).client_type || "confidential",
+            logo_url: (client as any).logo_url || null,
+            branding_display_name: (client as any).branding_display_name || null,
+            branding_primary_color: (client as any).branding_primary_color || null,
+            branding_accent_color: (client as any).branding_accent_color || null,
+            privacy_policy_url: (client as any).privacy_policy_url || null,
+            terms_of_service_url: (client as any).terms_of_service_url || null,
+            is_branding_verified: (client as any).is_branding_verified === 1,
         });
     } catch (error) {
         console.error("[OAuth Client] Get error:", error);
