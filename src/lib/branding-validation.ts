@@ -15,7 +15,63 @@ const HEX_COLOR_REGEX = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-f
  * Strips any HTML tags from a string to prevent arbitrary scripting or HTML injection.
  */
 export function sanitizeString(val: string): string {
-    return val.replace(/<[^>]*>/g, "").trim();
+    return val.replace(/[<>]/g, "").trim();
+}
+
+/**
+ * Resolves safe absolute URLs for fetching to prevent SSRF vulnerabilities.
+ * Restricts protocols to http/https, blocks private IPv4 and loopback/metadata addresses.
+ */
+export function getSafeUrlForFetch(urlStr: string): string | null {
+    try {
+        const parsed = new URL(urlStr);
+        if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+            return null;
+        }
+
+        const host = parsed.hostname.toLowerCase().trim();
+        
+        let isLocalDev = false;
+        try {
+            isLocalDev = typeof process !== "undefined" && process.env?.NODE_ENV !== "production";
+        } catch {}
+
+        if (host === "localhost" || host === "127.0.0.1" || host === "[::1]") {
+            if (!isLocalDev) {
+                return null;
+            }
+        }
+
+        // Validate host format to ensure it's either a standard domain name or allowed local IP
+        const DOMAIN_REGEX = /^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/;
+        const isValidDomain = DOMAIN_REGEX.test(host);
+        const isAllowedLocal = isLocalDev && (host === "localhost" || host === "127.0.0.1" || host === "[::1]");
+
+        if (!isValidDomain && !isAllowedLocal) {
+            return null;
+        }
+
+        // Additional private IP check for IPv4
+        const ipv4Regex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+        const match = host.match(ipv4Regex);
+        if (match) {
+            const parts = match.slice(1).map(Number);
+            if (parts.some((p) => p < 0 || p > 255)) return null;
+            const [p0, p1] = parts;
+            if (p0 === 10) return null; // 10.0.0.0/8
+            if (p0 === 172 && p1 >= 16 && p1 <= 31) return null; // 172.16.0.0/12
+            if (p0 === 192 && p1 === 168) return null; // 192.168.0.0/16
+            if (p0 === 169 && p1 === 254) return null; // 169.254.0.0/16
+            if (p0 === 127) return null; // 127.0.0.0/8
+            if (p0 === 0) return null; // 0.0.0.0
+        }
+
+        // Reconstruct URL to prevent spoofing
+        const portPart = parsed.port ? `:${parsed.port}` : "";
+        return `${parsed.protocol}//${parsed.hostname}${portPart}${parsed.pathname}${parsed.search}`;
+    } catch {
+        return null;
+    }
 }
 
 /**
@@ -132,8 +188,9 @@ export function hasSufficientContrast(hex: string): boolean {
  * 3. Its Content-Length does not exceed 1MB.
  */
 export async function validateLogoUrl(url: string): Promise<{ valid: boolean; error?: string }> {
-    if (!isValidUrl(url)) {
-        return { valid: false, error: "Invalid URL format" };
+    const safeUrl = getSafeUrlForFetch(url);
+    if (!safeUrl) {
+        return { valid: false, error: "Invalid or unsafe URL host" };
     }
 
     try {
@@ -142,7 +199,7 @@ export async function validateLogoUrl(url: string): Promise<{ valid: boolean; er
 
         let res: Response | null = null;
         try {
-            res = await fetch(url, {
+            res = await fetch(safeUrl, {
                 method: "HEAD",
                 signal: controller.signal,
             });
@@ -152,7 +209,7 @@ export async function validateLogoUrl(url: string): Promise<{ valid: boolean; er
 
         if (!res || !res.ok) {
             try {
-                res = await fetch(url, {
+                res = await fetch(safeUrl, {
                     method: "GET",
                     signal: controller.signal,
                 });
