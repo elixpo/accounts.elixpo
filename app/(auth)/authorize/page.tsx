@@ -13,6 +13,13 @@ interface AuthorizationRequest {
     redirectUri: string;
     scopes: string[];
     state: string;
+    logoUrl?: string | null;
+    brandingDisplayName?: string | null;
+    brandingPrimaryColor?: string | null;
+    brandingAccentColor?: string | null;
+    privacyPolicyUrl?: string | null;
+    termsOfServiceUrl?: string | null;
+    isBrandingVerified?: boolean;
 }
 
 type Account = {
@@ -27,27 +34,33 @@ function ClientIcon({
     name,
     homepageUrl,
     clientId,
+    logoUrl,
     size = 44,
 }: {
     name: string;
     homepageUrl?: string;
     clientId: string;
+    logoUrl?: string | null;
     size?: number;
 }) {
     const [stage, setStage] = useState(0);
-    // Try the app's OWN /favicon.ico first (the real brand icon), then Google's
+    // Try custom logo URL first, then the app's OWN /favicon.ico, then Google's
     // favicon service, then fall back to a generated pixel avatar.
     const sources = (() => {
-        if (!homepageUrl) return [] as string[];
-        try {
-            const u = new URL(homepageUrl);
-            return [
-                `${u.origin}/favicon.ico`,
-                `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=64`,
-            ];
-        } catch {
-            return [] as string[];
+        const list: string[] = [];
+        if (logoUrl) {
+            list.push(logoUrl);
         }
+        if (homepageUrl) {
+            try {
+                const u = new URL(homepageUrl);
+                list.push(`${u.origin}/favicon.ico`);
+                list.push(
+                    `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=64`,
+                );
+            } catch {}
+        }
+        return list;
     })();
 
     if (stage < sources.length) {
@@ -73,9 +86,32 @@ function ClientIcon({
             alt=""
             width={size}
             height={size}
-            style={{ borderRadius: 10, flexShrink: 0 }}
+            style={{
+                borderRadius: 10,
+                flexShrink: 0,
+                background: "var(--overlay)",
+            }}
         />
     );
+}
+
+function getContrastColorLocal(hex: string): string {
+    if (!hex || !hex.startsWith("#")) return "#FFFFFF";
+    let cleanHex = hex.slice(1);
+    if (cleanHex.length === 3 || cleanHex.length === 4) {
+        cleanHex = cleanHex.split("").map((c) => c + c).join("");
+    }
+    const r = parseInt(cleanHex.slice(0, 2), 16);
+    const g = parseInt(cleanHex.slice(2, 4), 16);
+    const b = parseInt(cleanHex.slice(4, 6), 16);
+    if (isNaN(r) || isNaN(g) || isNaN(b)) return "#FFFFFF";
+    
+    const [rs, gs, bs] = [r, g, b].map((c) => {
+        const s = c / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    });
+    const luminance = 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+    return luminance > 0.179 ? "#000000" : "#FFFFFF";
 }
 
 function AuthorizeContent() {
@@ -187,6 +223,13 @@ function AuthorizeContent() {
                     redirectUri,
                     scopes: scopes.length > 0 ? scopes : client.scopes || [],
                     state,
+                    logoUrl: client.logo_url || null,
+                    brandingDisplayName: client.branding_display_name || null,
+                    brandingPrimaryColor: client.branding_primary_color || null,
+                    brandingAccentColor: client.branding_accent_color || null,
+                    privacyPolicyUrl: client.privacy_policy_url || null,
+                    termsOfServiceUrl: client.terms_of_service_url || null,
+                    isBrandingVerified: client.is_branding_verified || false,
                 });
             } catch (err) {
                 setError(
@@ -499,6 +542,7 @@ function AuthorizeContent() {
                                 name={authRequest.clientName}
                                 homepageUrl={authRequest.homepageUrl}
                                 clientId={authRequest.clientId}
+                                logoUrl={authRequest.isBrandingVerified ? authRequest.logoUrl : null}
                                 size={44}
                             />
                         </div>
@@ -522,7 +566,9 @@ function AuthorizeContent() {
                                     whiteSpace: "nowrap",
                                 }}
                             >
-                                {authRequest.clientName}
+                                {authRequest.isBrandingVerified && authRequest.brandingDisplayName
+                                    ? authRequest.brandingDisplayName
+                                    : authRequest.clientName}
                             </p>
                             {hostname && (
                                 <p
@@ -678,7 +724,9 @@ function AuthorizeContent() {
                                     margin: "0 0 10px",
                                 }}
                             >
-                                {authRequest.clientName} will be able to
+                                {authRequest.isBrandingVerified && authRequest.brandingDisplayName
+                                    ? authRequest.brandingDisplayName
+                                    : authRequest.clientName} will be able to
                             </p>
                             <div
                                 style={{
@@ -855,9 +903,19 @@ function AuthorizeContent() {
                                 flex: 1,
                                 padding: "12px 16px",
                                 borderRadius: 10,
-                                border: "1px solid #ff7759",
-                                background: "#ff7759",
-                                color: "#fff",
+                                border: `1px solid ${
+                                    authRequest.isBrandingVerified && authRequest.brandingPrimaryColor
+                                        ? authRequest.brandingPrimaryColor
+                                        : "#ff7759"
+                                }`,
+                                background:
+                                    authRequest.isBrandingVerified && authRequest.brandingPrimaryColor
+                                        ? authRequest.brandingPrimaryColor
+                                        : "#ff7759",
+                                color:
+                                    authRequest.isBrandingVerified && authRequest.brandingPrimaryColor
+                                        ? getContrastColorLocal(authRequest.brandingPrimaryColor)
+                                        : "#fff",
                                 fontSize: 14,
                                 fontWeight: 700,
                                 cursor:
@@ -910,29 +968,58 @@ function AuthorizeContent() {
                 </div>
 
                 {/* Footer */}
-                <p
+                <div
                     style={{
-                        textAlign: "center",
-                        fontSize: 12,
-                        color: "var(--fg-faint)",
-                        marginTop: 16,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 12,
+                        marginTop: 20,
                     }}
                 >
-                    Don&apos;t recognize this app?{" "}
-                    <button
-                        onClick={() => router.push("/login")}
+                    <p
                         style={{
-                            color: "#ff7759",
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            fontWeight: 600,
+                            textAlign: "center",
                             fontSize: 12,
+                            color: "var(--fg-faint)",
+                            margin: 0,
                         }}
                     >
-                        Go back to safety
-                    </button>
-                </p>
+                        Don&apos;t recognize this app?{" "}
+                        <button
+                            onClick={() => router.push("/login")}
+                            style={{
+                                color: "#ff7759",
+                                background: "none",
+                                border: "none",
+                                cursor: "pointer",
+                                fontWeight: 600,
+                                fontSize: 12,
+                            }}
+                        >
+                            Go back to safety
+                        </button>
+                    </p>
+                    
+                    <p style={{ textAlign: "center", fontSize: 11, color: "var(--fg-faint)", margin: 0 }}>
+                        🛡️ Secured by Elixpo Accounts
+                    </p>
+
+                    {authRequest.isBrandingVerified && (authRequest.privacyPolicyUrl || authRequest.termsOfServiceUrl) && (
+                        <div style={{ display: "flex", gap: 12, fontSize: 11, color: "var(--fg-faint)" }}>
+                            {authRequest.privacyPolicyUrl && (
+                                <a href={authRequest.privacyPolicyUrl} target="_blank" rel="noopener noreferrer" style={{ color: "var(--fg-faint)", textDecoration: "underline" }}>
+                                    Privacy Policy
+                                </a>
+                            )}
+                            {authRequest.termsOfServiceUrl && (
+                                <a href={authRequest.termsOfServiceUrl} target="_blank" rel="noopener noreferrer" style={{ color: "var(--fg-faint)", textDecoration: "underline" }}>
+                                    Terms of Service
+                                </a>
+                            )}
+                        </div>
+                    )}
+                </div>
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
         </div>
