@@ -7,6 +7,7 @@ import {
     getOAuthClientByIdWithSecret,
     getUserById,
     updateOAuthClient,
+    logAuditEvent,
 } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
 import { SUPPORTED_LIXBLOGS_SCOPES } from "@/lib/lixblogs-scopes";
@@ -15,7 +16,8 @@ import {
     SUPPORTED_OAUTH_SCOPES,
     unsupportedOAuthScopes,
 } from "@/lib/oauth-scopes";
-import { generateRandomString, hashString } from "@/lib/webcrypto";
+import { generateRandomString, hashString, generateUUID } from "@/lib/webcrypto";
+import { isValidUrl, sanitizeString, hasSufficientContrast, validateLogoUrl } from "@/lib/branding-validation";
 
 /**
  * PUT /api/auth/oauth-clients/[client_id]
@@ -51,6 +53,11 @@ export async function PUT(
             description,
             homepage_url,
             logo_url,
+            branding_display_name,
+            branding_primary_color,
+            branding_accent_color,
+            privacy_policy_url,
+            terms_of_service_url,
         } = body;
 
         if (!client_id) {
@@ -134,6 +141,38 @@ export async function PUT(
             );
         }
 
+        // Custom branding validations
+        if (homepage_url !== undefined) {
+            if (homepage_url && !isValidUrl(homepage_url)) {
+                return NextResponse.json({ error: "Invalid homepage URL" }, { status: 400 });
+            }
+        }
+        if (privacy_policy_url !== undefined) {
+            if (privacy_policy_url && !isValidUrl(privacy_policy_url)) {
+                return NextResponse.json({ error: "Invalid Privacy Policy URL" }, { status: 400 });
+            }
+        }
+        if (terms_of_service_url !== undefined) {
+            if (terms_of_service_url && !isValidUrl(terms_of_service_url)) {
+                return NextResponse.json({ error: "Invalid Terms of Service URL" }, { status: 400 });
+            }
+        }
+        if (logo_url !== undefined) {
+            if (logo_url) {
+                const logoCheck = await validateLogoUrl(logo_url);
+                if (!logoCheck.valid) {
+                    return NextResponse.json({ error: logoCheck.error }, { status: 400 });
+                }
+            }
+        }
+        if (branding_primary_color !== undefined) {
+            if (branding_primary_color) {
+                if (!hasSufficientContrast(branding_primary_color)) {
+                    return NextResponse.json({ error: "Primary color has insufficient contrast against both black and white." }, { status: 400 });
+                }
+            }
+        }
+
         try {
             await updateOAuthClient(db, client_id, {
                 ...(name !== undefined && { name }),
@@ -143,10 +182,47 @@ export async function PUT(
                 ...(scopes !== undefined && { scopes: JSON.stringify(scopes) }),
                 ...(description !== undefined && { description }),
                 ...(homepage_url !== undefined && {
-                    homepageUrl: homepage_url,
+                    homepageUrl: homepage_url || null,
                 }),
-                ...(logo_url !== undefined && { logoUrl: logo_url }),
+                ...(logo_url !== undefined && { logoUrl: logo_url || null }),
+                ...(branding_display_name !== undefined && {
+                    brandingDisplayName: branding_display_name ? sanitizeString(branding_display_name).slice(0, 50) : null,
+                }),
+                ...(branding_primary_color !== undefined && {
+                    brandingPrimaryColor: branding_primary_color || null,
+                }),
+                ...(branding_accent_color !== undefined && {
+                    brandingAccentColor: branding_accent_color || null,
+                }),
+                ...(privacy_policy_url !== undefined && {
+                    privacyPolicyUrl: privacy_policy_url || null,
+                }),
+                ...(terms_of_service_url !== undefined && {
+                    termsOfServiceUrl: terms_of_service_url || null,
+                }),
+                // If homepage URL is changed, reset verification status
+                ...(homepage_url !== undefined && homepage_url !== app.homepage_url && {
+                    isBrandingVerified: false,
+                }),
             });
+
+            // Log audit event for branding modifications
+            if (
+                branding_display_name !== undefined ||
+                branding_primary_color !== undefined ||
+                branding_accent_color !== undefined ||
+                logo_url !== undefined ||
+                privacy_policy_url !== undefined ||
+                terms_of_service_url !== undefined
+            ) {
+                await logAuditEvent(db, {
+                    id: generateUUID(),
+                    userId: payload.sub,
+                    eventType: "client.branding_updated",
+                    provider: client_id,
+                    status: "success",
+                }).catch(() => {});
+            }
         } catch (error) {
             console.error("[OAuth Client] Database update error:", error);
             return NextResponse.json(
@@ -167,6 +243,13 @@ export async function PUT(
             client_type: updated?.client_type || "confidential",
             request_count: updated?.request_count ?? 0,
             last_used: updated?.last_used,
+            logo_url: updated?.logo_url || null,
+            branding_display_name: updated?.branding_display_name || null,
+            branding_primary_color: updated?.branding_primary_color || null,
+            branding_accent_color: updated?.branding_accent_color || null,
+            privacy_policy_url: updated?.privacy_policy_url || null,
+            terms_of_service_url: updated?.terms_of_service_url || null,
+            is_branding_verified: updated?.is_branding_verified === 1,
         });
     } catch (error) {
         console.error("[OAuth Client] Update error:", error);
@@ -450,6 +533,12 @@ export async function GET(
                 logo_url: (app as any).logo_url,
                 request_count: (app as any).request_count ?? 0,
                 last_used: (app as any).last_used,
+                branding_display_name: (app as any).branding_display_name || null,
+                branding_primary_color: (app as any).branding_primary_color || null,
+                branding_accent_color: (app as any).branding_accent_color || null,
+                privacy_policy_url: (app as any).privacy_policy_url || null,
+                terms_of_service_url: (app as any).terms_of_service_url || null,
+                is_branding_verified: (app as any).is_branding_verified === 1,
             }),
         });
     } catch (error) {
