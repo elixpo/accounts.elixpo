@@ -188,24 +188,68 @@ export function hasSufficientContrast(hex: string): boolean {
  * 3. Its Content-Length does not exceed 1MB.
  */
 export async function validateLogoUrl(url: string): Promise<{ valid: boolean; error?: string }> {
-    const safeUrl = getSafeUrlForFetch(url);
-    if (!safeUrl) {
+    let target: URL;
+    try {
+        target = new URL(url);
+    } catch {
         return { valid: false, error: "Invalid or unsafe URL host" };
     }
+
+    if (target.protocol !== "https:" && target.protocol !== "http:") {
+        return { valid: false, error: "Invalid or unsafe URL host" };
+    }
+
+    const host = target.hostname.toLowerCase().trim();
+
+    let isLocalDev = false;
+    try {
+        isLocalDev = typeof process !== "undefined" && process.env?.NODE_ENV !== "production";
+    } catch {}
+
+    if (host === "localhost" || host === "127.0.0.1" || host === "[::1]") {
+        if (!isLocalDev) {
+            return { valid: false, error: "Invalid or unsafe URL host" };
+        }
+    }
+
+    const DOMAIN_REGEX = /^[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/;
+    const isValidDomain = DOMAIN_REGEX.test(host);
+    const isAllowedLocal = isLocalDev && (host === "localhost" || host === "127.0.0.1" || host === "[::1]");
+
+    if (!isValidDomain && !isAllowedLocal) {
+        return { valid: false, error: "Invalid or unsafe URL host" };
+    }
+
+    const ipv4Regex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+    const ipMatch = host.match(ipv4Regex);
+    if (ipMatch) {
+        const parts = ipMatch.slice(1).map(Number);
+        if (parts.some((p) => p < 0 || p > 255)) {
+            return { valid: false, error: "Invalid or unsafe URL host" };
+        }
+        const [p0, p1] = parts;
+        if (
+            p0 === 10 ||
+            (p0 === 172 && p1 >= 16 && p1 <= 31) ||
+            (p0 === 192 && p1 === 168) ||
+            (p0 === 169 && p1 === 254) ||
+            p0 === 127 ||
+            p0 === 0
+        ) {
+            return { valid: false, error: "Invalid or unsafe URL host" };
+        }
+    }
+
+    const portPart = target.port ? `:${target.port}` : "";
+    const fetchUrl = `${target.protocol}//${target.hostname}${portPart}${target.pathname}${target.search}`;
 
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 2000);
 
-        const target = new URL(safeUrl);
-        if (target.protocol !== "https:" && target.protocol !== "http:") {
-            clearTimeout(timeoutId);
-            return { valid: false, error: "Invalid URL protocol" };
-        }
-
         let res: Response | null = null;
         try {
-            res = await fetch(target.href, {
+            res = await fetch(fetchUrl, {
                 method: "HEAD",
                 signal: controller.signal,
             });
@@ -215,7 +259,7 @@ export async function validateLogoUrl(url: string): Promise<{ valid: boolean; er
 
         if (!res || !res.ok) {
             try {
-                res = await fetch(target.href, {
+                res = await fetch(fetchUrl, {
                     method: "GET",
                     signal: controller.signal,
                 });
