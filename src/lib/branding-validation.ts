@@ -197,9 +197,15 @@ export async function validateLogoUrl(url: string): Promise<{ valid: boolean; er
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 2000);
 
+        const target = new URL(safeUrl);
+        if (target.protocol !== "https:" && target.protocol !== "http:") {
+            clearTimeout(timeoutId);
+            return { valid: false, error: "Invalid URL protocol" };
+        }
+
         let res: Response | null = null;
         try {
-            res = await fetch(safeUrl, {
+            res = await fetch(target.href, {
                 method: "HEAD",
                 signal: controller.signal,
             });
@@ -209,7 +215,7 @@ export async function validateLogoUrl(url: string): Promise<{ valid: boolean; er
 
         if (!res || !res.ok) {
             try {
-                res = await fetch(safeUrl, {
+                res = await fetch(target.href, {
                     method: "GET",
                     signal: controller.signal,
                 });
