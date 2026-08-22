@@ -2,6 +2,7 @@
   "name": "elixpo-accounts",
   "version": "1.2.15",
   "private": true,
+  "workspaces": ["packages/accounts"],
   "description": "Elixpo Accounts — open OAuth 2.0 single sign-on built on Cloudflare's edge. One identity for the Elixpo ecosystem and any third-party app.",
   "homepage": "https://accounts.elixpo.com",
   "repository": {
