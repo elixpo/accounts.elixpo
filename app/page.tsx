@@ -30,7 +30,7 @@ const MARKETING_LINKS = [
     { label: "Home", href: "/" },
     { label: "Pricing", href: "/pricing" },
     { label: "Docs", href: "/docs" },
-    { label: "SDK", href: "/docs/lixaccounts" },
+    { label: "Developer SDK", href: "/docs/lixaccounts" },
     { label: "About", href: "/about" },
 ];
 
@@ -40,7 +40,7 @@ const APP_LINKS = [
     { label: "Services", href: "/dashboard/services" },
     { label: "Webhooks", href: "/dashboard/webhooks" },
     { label: "Docs", href: "/docs" },
-    { label: "SDK", href: "/docs/lixaccounts" },
+    { label: "Developer SDK", href: "/docs/lixaccounts" },
     { label: "Pricing", href: "/pricing" },
     { label: "Profile", href: "/dashboard/profile" },
 ];
@@ -274,6 +274,19 @@ export default function LandingPage() {
                                     Docs
                                 </Link>
                             </motion.div>
+                            <motion.div
+                                whileHover={{ scale: 1.04 }}
+                                whileTap={{ scale: 0.96 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <Link
+                                    href="/docs/lixaccounts"
+                                    className="text-[var(--fg)] rounded-full py-[15px] px-5 font-body font-semibold text-[clamp(0.9rem,2vw,1rem)] flex items-center gap-2 opacity-80 hover:opacity-100"
+                                >
+                                    Developer SDK
+                                    <ArrowRightCircle className="w-4 h-4" />
+                                </Link>
+                            </motion.div>
                         </div>
                     </div>
                 </main>
@@ -408,24 +421,29 @@ export default function LandingPage() {
                             Official TypeScript SDK
                         </span>
                         <h2 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight mb-5">
-                            Ship OAuth with lixaccounts
+                            Add secure sign-in without rebuilding OAuth
                         </h2>
                         <p className="text-base sm:text-lg text-[var(--fg-muted)] leading-relaxed font-body mb-7">
-                            Discovery, S256 PKCE, callback validation, token
-                            rotation, revocation, and JWKS verification in one
-                            edge-safe package. It works anywhere Web Crypto and
-                            fetch are available.
+                            <code className="font-mono text-[0.9em]">
+                                @elixpo/accounts
+                            </code>{" "}
+                            creates the sign-in link, checks that callbacks are
+                            genuine, refreshes sessions, and verifies tokens for
+                            you. You write less security-sensitive code and get
+                            safe defaults that work in Node.js and edge
+                            runtimes—while staying on standard OAuth, so you are
+                            never locked into the SDK.
                         </p>
                         <div className="flex flex-wrap gap-3">
                             <Link
                                 href="/docs/lixaccounts"
                                 className="inline-flex items-center gap-2 bg-[#ff7759] text-white px-6 py-3 rounded-full font-body font-semibold text-sm transition-all hover:brightness-110 active:scale-[0.98]"
                             >
-                                Read the SDK guide
+                                Developer SDK
                                 <ArrowRightCircle className="w-4 h-4" />
                             </Link>
                             <a
-                                href="https://www.npmjs.com/package/lixaccounts"
+                                href="https://www.npmjs.com/package/@elixpo/accounts"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-2 border border-[var(--border)] bg-[var(--bg)] px-6 py-3 rounded-full font-body font-semibold text-sm transition-all hover:border-[#ff7759]/50 active:scale-[0.98]"
@@ -445,12 +463,12 @@ export default function LandingPage() {
                         <pre className="p-5 sm:p-6 overflow-x-auto font-mono text-sm leading-7">
                             <code>
                                 <span className="text-[#ff9a82]">$</span> npm
-                                install lixaccounts{"\n\n"}
+                                install @elixpo/accounts{"\n\n"}
                                 <span className="text-white/55">import</span>{" "}
                                 {"{ createAccountsClient }"}{" "}
                                 <span className="text-white/55">from</span>{" "}
                                 <span className="text-[#ff9a82]">
-                                    &quot;lixaccounts&quot;
+                                    &quot;@elixpo/accounts&quot;
                                 </span>
                             </code>
                         </pre>
