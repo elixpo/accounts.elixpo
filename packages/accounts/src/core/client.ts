@@ -1,5 +1,6 @@
 import { createAuthorizationRequest } from "./authorization.js";
 import { discoverAccounts } from "./discovery.js";
+import { AccountsError } from "./errors.js";
 import { exchangeAuthorizationCode, refreshTokens, revokeToken } from "./tokens.js";
 import type { AccountsConfiguration, AuthorizationServerMetadata } from "./types.js";
 import { verifyAccessToken, verifyIdToken } from "./verify.js";
@@ -36,7 +37,7 @@ export function createAccountsClient(configuration: AccountsConfiguration) {
         },
         async verifyAccessToken(token: string) {
             if (!configuration.audience) {
-                throw new (await import("./errors.js")).AccountsError(
+                throw new AccountsError(
                     "configuration_error",
                     "audience is required to verify an access token",
                 );

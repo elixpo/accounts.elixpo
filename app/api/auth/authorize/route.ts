@@ -119,6 +119,7 @@ export async function GET(request: NextRequest) {
                 if (
                     ((client as any).client_type === "public" &&
                         !codeChallenge) ||
+                    (!codeChallenge && !!codeChallengeMethod) ||
                     (codeChallenge &&
                         (codeChallengeMethod !== "S256" ||
                             !isValidPkceValue(codeChallenge)))
@@ -127,7 +128,7 @@ export async function GET(request: NextRequest) {
                         {
                             error: "invalid_request",
                             error_description:
-                                "Public clients require a valid S256 PKCE code_challenge",
+                                "Use a valid S256 PKCE code_challenge; public clients require PKCE",
                         },
                         { status: 400 },
                     );

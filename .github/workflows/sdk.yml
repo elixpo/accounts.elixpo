@@ -1,0 +1,37 @@
+name: Accounts SDK
+
+on:
+  pull_request:
+    paths:
+      - "packages/accounts/**"
+      - "app/.well-known/**"
+      - "app/api/auth/token/**"
+      - "app/oauth/authorize/**"
+      - "src/lib/jwt.ts"
+      - "src/lib/pkce.ts"
+      - "src/lib/oauth-metadata.ts"
+      - ".github/workflows/sdk.yml"
+  push:
+    branches: [main]
+    paths:
+      - "packages/accounts/**"
+      - "app/.well-known/**"
+      - "app/api/auth/token/**"
+      - "app/oauth/authorize/**"
+      - "src/lib/jwt.ts"
+      - "src/lib/pkce.ts"
+      - "src/lib/oauth-metadata.ts"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run sdk:build
+      - run: npm test
+      - run: npm run sdk:pack

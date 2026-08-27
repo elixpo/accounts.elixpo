@@ -161,6 +161,19 @@ export async function POST(request: NextRequest) {
                         { status: 400 },
                     );
                 }
+                if (
+                    typeof code_verifier === "string" &&
+                    !authRequest.code_challenge
+                ) {
+                    return NextResponse.json(
+                        {
+                            error: "invalid_grant",
+                            error_description:
+                                "PKCE was not bound to this authorization code",
+                        },
+                        { status: 400 },
+                    );
+                }
 
                 const claim = await db
                     .prepare(

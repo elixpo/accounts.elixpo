@@ -7,7 +7,7 @@ For third-party services integrating with Elixpo Accounts as an OAuth identity p
 ## Prerequisites
 
 1. Register an OAuth app at `https://accounts.elixpo.com/dashboard/oauth-apps`
-2. Save your **Client ID** and **Client Secret** (secret is shown once at creation)
+2. Save your **Client ID**. Confidential clients must also save the one-time **Client Secret**.
 3. Register your **Redirect URI(s)** — HTTPS in production
 
 ## Flow Overview
@@ -40,6 +40,9 @@ https://accounts.elixpo.com/oauth/authorize
   &redirect_uri=https://yourapp.com/callback
   &state=RANDOM_CSRF_TOKEN
   &scope=openid profile email
+  &nonce=RANDOM_NONCE
+  &code_challenge=BASE64URL_SHA256_CODE_VERIFIER
+  &code_challenge_method=S256
 ```
 
 | Parameter       | Required | Description |
@@ -49,7 +52,9 @@ https://accounts.elixpo.com/oauth/authorize
 | `redirect_uri`  | Yes      | Must exactly match a registered redirect URI |
 | `state`         | Yes      | Random string for CSRF protection — verify on callback |
 | `scope`         | No       | Space-separated (default: `openid profile email`) |
-| `nonce`         | No       | Optional nonce for replay protection |
+| `nonce`         | Yes for OIDC | Verify this against the returned ID token |
+| `code_challenge` | Yes for public clients | S256 challenge derived from the private verifier |
+| `code_challenge_method` | With PKCE | Must be `S256` |
 
 If the user is not logged in, they are redirected to the Elixpo login page and back to the consent screen automatically.
 
@@ -69,27 +74,27 @@ Always verify that `state` matches what you sent. Reject otherwise.
 
 ## Step 3 — Exchange Code for Tokens
 
-Server-side only — never expose the client secret in frontend code.
+Server-side only. Public clients use PKCE without a secret; confidential clients
+also authenticate with their client secret.
 
 ```bash
 curl -X POST https://accounts.elixpo.com/api/auth/token \
-  -H "Content-Type: application/json" \
-  -d '{
-    "grant_type": "authorization_code",
-    "code": "code_abc123...",
-    "client_id": "YOUR_CLIENT_ID",
-    "client_secret": "YOUR_CLIENT_SECRET",
-    "redirect_uri": "https://yourapp.com/callback"
-  }'
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "grant_type=authorization_code" \
+  --data-urlencode "code=code_abc123..." \
+  --data-urlencode "code_verifier=YOUR_ORIGINAL_PKCE_VERIFIER" \
+  --data-urlencode "client_id=YOUR_CLIENT_ID" \
+  --data-urlencode "redirect_uri=https://yourapp.com/callback"
 ```
 
 **Response:**
 ```json
 {
-  "access_token": "eyJhbGciOiJIUzI1NiIs...",
+  "access_token": "eyJ...",
   "token_type": "Bearer",
   "expires_in": 900,
-  "refresh_token": "eyJhbGciOiJIUzI1NiIs...",
+  "refresh_token": "eyJ...",
+  "id_token": "eyJ...",
   "scope": "openid profile email"
 }
 ```
@@ -154,46 +159,31 @@ Standard OAuth 2.0 error format:
 | `unsupported_response_type` | 400  | Only `code` is supported |
 | `server_error`              | 500  | Internal error — retry later or contact support |
 
-## Example — Node.js
+## Example — `@elixpo/accounts`
 
 ```js
-// 1. Generate authorization URL
-const state = crypto.randomUUID();
-// Store state in session for CSRF validation
-const authUrl = `https://accounts.elixpo.com/oauth/authorize?` +
-  `response_type=code&client_id=${CLIENT_ID}` +
-  `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-  `&state=${state}&scope=openid profile email`;
+import { createAccountsClient } from "@elixpo/accounts";
 
-// Redirect user to authUrl...
-
-// 2. In your callback handler
-app.get('/callback', async (req, res) => {
-  const { code, state } = req.query;
-  // Verify state matches session — reject if not
-
-  // 3. Exchange code for tokens
-  const tokenRes = await fetch('https://accounts.elixpo.com/api/auth/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      grant_type: 'authorization_code',
-      code,
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-      redirect_uri: REDIRECT_URI,
-    }),
-  });
-  const tokens = await tokenRes.json();
-
-  // 4. Fetch user profile
-  const userRes = await fetch('https://accounts.elixpo.com/api/auth/me', {
-    headers: { Authorization: `Bearer ${tokens.access_token}` },
-  });
-  const user = await userRes.json();
-
-  // user.id, user.email, user.displayName — create a session in your app
+const accounts = createAccountsClient({
+  issuer: "https://accounts.elixpo.com",
+  clientId: CLIENT_ID,
+  clientSecret: CLIENT_SECRET,
+  redirectUri: REDIRECT_URI,
 });
+
+const authorization = await accounts.createAuthorizationRequest();
+// Store authorization.transaction in the user's server-side session, then
+// redirect to authorization.url.
+
+const tokens = await accounts.exchangeAuthorizationCode({
+  code,
+  codeVerifier: authorization.transaction.codeVerifier,
+});
+
+const claims = await accounts.verifyIdToken(
+  tokens.idToken,
+  authorization.transaction.nonce,
+);
 ```
 
 ## Support
