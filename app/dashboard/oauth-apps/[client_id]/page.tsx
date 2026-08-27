@@ -621,6 +621,23 @@ export default function OAuthAppSettingsPage() {
                             </IconButton>
                         </Tooltip>
                     </Box>
+                    <Typography
+                        component="a"
+                        href="/docs/lixaccounts"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{
+                            display: "inline-block",
+                            color: "#ff7759",
+                            fontSize: "0.8rem",
+                            fontWeight: 600,
+                            mt: 1.25,
+                            textDecoration: "none",
+                            "&:hover": { textDecoration: "underline" },
+                        }}
+                    >
+                        Use this Client ID with the Developer SDK →
+                    </Typography>
                 </Box>
 
                 {/* Client Secret */}
@@ -1100,7 +1117,7 @@ export default function OAuthAppSettingsPage() {
                     separating localhost/staging/production receivers, each
                     listening to a different subset of events. See the{" "}
                     <a
-                        href="https://github.com/elixpo/accounts.elixpo/blob/main/docs/WEBHOOKS_APP_SUBSCRIPTION.md"
+                        href="/docs/webhooks"
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
