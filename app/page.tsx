@@ -88,7 +88,8 @@ const softwareApplicationStructuredData = {
         "@type": "Offer",
         price: "0",
         priceCurrency: "INR",
-        description: "Free Hobby plan for up to 1,000 monthly active users per app",
+        description:
+            "Free Hobby plan for up to 1,000 monthly active users per app",
     },
     featureList: [
         "Email, Google, GitHub, Microsoft, and Discord sign-in",
