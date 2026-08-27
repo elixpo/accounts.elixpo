@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Usage:
-#   ./deploy.sh --package build deploy      — build and publish to npm
+#   ./deploy.sh --package build deploy      — publish to npm + GitHub Release
 #   ./deploy.sh --package --vs build deploy — build and publish a VS Code extension
 #   ./deploy.sh --worker build deploy       — build and deploy a Cloudflare Worker
 #   ./deploy.sh --pages build deploy        — build and deploy Cloudflare Pages
@@ -14,6 +14,7 @@ PACKAGE_DIR="${PACKAGE_DIR:-./packages/accounts}"
 VSCODE_PACKAGE_DIR="${VSCODE_PACKAGE_DIR:-./packages/vscode}"
 WORKER_CONFIG="${WORKER_CONFIG:-wrangler.worker.toml}"
 TEMP_NPMRC=""
+TEMP_RELEASE_DIR=""
 
 usage() {
   sed -n '2,7p' "$0"
@@ -22,6 +23,9 @@ usage() {
 cleanup() {
   if [ -n "$TEMP_NPMRC" ] && [ -f "$TEMP_NPMRC" ]; then
     rm -f "$TEMP_NPMRC"
+  fi
+  if [ -n "$TEMP_RELEASE_DIR" ] && [ -d "$TEMP_RELEASE_DIR" ]; then
+    rm -rf "$TEMP_RELEASE_DIR"
   fi
 }
 
@@ -237,6 +241,44 @@ publish_sdk() {
       --provenance="$provenance"
 }
 
+create_github_release() {
+  local version release_tag target gh_token tarball_name tarball
+  version="$(node -p "require('$PACKAGE_DIR/package.json').version")"
+  release_tag="accounts-v$version"
+  target="${GITHUB_SHA:-$(git rev-parse HEAD)}"
+  gh_token="${GH_TOKEN:-${GITHUB_TOKEN:-}}"
+
+  if [ -z "$gh_token" ] && [ -f "$ENV_FILE" ]; then
+    validate_plaintext_env
+    gh_token="$(read_env_value "GITHUB_TOKEN" || true)"
+  fi
+
+  if [ -n "$gh_token" ]; then
+    export GH_TOKEN="$gh_token"
+  fi
+
+  if gh release view "$release_tag" >/dev/null 2>&1; then
+    echo "GitHub Release $release_tag already exists; skipping."
+    return 0
+  fi
+
+  TEMP_RELEASE_DIR="$(mktemp -d)"
+  tarball_name="$(npm pack "$PACKAGE_DIR" --pack-destination "$TEMP_RELEASE_DIR" --silent)"
+  tarball="$TEMP_RELEASE_DIR/$tarball_name"
+
+  local release_args=(
+    "$release_tag"
+    "$tarball"
+    --target "$target"
+    --title "@elixpo/accounts v$version"
+    --generate-notes
+  )
+  [[ "$version" == *-* ]] && release_args+=(--prerelease)
+
+  echo "=== Creating GitHub Release $release_tag ==="
+  gh release create "${release_args[@]}"
+}
+
 require_vscode_package() {
   if [ ! -f "$VSCODE_PACKAGE_DIR/package.json" ]; then
     echo "Error: no VS Code extension found at $VSCODE_PACKAGE_DIR."
@@ -288,7 +330,10 @@ run_target() {
   for command in "$@"; do
     case "$target:$command" in
       npm:build|github:build) build_sdk ;;
-      npm:deploy) publish_sdk npm ;;
+      npm:deploy)
+        publish_sdk npm
+        create_github_release
+        ;;
       github:deploy) publish_sdk github ;;
       vscode:build) build_vscode ;;
       vscode:deploy) deploy_vscode ;;

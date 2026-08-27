@@ -87,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: npm
     permissions:
-      contents: read
+      contents: write
       id-token: write
     steps:
       - uses: actions/checkout@v5
@@ -96,10 +96,11 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
-      - name: Build and publish npm package
+      - name: Publish npm package and GitHub Release
         run: ./deploy.sh --package build deploy
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-github:
     if: >-
