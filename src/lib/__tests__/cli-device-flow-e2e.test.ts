@@ -217,6 +217,8 @@ describe("LixBlogs CLI device-flow contract", () => {
         process.env.JWT_PRIVATE_KEY = await exportPKCS8(privateKey);
         process.env.JWT_PUBLIC_KEY = await exportSPKI(publicKey);
         process.env.NEXT_PUBLIC_APP_URL = "https://accounts.test";
+        process.env.JWT_EXPIRATION_MINUTES = "15";
+        process.env.REFRESH_TOKEN_EXPIRATION_DAYS = "30";
     });
 
     beforeEach(setupDatabase);
