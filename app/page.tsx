@@ -369,7 +369,11 @@ export default function LandingPage() {
                                     <ArrowRightCircle className="w-4 h-4" />
                                 </Link>
                                 <Link
-                                    href={authed ? "/dashboard/oauth-apps" : "/login"}
+                                    href={
+                                        authed
+                                            ? "/dashboard/oauth-apps"
+                                            : "/login"
+                                    }
                                     className="inline-flex items-center text-sm font-semibold text-[var(--fg)] opacity-80 hover:opacity-100 transition-opacity"
                                 >
                                     Open dashboard
@@ -432,10 +436,10 @@ export default function LandingPage() {
                             </code>{" "}
                             creates login links, protects callbacks, refreshes
                             access, and verifies user identity. That means less
-                            auth code to write, review, and keep patched. It runs
-                            in Node.js and edge runtimes, and it stays compatible
-                            with standard OAuth if you ever want to integrate
-                            without the package.
+                            auth code to write, review, and keep patched. It
+                            runs in Node.js and edge runtimes, and it stays
+                            compatible with standard OAuth if you ever want to
+                            integrate without the package.
                         </p>
                         <div className="flex flex-wrap gap-3">
                             <Link
@@ -551,11 +555,15 @@ export default function LandingPage() {
                         className="inline-block"
                     >
                         <Link
-                            href={authed ? "/dashboard/oauth-apps" : "/register"}
+                            href={
+                                authed ? "/dashboard/oauth-apps" : "/register"
+                            }
                             className="inline-flex items-center gap-3 bg-[#ff7759] text-white px-8 py-4 rounded-full font-body font-semibold transition-all shadow-[0_4px_24px_rgba(255, 119, 89,0.28)]"
                         >
                             <span>
-                                {authed ? "Open your projects" : "Start building"}
+                                {authed
+                                    ? "Open your projects"
+                                    : "Start building"}
                             </span>
                             <ArrowRightCircle className="w-5 h-5 text-white" />
                         </Link>
