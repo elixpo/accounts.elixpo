@@ -3,7 +3,7 @@
 Edge-safe OAuth 2.0 and OpenID Connect primitives for Elixpo Accounts.
 
 The canonical SDK contract and release policy live in the
-[SDK documentation](https://github.com/elixpo/accounts.elixpo/blob/main/docs/SDK.md).
+[integration reference](https://github.com/elixpo/accounts.elixpo/blob/main/docs/README.md).
 
 > Phase 1 is a prerelease core. Next.js and React adapters are tracked in the
 > next phase and are not exported yet.
