@@ -250,7 +250,9 @@ function DeviceVerificationContent() {
                                     <li
                                         key={scope}
                                         className={`flex items-start gap-2 px-4 py-3 text-sm border-t border-[var(--border)] first:border-t-0 ${
-                                            highImpact ? "bg-[rgba(217,119,6,0.12)]" : ""
+                                            highImpact
+                                                ? "bg-[rgba(217,119,6,0.12)]"
+                                                : ""
                                         }`}
                                     >
                                         <span
