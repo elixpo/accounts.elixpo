@@ -85,6 +85,11 @@ jobs:
         working-directory: packages/accounts
         run: |
           VERSION=$(node -p "require('./package.json').version")
+          if [[ "$VERSION" == *-* ]]; then
+            echo "tag=beta" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=latest" >> "$GITHUB_OUTPUT"
+          fi
           if npm view "@elixpo/accounts@$VERSION" version >/dev/null 2>&1; then
             echo "publish=false" >> "$GITHUB_OUTPUT"
           else
@@ -94,6 +99,6 @@ jobs:
       - name: Publish SDK
         if: steps.version.outputs.publish == 'true'
         working-directory: packages/accounts
-        run: npm publish --access public --provenance
+        run: npm publish --access public --tag "${{ steps.version.outputs.tag }}" --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -67,6 +67,8 @@ Yes. Anyone can register an app and add a "Sign in with Elixpo" button on their 
 2. Open the dashboard → **OAuth Apps** → register a new app.
 3. Follow the integration guide: **[docs/OAUTH_INTEGRATION.md](docs/OAUTH_INTEGRATION.md)**.
 
+SDK, webhook, and deployment references are indexed in **[docs/](docs/README.md)**.
+
 You also get webhook events (like "user deleted their account") so your app can stay in sync automatically.
 
 ### Running this locally
