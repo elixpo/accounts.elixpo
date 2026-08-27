@@ -50,7 +50,7 @@ export async function getVerifyingKey(): Promise<jose.KeyLike | Uint8Array> {
     if (!publicKeyPEM) {
         throw new Error("JWT_PUBLIC_KEY not found in environment");
     }
-    return jose.importSPKI(publicKeyPEM, "EdDSA");
+    return jose.importSPKI(publicKeyPEM, "EdDSA", { extractable: true });
 }
 
 async function getSigningMetadata() {

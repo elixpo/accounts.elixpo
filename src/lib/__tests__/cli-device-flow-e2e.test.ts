@@ -2,8 +2,9 @@
 
 import { env } from "cloudflare:test";
 import type { D1Database } from "@cloudflare/workers-types";
+import { exportPKCS8, exportSPKI, generateKeyPair } from "jose";
 import { NextRequest } from "next/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { GET as getDiscovery } from "../../../app/.well-known/oauth-authorization-server/route";
 import { POST as approveDevice } from "../../../app/api/auth/device/approve/route";
 import { POST as issueDevice } from "../../../app/api/auth/device/authorize/route";
@@ -124,11 +125,24 @@ async function setupDatabase() {
             used INTEGER DEFAULT 0, code_challenge TEXT,
             code_challenge_method TEXT
         )`),
+        env.DB.prepare(`CREATE TABLE IF NOT EXISTS app_usage_seen (
+            client_id TEXT NOT NULL, user_id TEXT NOT NULL,
+            year_month TEXT NOT NULL,
+            PRIMARY KEY (client_id, user_id, year_month)
+        )`),
+        env.DB.prepare(`CREATE TABLE IF NOT EXISTS app_usage_monthly (
+            client_id TEXT NOT NULL, year_month TEXT NOT NULL,
+            mau_count INTEGER NOT NULL DEFAULT 0,
+            last_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (client_id, year_month)
+        )`),
         env.DB.prepare("DELETE FROM audit_logs"),
         env.DB.prepare("DELETE FROM refresh_tokens"),
         env.DB.prepare("DELETE FROM device_authorizations"),
         env.DB.prepare("DELETE FROM rate_limits"),
         env.DB.prepare("DELETE FROM auth_requests"),
+        env.DB.prepare("DELETE FROM app_usage_seen"),
+        env.DB.prepare("DELETE FROM app_usage_monthly"),
         env.DB.prepare("DELETE FROM identities"),
         env.DB.prepare("DELETE FROM oauth_clients"),
         env.DB.prepare("DELETE FROM users"),
@@ -196,6 +210,15 @@ async function approve(userCode: string) {
 }
 
 describe("LixBlogs CLI device-flow contract", () => {
+    beforeAll(async () => {
+        const { privateKey, publicKey } = await generateKeyPair("EdDSA", {
+            extractable: true,
+        });
+        process.env.JWT_PRIVATE_KEY = await exportPKCS8(privateKey);
+        process.env.JWT_PUBLIC_KEY = await exportSPKI(publicKey);
+        process.env.NEXT_PUBLIC_APP_URL = "https://accounts.test";
+    });
+
     beforeEach(setupDatabase);
 
     it("covers pending, slow-down, browser approval, refresh rotation, and replay revocation", async () => {
