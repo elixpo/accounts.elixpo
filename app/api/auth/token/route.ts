@@ -8,7 +8,6 @@ import {
     getUserById,
     logAuditEvent,
     createRefreshToken as storeRefreshToken,
-    validateOAuthClient,
 } from "@/lib/db";
 import { classifyDevicePollAttempt } from "@/lib/device-auth-service";
 import {
@@ -246,7 +245,7 @@ export async function POST(request: NextRequest) {
                     scopes,
                     oauthClaims,
                 );
-                const idToken = authorizedScopes.includes("openid")
+                const idToken = scopes.includes("openid")
                     ? await createIdToken(
                           authRequest.user_id,
                           user.email,
@@ -733,6 +732,22 @@ export async function POST(request: NextRequest) {
                     oauthClaims,
                 );
                 const refreshTokenHash = await hashString(refreshToken);
+                const idToken = scopes.includes("openid")
+                    ? await createIdToken(
+                          row.user_id as string,
+                          user.email,
+                          client_id,
+                          parseInt(
+                              process.env.JWT_EXPIRATION_MINUTES || "15",
+                              10,
+                          ),
+                          {
+                              emailVerified: !!user.email_verified,
+                              name: user.display_name,
+                              preferredUsername: user.username,
+                          },
+                      )
+                    : undefined;
 
                 await storeRefreshToken(db, {
                     id: generateUUID(),
@@ -763,6 +778,7 @@ export async function POST(request: NextRequest) {
                                 10,
                             ) * 60,
                         scope: scopes.join(" "),
+                        ...(idToken ? { id_token: idToken } : {}),
                     },
                     { status: 200 },
                 );
