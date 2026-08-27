@@ -20,6 +20,7 @@ interface AuthorizationRequest {
     privacyPolicyUrl?: string | null;
     termsOfServiceUrl?: string | null;
     isBrandingVerified?: boolean;
+    brandingVerifiedDomain?: string | null;
 }
 
 type Account = {
@@ -96,19 +97,22 @@ function ClientIcon({
 }
 
 function getContrastColorLocal(hex: string): string {
-    if (!hex || !hex.startsWith("#")) return "#FFFFFF";
+    if (!hex?.startsWith("#")) return "#FFFFFF";
     let cleanHex = hex.slice(1);
     if (cleanHex.length === 3 || cleanHex.length === 4) {
-        cleanHex = cleanHex.split("").map((c) => c + c).join("");
+        cleanHex = cleanHex
+            .split("")
+            .map((c) => c + c)
+            .join("");
     }
     const r = parseInt(cleanHex.slice(0, 2), 16);
     const g = parseInt(cleanHex.slice(2, 4), 16);
     const b = parseInt(cleanHex.slice(4, 6), 16);
-    if (isNaN(r) || isNaN(g) || isNaN(b)) return "#FFFFFF";
-    
+    if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return "#FFFFFF";
+
     const [rs, gs, bs] = [r, g, b].map((c) => {
         const s = c / 255;
-        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
     });
     const luminance = 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
     return luminance > 0.179 ? "#000000" : "#FFFFFF";
@@ -230,6 +234,8 @@ function AuthorizeContent() {
                     privacyPolicyUrl: client.privacy_policy_url || null,
                     termsOfServiceUrl: client.terms_of_service_url || null,
                     isBrandingVerified: client.is_branding_verified || false,
+                    brandingVerifiedDomain:
+                        client.branding_verified_domain || null,
                 });
             } catch (err) {
                 setError(
@@ -318,8 +324,12 @@ function AuthorizeContent() {
     const formatTime = (s: number) =>
         `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 
-    const hostname = authRequest?.homepageUrl
+    const hostname = authRequest?.isBrandingVerified
         ? (() => {
+              if (authRequest.brandingVerifiedDomain) {
+                  return authRequest.brandingVerifiedDomain;
+              }
+              if (!authRequest.homepageUrl) return "";
               try {
                   return new URL(authRequest.homepageUrl).hostname;
               } catch {
@@ -540,9 +550,17 @@ function AuthorizeContent() {
                         >
                             <ClientIcon
                                 name={authRequest.clientName}
-                                homepageUrl={authRequest.homepageUrl}
+                                homepageUrl={
+                                    authRequest.isBrandingVerified
+                                        ? authRequest.homepageUrl
+                                        : undefined
+                                }
                                 clientId={authRequest.clientId}
-                                logoUrl={authRequest.isBrandingVerified ? authRequest.logoUrl : null}
+                                logoUrl={
+                                    authRequest.isBrandingVerified
+                                        ? authRequest.logoUrl
+                                        : null
+                                }
                                 size={44}
                             />
                         </div>
@@ -566,7 +584,8 @@ function AuthorizeContent() {
                                     whiteSpace: "nowrap",
                                 }}
                             >
-                                {authRequest.isBrandingVerified && authRequest.brandingDisplayName
+                                {authRequest.isBrandingVerified &&
+                                authRequest.brandingDisplayName
                                     ? authRequest.brandingDisplayName
                                     : authRequest.clientName}
                             </p>
@@ -724,9 +743,11 @@ function AuthorizeContent() {
                                     margin: "0 0 10px",
                                 }}
                             >
-                                {authRequest.isBrandingVerified && authRequest.brandingDisplayName
+                                {authRequest.isBrandingVerified &&
+                                authRequest.brandingDisplayName
                                     ? authRequest.brandingDisplayName
-                                    : authRequest.clientName} will be able to
+                                    : authRequest.clientName}{" "}
+                                will be able to
                             </p>
                             <div
                                 style={{
@@ -904,17 +925,22 @@ function AuthorizeContent() {
                                 padding: "12px 16px",
                                 borderRadius: 10,
                                 border: `1px solid ${
-                                    authRequest.isBrandingVerified && authRequest.brandingPrimaryColor
+                                    authRequest.isBrandingVerified &&
+                                    authRequest.brandingPrimaryColor
                                         ? authRequest.brandingPrimaryColor
                                         : "#ff7759"
                                 }`,
                                 background:
-                                    authRequest.isBrandingVerified && authRequest.brandingPrimaryColor
+                                    authRequest.isBrandingVerified &&
+                                    authRequest.brandingPrimaryColor
                                         ? authRequest.brandingPrimaryColor
                                         : "#ff7759",
                                 color:
-                                    authRequest.isBrandingVerified && authRequest.brandingPrimaryColor
-                                        ? getContrastColorLocal(authRequest.brandingPrimaryColor)
+                                    authRequest.isBrandingVerified &&
+                                    authRequest.brandingPrimaryColor
+                                        ? getContrastColorLocal(
+                                              authRequest.brandingPrimaryColor,
+                                          )
                                         : "#fff",
                                 fontSize: 14,
                                 fontWeight: 700,
@@ -1000,25 +1026,57 @@ function AuthorizeContent() {
                             Go back to safety
                         </button>
                     </p>
-                    
-                    <p style={{ textAlign: "center", fontSize: 11, color: "var(--fg-faint)", margin: 0 }}>
+
+                    <p
+                        style={{
+                            textAlign: "center",
+                            fontSize: 11,
+                            color: "var(--fg-faint)",
+                            margin: 0,
+                        }}
+                    >
                         🛡️ Secured by Elixpo Accounts
                     </p>
 
-                    {authRequest.isBrandingVerified && (authRequest.privacyPolicyUrl || authRequest.termsOfServiceUrl) && (
-                        <div style={{ display: "flex", gap: 12, fontSize: 11, color: "var(--fg-faint)" }}>
-                            {authRequest.privacyPolicyUrl && (
-                                <a href={authRequest.privacyPolicyUrl} target="_blank" rel="noopener noreferrer" style={{ color: "var(--fg-faint)", textDecoration: "underline" }}>
-                                    Privacy Policy
-                                </a>
-                            )}
-                            {authRequest.termsOfServiceUrl && (
-                                <a href={authRequest.termsOfServiceUrl} target="_blank" rel="noopener noreferrer" style={{ color: "var(--fg-faint)", textDecoration: "underline" }}>
-                                    Terms of Service
-                                </a>
-                            )}
-                        </div>
-                    )}
+                    {authRequest.isBrandingVerified &&
+                        (authRequest.privacyPolicyUrl ||
+                            authRequest.termsOfServiceUrl) && (
+                            <div
+                                style={{
+                                    display: "flex",
+                                    gap: 12,
+                                    fontSize: 11,
+                                    color: "var(--fg-faint)",
+                                }}
+                            >
+                                {authRequest.privacyPolicyUrl && (
+                                    <a
+                                        href={authRequest.privacyPolicyUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{
+                                            color: "var(--fg-faint)",
+                                            textDecoration: "underline",
+                                        }}
+                                    >
+                                        Privacy Policy
+                                    </a>
+                                )}
+                                {authRequest.termsOfServiceUrl && (
+                                    <a
+                                        href={authRequest.termsOfServiceUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{
+                                            color: "var(--fg-faint)",
+                                            textDecoration: "underline",
+                                        }}
+                                    >
+                                        Terms of Service
+                                    </a>
+                                )}
+                            </div>
+                        )}
                 </div>
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>

@@ -45,22 +45,26 @@ interface LookupResult {
     privacy_policy_url?: string | null;
     terms_of_service_url?: string | null;
     is_branding_verified?: boolean;
+    branding_verified_domain?: string | null;
 }
 
 function getContrastColorLocal(hex: string): string {
-    if (!hex || !hex.startsWith("#")) return "#FFFFFF";
+    if (!hex?.startsWith("#")) return "#FFFFFF";
     let cleanHex = hex.slice(1);
     if (cleanHex.length === 3 || cleanHex.length === 4) {
-        cleanHex = cleanHex.split("").map((c) => c + c).join("");
+        cleanHex = cleanHex
+            .split("")
+            .map((c) => c + c)
+            .join("");
     }
     const r = parseInt(cleanHex.slice(0, 2), 16);
     const g = parseInt(cleanHex.slice(2, 4), 16);
     const b = parseInt(cleanHex.slice(4, 6), 16);
-    if (isNaN(r) || isNaN(g) || isNaN(b)) return "#FFFFFF";
-    
+    if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return "#FFFFFF";
+
     const [rs, gs, bs] = [r, g, b].map((c) => {
         const s = c / 255;
-        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
     });
     const luminance = 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
     return luminance > 0.179 ? "#000000" : "#FFFFFF";
@@ -262,12 +266,21 @@ function DeviceVerificationContent() {
                         ) : null}
                         <p className="text-sm text-[var(--fg)] mb-1">
                             <strong>
-                                {view.details.is_branding_verified && view.details.branding_display_name
+                                {view.details.is_branding_verified &&
+                                view.details.branding_display_name
                                     ? view.details.branding_display_name
-                                    : (view.details.client_name || view.details.client_id)}
+                                    : view.details.client_name ||
+                                      view.details.client_id}
                             </strong>{" "}
                             wants to access your account.
                         </p>
+                        {view.details.is_branding_verified &&
+                        view.details.branding_verified_domain ? (
+                            <p className="mb-3 font-mono text-xs text-[var(--fg-faint)]">
+                                Verified for{" "}
+                                {view.details.branding_verified_domain}
+                            </p>
+                        ) : null}
                         {view.details.expires_at ? (
                             <p className="text-xs font-mono text-[var(--fg-faint)] mb-5">
                                 Expires{" "}
@@ -327,10 +340,16 @@ function DeviceVerificationContent() {
                                 onClick={() => resolve("approve")}
                                 className="w-full rounded-lg bg-[var(--accent)] py-3 font-semibold text-[var(--accent-contrast)]"
                                 style={
-                                    view.details.is_branding_verified && view.details.branding_primary_color
+                                    view.details.is_branding_verified &&
+                                    view.details.branding_primary_color
                                         ? {
-                                              backgroundColor: view.details.branding_primary_color,
-                                              color: getContrastColorLocal(view.details.branding_primary_color),
+                                              backgroundColor:
+                                                  view.details
+                                                      .branding_primary_color,
+                                              color: getContrastColorLocal(
+                                                  view.details
+                                                      .branding_primary_color,
+                                              ),
                                           }
                                         : undefined
                                 }
@@ -389,20 +408,34 @@ function DeviceVerificationContent() {
                     <p className="text-[10px] text-[var(--fg-faint)] font-medium">
                         🛡️ Secured by Elixpo Accounts
                     </p>
-                    {view.phase === "ready" && view.details && view.details.is_branding_verified && (view.details.privacy_policy_url || view.details.terms_of_service_url) && (
-                        <div className="flex gap-3 text-[10px] text-neutral-500">
-                            {view.details.privacy_policy_url && (
-                                <a href={view.details.privacy_policy_url} target="_blank" rel="noopener noreferrer" className="underline hover:text-neutral-300">
-                                    Privacy Policy
-                                </a>
-                            )}
-                            {view.details.terms_of_service_url && (
-                                <a href={view.details.terms_of_service_url} target="_blank" rel="noopener noreferrer" className="underline hover:text-neutral-300">
-                                    Terms of Service
-                                </a>
-                            )}
-                        </div>
-                    )}
+                    {view.phase === "ready" &&
+                        view.details &&
+                        view.details.is_branding_verified &&
+                        (view.details.privacy_policy_url ||
+                            view.details.terms_of_service_url) && (
+                            <div className="flex gap-3 text-[10px] text-neutral-500">
+                                {view.details.privacy_policy_url && (
+                                    <a
+                                        href={view.details.privacy_policy_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="underline hover:text-neutral-300"
+                                    >
+                                        Privacy Policy
+                                    </a>
+                                )}
+                                {view.details.terms_of_service_url && (
+                                    <a
+                                        href={view.details.terms_of_service_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="underline hover:text-neutral-300"
+                                    >
+                                        Terms of Service
+                                    </a>
+                                )}
+                            </div>
+                        )}
                 </div>
             </div>
         </main>

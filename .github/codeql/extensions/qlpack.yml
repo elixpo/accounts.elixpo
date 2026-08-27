@@ -1,4 +1,0 @@
-name: elixpo/ssrf-extensions
-version: 0.0.1
-extensionTargets:
-  codeql/javascript-queries: "*"

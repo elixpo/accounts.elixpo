@@ -1,18 +1,28 @@
 export const runtime = "edge";
 
 import { type NextRequest, NextResponse } from "next/server";
+import {
+    getBrandDomain,
+    hasSufficientContrast,
+    isOpaqueHexColor,
+    validateBrandAssetUrl,
+    validateRedirectDomains,
+} from "@/lib/branding-validation";
 import { getDatabase } from "@/lib/d1-client";
-import { getOAuthClientByIdWithSecret, updateOAuthClient, logAuditEvent } from "@/lib/db";
+import { getOAuthClientByIdWithSecret, logAuditEvent } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
+import { checkBrandingVerificationRateLimit } from "@/lib/rate-limit-middleware";
 import { generateUUID } from "@/lib/webcrypto";
 
-/**
- * POST /api/auth/oauth-clients/[client_id]/verify
- *
- * Verifies domain ownership of the client's homepage_url by fetching:
- * https://<domain>/.well-known/elixpo-challenge.txt
- * Expects the file content to match: elixpo-challenge-<client_id>
- */
+type DnsJsonResponse = {
+    Status?: number;
+    Answer?: Array<{ type?: number; data?: string }>;
+};
+
+function normalizeTxtRecord(value: string): string {
+    return value.replace(/^"|"$/g, "").replace(/\\"/g, '"');
+}
+
 export async function POST(
     request: NextRequest,
     { params }: { params: Promise<{ client_id: string }> },
@@ -20,116 +30,208 @@ export async function POST(
     try {
         const token = request.cookies.get("access_token")?.value;
         if (!token) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 },
+            );
         }
 
         const payload = await verifyJWT(token);
-        if (!payload) {
-            return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+        if (payload?.type !== "access") {
+            return NextResponse.json(
+                { error: "Invalid token" },
+                { status: 401 },
+            );
         }
 
-        const { client_id } = await params;
-        if (!client_id) {
-            return NextResponse.json({ error: "client_id is required" }, { status: 400 });
+        const { client_id: clientId } = await params;
+        if (!clientId) {
+            return NextResponse.json(
+                { error: "client_id is required" },
+                { status: 400 },
+            );
         }
 
         const db = await getDatabase();
-
-        // Verify ownership
-        const app = (await getOAuthClientByIdWithSecret(db, client_id)) as any;
-        if (!app) {
-            return NextResponse.json({ error: "Application not found" }, { status: 404 });
+        const rateLimit = await checkBrandingVerificationRateLimit(
+            db,
+            `owner:${payload.sub}`,
+        );
+        if (!rateLimit.allowed) {
+            return NextResponse.json(
+                { error: "Too many verification attempts" },
+                {
+                    status: 429,
+                    headers: rateLimit.retryAfter
+                        ? { "Retry-After": String(rateLimit.retryAfter) }
+                        : undefined,
+                },
+            );
         }
-        if (app.owner_id !== payload.sub) {
+
+        const app = await getOAuthClientByIdWithSecret(db, clientId);
+        if (!app) {
+            return NextResponse.json(
+                { error: "Application not found" },
+                { status: 404 },
+            );
+        }
+        if (String(app.owner_id) !== payload.sub) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
-        const homepageUrl = app.homepage_url;
-        if (!homepageUrl) {
-            return NextResponse.json({
-                error: "A homepage URL is required before verification. Configure it first in the settings panel."
-            }, { status: 400 });
+        const homepageUrl = String(app.homepage_url || "");
+        const verifiedDomain = getBrandDomain(homepageUrl);
+        if (!verifiedDomain) {
+            return NextResponse.json(
+                { error: "A public HTTPS homepage is required" },
+                { status: 400 },
+            );
         }
 
-        let parsedUrl: URL;
+        let redirectUris: string[];
         try {
-            parsedUrl = new URL(homepageUrl);
+            redirectUris = JSON.parse(String(app.redirect_uris || "[]"));
         } catch {
-            return NextResponse.json({ error: "Invalid homepage URL format" }, { status: 400 });
+            return NextResponse.json(
+                { error: "Registered redirect URIs are malformed" },
+                { status: 400 },
+            );
         }
-
-        const hostname = parsedUrl.hostname;
-        const challengeUrl = `https://${hostname}/.well-known/elixpo-challenge.txt`;
-        const expectedChallenge = `elixpo-challenge-${client_id}`;
-
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000);
-
-            const res = await fetch(challengeUrl, {
-                method: "GET",
-                signal: controller.signal,
-                headers: {
-                    "User-Agent": "ElixpoAccountsDomainVerifier/1.0",
-                    "Cache-Control": "no-cache",
+        if (!validateRedirectDomains(homepageUrl, redirectUris)) {
+            return NextResponse.json(
+                {
+                    error: `Every redirect URI must use ${verifiedDomain} or one of its subdomains`,
                 },
-            }).finally(() => clearTimeout(timeoutId));
-
-            if (!res.ok) {
-                return NextResponse.json({
-                    error: `Verification file not found. Fetch returned status code: ${res.status}. Check that it exists at ${challengeUrl}`
-                }, { status: 400 });
-            }
-
-            const bodyText = (await res.text()).trim();
-            if (bodyText !== expectedChallenge) {
-                return NextResponse.json({
-                    error: `Verification mismatch. Expected file content to equal: '${expectedChallenge}' (received: '${bodyText.slice(0, 100)}')`
-                }, { status: 400 });
-            }
-
-            // Verify redirect URIs are subdomains of homepage host (for security)
-            const redirectUris = JSON.parse(app.redirect_uris || "[]") as string[];
-            for (const uri of redirectUris) {
-                try {
-                    const redirectHost = new URL(uri).hostname.toLowerCase();
-                    const homepageHost = hostname.toLowerCase();
-                    if (redirectHost !== homepageHost && !redirectHost.endsWith("." + homepageHost)) {
-                        return NextResponse.json({
-                            error: `For security, all registered redirect URIs must belong to the verified domain or its subdomains. URI '${uri}' does not match '${hostname}'.`
-                        }, { status: 400 });
-                    }
-                } catch {
-                    return NextResponse.json({ error: `Malformed redirect URI registered: ${uri}` }, { status: 400 });
-                }
-            }
-
-            // Perform DB update
-            await updateOAuthClient(db, client_id, { isBrandingVerified: true });
-
-            // Log audit trail
-            await logAuditEvent(db, {
-                id: generateUUID(),
-                userId: payload.sub,
-                eventType: "client.branding_verified",
-                provider: client_id,
-                status: "success",
-            }).catch(() => {});
-
-            return NextResponse.json({
-                ok: true,
-                message: "Custom branding and domain verified successfully"
-            });
-        } catch (fetchErr: any) {
-            const isTimeout = fetchErr.name === "AbortError";
-            return NextResponse.json({
-                error: isTimeout
-                    ? `Verification timeout. The server at ${challengeUrl} took too long to respond (3s limit).`
-                    : `Network error connecting to ${challengeUrl}. Check that your server is running and accessible over public HTTPS.`
-            }, { status: 400 });
+                { status: 400 },
+            );
         }
+
+        for (const [label, value] of [
+            ["Logo", app.logo_url],
+            ["Privacy Policy", app.privacy_policy_url],
+            ["Terms of Service", app.terms_of_service_url],
+        ] as const) {
+            if (!value) continue;
+            const result = validateBrandAssetUrl(String(value), homepageUrl);
+            if (!result.valid) {
+                return NextResponse.json(
+                    { error: `${label}: ${result.error}` },
+                    { status: 400 },
+                );
+            }
+        }
+        if (
+            app.branding_primary_color &&
+            !hasSufficientContrast(String(app.branding_primary_color))
+        ) {
+            return NextResponse.json(
+                { error: "Primary color is invalid or inaccessible" },
+                { status: 400 },
+            );
+        }
+        if (
+            app.branding_accent_color &&
+            !isOpaqueHexColor(String(app.branding_accent_color))
+        ) {
+            return NextResponse.json(
+                { error: "Accent color must be an opaque hex color" },
+                { status: 400 },
+            );
+        }
+
+        const recordName = `_elixpo-challenge.${verifiedDomain}`;
+        const expectedValue = `elixpo-verification=${clientId}`;
+        const dnsUrl =
+            "https://cloudflare-dns.com/dns-query?" +
+            new URLSearchParams({ name: recordName, type: "TXT" }).toString();
+
+        const response = await fetch(dnsUrl, {
+            headers: { Accept: "application/dns-json" },
+            cache: "no-store",
+        });
+        if (!response.ok) {
+            return NextResponse.json(
+                { error: "DNS verification service is unavailable" },
+                { status: 502 },
+            );
+        }
+
+        const dns = (await response.json()) as DnsJsonResponse;
+        const verified = (dns.Answer || []).some(
+            (answer) =>
+                answer.type === 16 &&
+                typeof answer.data === "string" &&
+                normalizeTxtRecord(answer.data) === expectedValue,
+        );
+        if (!verified) {
+            return NextResponse.json(
+                {
+                    error: `TXT record ${recordName} must equal ${expectedValue}`,
+                },
+                { status: 400 },
+            );
+        }
+
+        const result = await db
+            .prepare(
+                `UPDATE oauth_clients
+                 SET is_branding_verified = 1,
+                     branding_verified_domain = ?,
+                     branding_verified_at = CURRENT_TIMESTAMP
+                 WHERE client_id = ?
+                   AND owner_id = ?
+                   AND homepage_url = ?
+                   AND redirect_uris = ?
+                   AND logo_url IS ?
+                   AND branding_display_name IS ?
+                   AND branding_primary_color IS ?
+                   AND branding_accent_color IS ?
+                   AND privacy_policy_url IS ?
+                   AND terms_of_service_url IS ?`,
+            )
+            .bind(
+                verifiedDomain,
+                clientId,
+                payload.sub,
+                homepageUrl,
+                String(app.redirect_uris),
+                app.logo_url ?? null,
+                app.branding_display_name ?? null,
+                app.branding_primary_color ?? null,
+                app.branding_accent_color ?? null,
+                app.privacy_policy_url ?? null,
+                app.terms_of_service_url ?? null,
+            )
+            .run();
+
+        if (result.meta.changes !== 1) {
+            return NextResponse.json(
+                {
+                    error: "Application settings changed during verification; try again",
+                },
+                { status: 409 },
+            );
+        }
+
+        await logAuditEvent(db, {
+            id: generateUUID(),
+            userId: payload.sub,
+            eventType: "client.branding_verified",
+            provider: clientId,
+            status: "success",
+        }).catch(() => {});
+
+        return NextResponse.json({
+            ok: true,
+            verified_domain: verifiedDomain,
+            message: "Custom branding domain verified",
+        });
     } catch (error) {
-        console.error("[OAuth Client] Verification endpoint error:", error);
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+        console.error("[OAuth Client] Branding verification failed:", error);
+        return NextResponse.json(
+            { error: "Branding verification failed" },
+            { status: 500 },
+        );
     }
 }

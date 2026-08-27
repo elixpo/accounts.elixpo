@@ -263,6 +263,7 @@ export interface DeviceAuthorizationLookupResult {
     privacy_policy_url?: string | null;
     terms_of_service_url?: string | null;
     is_branding_verified?: boolean;
+    branding_verified_domain?: string | null;
 }
 
 /**
@@ -278,7 +279,7 @@ export async function lookupDeviceAuthorizationByUserCode(
 
     const row = (await db
         .prepare(
-            `SELECT da.status, da.expires_at, da.scopes, da.client_id, oc.name AS client_name, oc.logo_url, oc.branding_display_name, oc.branding_primary_color, oc.branding_accent_color, oc.privacy_policy_url, oc.terms_of_service_url, oc.is_branding_verified
+            `SELECT da.status, da.expires_at, da.scopes, da.client_id, oc.name AS client_name, oc.logo_url, oc.branding_display_name, oc.branding_primary_color, oc.branding_accent_color, oc.privacy_policy_url, oc.terms_of_service_url, oc.is_branding_verified, oc.branding_verified_domain
              FROM device_authorizations da
              JOIN oauth_clients oc ON oc.client_id = da.client_id
              WHERE da.user_code_hash = ?`,
@@ -297,13 +298,19 @@ export async function lookupDeviceAuthorizationByUserCode(
         privacy_policy_url: string | null;
         terms_of_service_url: string | null;
         is_branding_verified: number;
+        branding_verified_domain: string | null;
     } | null;
 
     if (!row) {
         return { status: "not_found" };
     }
 
-    const expired = new Date(row.expires_at.endsWith("Z") || row.expires_at.includes("+") ? row.expires_at : row.expires_at + " Z") <= new Date();
+    const expired =
+        new Date(
+            row.expires_at.endsWith("Z") || row.expires_at.includes("+")
+                ? row.expires_at
+                : `${row.expires_at} Z`,
+        ) <= new Date();
 
     return {
         status: expired
@@ -313,13 +320,32 @@ export async function lookupDeviceAuthorizationByUserCode(
         client_name: row.client_name,
         scopes: row.scopes.split(" ").filter(Boolean),
         expires_at: row.expires_at,
-        logo_url: row.logo_url || null,
-        branding_display_name: row.branding_display_name || null,
-        branding_primary_color: row.branding_primary_color || null,
-        branding_accent_color: row.branding_accent_color || null,
-        privacy_policy_url: row.privacy_policy_url || null,
-        terms_of_service_url: row.terms_of_service_url || null,
+        logo_url: row.is_branding_verified === 1 ? row.logo_url || null : null,
+        branding_display_name:
+            row.is_branding_verified === 1
+                ? row.branding_display_name || null
+                : null,
+        branding_primary_color:
+            row.is_branding_verified === 1
+                ? row.branding_primary_color || null
+                : null,
+        branding_accent_color:
+            row.is_branding_verified === 1
+                ? row.branding_accent_color || null
+                : null,
+        privacy_policy_url:
+            row.is_branding_verified === 1
+                ? row.privacy_policy_url || null
+                : null,
+        terms_of_service_url:
+            row.is_branding_verified === 1
+                ? row.terms_of_service_url || null
+                : null,
         is_branding_verified: row.is_branding_verified === 1,
+        branding_verified_domain:
+            row.is_branding_verified === 1
+                ? row.branding_verified_domain || null
+                : null,
     };
 }
 
@@ -548,7 +574,11 @@ export function classifyDevicePollAttempt(
         return { kind: "client_mismatch" };
     }
 
-    const expiresAt = new Date(row.expires_at.endsWith("Z") || row.expires_at.includes("+") ? row.expires_at : row.expires_at + " Z");
+    const expiresAt = new Date(
+        row.expires_at.endsWith("Z") || row.expires_at.includes("+")
+            ? row.expires_at
+            : `${row.expires_at} Z`,
+    );
     if (row.status === "expired" || expiresAt <= now) {
         return { kind: "expired_token", wasPending: row.status === "pending" };
     }
@@ -559,7 +589,12 @@ export function classifyDevicePollAttempt(
 
     if (row.status === "pending") {
         const lastPolledAt = row.last_polled_at
-            ? new Date(row.last_polled_at.endsWith("Z") || row.last_polled_at.includes("+") ? row.last_polled_at : row.last_polled_at + " Z")
+            ? new Date(
+                  row.last_polled_at.endsWith("Z") ||
+                      row.last_polled_at.includes("+")
+                      ? row.last_polled_at
+                      : `${row.last_polled_at} Z`,
+              )
             : null;
         const elapsedSeconds = lastPolledAt
             ? (now.getTime() - lastPolledAt.getTime()) / 1000

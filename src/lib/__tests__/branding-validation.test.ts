@@ -1,21 +1,25 @@
 import { describe, expect, it } from "vitest";
 import {
-    sanitizeString,
-    isValidUrl,
-    validateRedirectDomains,
-    hexToRgb,
+    getBrandDomain,
+    getContrastColor,
     getContrastRatio,
     hasSufficientContrast,
-    getContrastColor,
-    getSafeUrlForFetch,
+    hexToRgb,
+    isOpaqueHexColor,
+    isValidUrl,
+    sanitizeString,
+    validateBrandAssetUrl,
     validateLogoUrl,
+    validateRedirectDomains,
 } from "../branding-validation";
 
 describe("Branding Validation and Sanitization", () => {
     describe("sanitizeString", () => {
         it("should strip HTML tag delimiters", () => {
             expect(sanitizeString("My <b>App</b>")).toBe("My bApp/b");
-            expect(sanitizeString("<script>alert(1)</script>Safe App")).toBe("scriptalert(1)/scriptSafe App");
+            expect(sanitizeString("<script>alert(1)</script>Safe App")).toBe(
+                "scriptalert(1)/scriptSafe App",
+            );
         });
 
         it("should trim whitespace", () => {
@@ -26,7 +30,9 @@ describe("Branding Validation and Sanitization", () => {
     describe("isValidUrl", () => {
         it("should validate standard https URLs", () => {
             expect(isValidUrl("https://example.com")).toBe(true);
-            expect(isValidUrl("https://sub.domain.co.uk/path?query=1")).toBe(true);
+            expect(isValidUrl("https://sub.domain.co.uk/path?query=1")).toBe(
+                true,
+            );
         });
 
         it("should allow http for localhost and 127.0.0.1", () => {
@@ -51,7 +57,7 @@ describe("Branding Validation and Sanitization", () => {
                 validateRedirectDomains("https://example.com", [
                     "https://example.com/callback",
                     "https://sub.example.com/auth",
-                ])
+                ]),
             ).toBe(true);
         });
 
@@ -60,7 +66,7 @@ describe("Branding Validation and Sanitization", () => {
                 validateRedirectDomains("https://example.com", [
                     "https://example.com/callback",
                     "https://anotherdomain.com/auth",
-                ])
+                ]),
             ).toBe(false);
         });
     });
@@ -80,6 +86,7 @@ describe("Branding Validation and Sanitization", () => {
         it("should return null for invalid hex format", () => {
             expect(hexToRgb("red")).toBeNull();
             expect(hexToRgb("#12345")).toBeNull();
+            expect(hexToRgb("#00000000")).toBeNull();
         });
     });
 
@@ -111,30 +118,50 @@ describe("Branding Validation and Sanitization", () => {
         });
     });
 
-    describe("getSafeUrlForFetch", () => {
-        it("should allow safe public https URLs", () => {
-            expect(getSafeUrlForFetch("https://example.com/logo.png")).toBe("https://example.com/logo.png");
-            expect(getSafeUrlForFetch("https://sub.domain.co.uk/image")).toBe("https://sub.domain.co.uk/image");
+    describe("verified brand domains", () => {
+        it("accepts public HTTPS homepages", () => {
+            expect(getBrandDomain("https://example.com/about")).toBe(
+                "example.com",
+            );
         });
 
-        it("should reject private IPs", () => {
-            expect(getSafeUrlForFetch("https://192.168.1.1/logo.png")).toBeNull();
-            expect(getSafeUrlForFetch("https://10.0.0.5/logo.png")).toBeNull();
-            expect(getSafeUrlForFetch("https://172.16.5.5/logo.png")).toBeNull();
-            expect(getSafeUrlForFetch("https://169.254.169.254/metadata")).toBeNull();
+        it("rejects loopback, private IP, and credentialed homepages", () => {
+            expect(getBrandDomain("https://localhost")).toBeNull();
+            expect(getBrandDomain("https://192.168.1.1")).toBeNull();
+            expect(getBrandDomain("https://user:pass@example.com")).toBeNull();
         });
 
-        it("should reject invalid protocols", () => {
-            expect(getSafeUrlForFetch("ftp://example.com/logo.png")).toBeNull();
-            expect(getSafeUrlForFetch("gopher://example.com")).toBeNull();
+        it("requires assets and policies to stay on the verified domain", () => {
+            expect(
+                validateBrandAssetUrl(
+                    "https://cdn.example.com/logo.png",
+                    "https://example.com",
+                ).valid,
+            ).toBe(true);
+            expect(
+                validateBrandAssetUrl(
+                    "https://example.net/logo.png",
+                    "https://example.com",
+                ).valid,
+            ).toBe(false);
         });
     });
 
     describe("validateLogoUrl", () => {
-        it("should return error for unsafe hosts", async () => {
-            const res = await validateLogoUrl("https://192.168.1.1/logo.png");
+        it("rejects logos outside the verified domain", () => {
+            const res = validateLogoUrl(
+                "https://assets.example.net/logo.png",
+                "https://example.com",
+            );
             expect(res.valid).toBe(false);
-            expect(res.error).toBe("Invalid or unsafe URL host");
+        });
+    });
+
+    describe("brand colors", () => {
+        it("rejects alpha colors because contrast depends on compositing", () => {
+            expect(isOpaqueHexColor("#112233")).toBe(true);
+            expect(isOpaqueHexColor("#1234")).toBe(false);
+            expect(isOpaqueHexColor("#11223344")).toBe(false);
         });
     });
 });

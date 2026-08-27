@@ -609,7 +609,7 @@ export async function createOAuthClient(
 
 export async function getOAuthClientById(db: D1Database, clientId: string) {
     const stmt = db.prepare(
-        "SELECT client_id, name, redirect_uris, scopes, description, homepage_url, created_at, is_active, client_type, logo_url, branding_display_name, branding_primary_color, branding_accent_color, privacy_policy_url, terms_of_service_url, is_branding_verified FROM oauth_clients WHERE client_id = ?",
+        "SELECT client_id, name, redirect_uris, scopes, description, homepage_url, created_at, is_active, client_type, logo_url, branding_display_name, branding_primary_color, branding_accent_color, privacy_policy_url, terms_of_service_url, is_branding_verified, branding_verified_domain, branding_verified_at FROM oauth_clients WHERE client_id = ?",
     );
     return await stmt.bind(clientId).first();
 }
@@ -676,6 +676,8 @@ export async function updateOAuthClient(
         privacyPolicyUrl?: string | null;
         termsOfServiceUrl?: string | null;
         isBrandingVerified?: boolean;
+        brandingVerifiedDomain?: string | null;
+        brandingVerifiedAt?: string | null;
     },
 ) {
     const setClauses: string[] = [];
@@ -736,6 +738,14 @@ export async function updateOAuthClient(
     if (updates.isBrandingVerified !== undefined) {
         setClauses.push("is_branding_verified = ?");
         values.push(updates.isBrandingVerified ? 1 : 0);
+    }
+    if (updates.brandingVerifiedDomain !== undefined) {
+        setClauses.push("branding_verified_domain = ?");
+        values.push(updates.brandingVerifiedDomain);
+    }
+    if (updates.brandingVerifiedAt !== undefined) {
+        setClauses.push("branding_verified_at = ?");
+        values.push(updates.brandingVerifiedAt);
     }
 
     if (setClauses.length === 0) {
