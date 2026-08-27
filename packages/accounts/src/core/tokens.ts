@@ -24,12 +24,17 @@ function parseTokenSet(value: RawTokenResponse): TokenSet {
         typeof value.expires_in !== "number" ||
         typeof value.scope !== "string"
     ) {
-        throw new AccountsError("protocol_error", "Token endpoint returned an invalid response");
+        throw new AccountsError(
+            "protocol_error",
+            "Token endpoint returned an invalid response",
+        );
     }
     return {
         accessToken: value.access_token,
         refreshToken: value.refresh_token,
-        ...(typeof value.id_token === "string" ? { idToken: value.id_token } : {}),
+        ...(typeof value.id_token === "string"
+            ? { idToken: value.id_token }
+            : {}),
         tokenType: "Bearer",
         expiresIn: value.expires_in,
         scope: value.scope.split(/\s+/).filter(Boolean),
@@ -43,7 +48,10 @@ async function postForm(
 ): Promise<Record<string, unknown>> {
     const fetcher = options.fetch ?? globalThis.fetch;
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), options.timeoutMs ?? 5_000);
+    const timeout = setTimeout(
+        () => controller.abort(),
+        options.timeoutMs ?? 5_000,
+    );
     try {
         const body = new URLSearchParams();
         for (const [key, value] of Object.entries(values)) {
@@ -64,28 +72,40 @@ async function postForm(
         try {
             payload = (await response.json()) as Record<string, unknown>;
         } catch (error) {
-            throw new AccountsError("protocol_error", "OAuth endpoint returned invalid JSON", {
-                status: response.status,
-                cause: error,
-            });
+            throw new AccountsError(
+                "protocol_error",
+                "OAuth endpoint returned invalid JSON",
+                {
+                    status: response.status,
+                    cause: error,
+                },
+            );
         }
         if (!response.ok || typeof payload.error === "string") {
-            throw new AccountsError("oauth_error", "OAuth request was rejected", {
-                oauthCode:
-                    typeof payload.error === "string"
-                        ? (payload.error as OAuthErrorCode)
-                        : "server_error",
-                retryable: response.status >= 500,
-                status: response.status,
-            });
+            throw new AccountsError(
+                "oauth_error",
+                "OAuth request was rejected",
+                {
+                    oauthCode:
+                        typeof payload.error === "string"
+                            ? (payload.error as OAuthErrorCode)
+                            : "server_error",
+                    retryable: response.status >= 500,
+                    status: response.status,
+                },
+            );
         }
         return payload;
     } catch (error) {
         if (error instanceof AccountsError) throw error;
-        throw new AccountsError("network_error", "OAuth endpoint was unavailable", {
-            retryable: true,
-            cause: error,
-        });
+        throw new AccountsError(
+            "network_error",
+            "OAuth endpoint was unavailable",
+            {
+                retryable: true,
+                cause: error,
+            },
+        );
     } finally {
         clearTimeout(timeout);
     }

@@ -1,10 +1,10 @@
 import {
     createLocalJWKSet,
     decodeProtectedHeader,
-    errors as joseErrors,
-    jwtVerify,
     type JSONWebKeySet,
     type JWTPayload,
+    errors as joseErrors,
+    jwtVerify,
 } from "jose";
 import { assertNonce } from "./crypto.js";
 import { AccountsError } from "./errors.js";
@@ -33,7 +33,10 @@ async function loadJwks(
 
     const fetcher = options.fetch ?? globalThis.fetch;
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), options.timeoutMs ?? 5_000);
+    const timeout = setTimeout(
+        () => controller.abort(),
+        options.timeoutMs ?? 5_000,
+    );
     try {
         const response = await fetcher(metadata.jwks_uri, {
             headers: { Accept: "application/json" },
@@ -42,10 +45,14 @@ async function loadJwks(
             signal: controller.signal,
         });
         if (!response.ok) {
-            throw new AccountsError("token_verification_error", "JWKS request failed", {
-                status: response.status,
-                retryable: response.status >= 500,
-            });
+            throw new AccountsError(
+                "token_verification_error",
+                "JWKS request failed",
+                {
+                    status: response.status,
+                    retryable: response.status >= 500,
+                },
+            );
         }
         const value = (await response.json()) as { keys?: unknown };
         if (!Array.isArray(value.keys) || value.keys.length === 0) {
@@ -78,10 +85,14 @@ async function loadJwks(
         return jwks;
     } catch (error) {
         if (error instanceof AccountsError) throw error;
-        throw new AccountsError("network_error", "JWKS endpoint was unavailable", {
-            retryable: true,
-            cause: error,
-        });
+        throw new AccountsError(
+            "network_error",
+            "JWKS endpoint was unavailable",
+            {
+                retryable: true,
+                cause: error,
+            },
+        );
     } finally {
         clearTimeout(timeout);
     }
@@ -91,7 +102,11 @@ async function verify(
     token: string,
     metadata: AuthorizationServerMetadata,
     audience: string,
-    options: { fetch?: typeof fetch; timeoutMs?: number; clockTolerance?: number },
+    options: {
+        fetch?: typeof fetch;
+        timeoutMs?: number;
+        clockTolerance?: number;
+    },
 ): Promise<JWTPayload> {
     let header: ReturnType<typeof decodeProtectedHeader>;
     try {
@@ -207,7 +222,8 @@ export async function verifyIdToken(
             "ID token claims are invalid",
         );
     }
-    if (options.nonce) assertNonce(options.nonce, payload.nonce as string | undefined);
+    if (options.nonce)
+        assertNonce(options.nonce, payload.nonce as string | undefined);
     return {
         tokenType: "id",
         subject: payload.sub,

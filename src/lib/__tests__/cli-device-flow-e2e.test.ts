@@ -268,8 +268,7 @@ describe("LixBlogs CLI device-flow contract", () => {
     });
 
     it("binds a public authorization code to S256 PKCE and issues an ID token", async () => {
-        const verifier =
-            "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
+        const verifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
         await env.DB.prepare(
             `INSERT INTO auth_requests
              (id, state, nonce, pkce_verifier, provider, client_id,
@@ -296,8 +295,7 @@ describe("LixBlogs CLI device-flow contract", () => {
             formRequest("https://accounts.test/api/auth/token", {
                 grant_type: "authorization_code",
                 code: "code_pkce",
-                code_verifier:
-                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                code_verifier: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 client_id: CLIENT_ID,
                 redirect_uri: REDIRECT_URI,
             }),

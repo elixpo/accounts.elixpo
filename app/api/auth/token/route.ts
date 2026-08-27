@@ -148,10 +148,7 @@ export async function POST(request: NextRequest) {
                         { status: 400 },
                     );
                 }
-                if (
-                    clientType === "public" &&
-                    !authRequest.code_challenge
-                ) {
+                if (clientType === "public" && !authRequest.code_challenge) {
                     return NextResponse.json(
                         {
                             error: "invalid_grant",

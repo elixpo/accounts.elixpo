@@ -1,8 +1,15 @@
 import { createAuthorizationRequest } from "./authorization.js";
 import { discoverAccounts } from "./discovery.js";
 import { AccountsError } from "./errors.js";
-import { exchangeAuthorizationCode, refreshTokens, revokeToken } from "./tokens.js";
-import type { AccountsConfiguration, AuthorizationServerMetadata } from "./types.js";
+import {
+    exchangeAuthorizationCode,
+    refreshTokens,
+    revokeToken,
+} from "./tokens.js";
+import type {
+    AccountsConfiguration,
+    AuthorizationServerMetadata,
+} from "./types.js";
 import { verifyAccessToken, verifyIdToken } from "./verify.js";
 
 export function createAccountsClient(configuration: AccountsConfiguration) {
@@ -18,22 +25,40 @@ export function createAccountsClient(configuration: AccountsConfiguration) {
             scopes?: string[];
             prompt?: "consent" | "login" | "select_account";
         }) {
-            return createAuthorizationRequest(await metadata(), configuration, options);
+            return createAuthorizationRequest(
+                await metadata(),
+                configuration,
+                options,
+            );
         },
         async exchangeAuthorizationCode(input: {
             code: string;
             codeVerifier: string;
         }) {
-            return exchangeAuthorizationCode(await metadata(), configuration, input);
+            return exchangeAuthorizationCode(
+                await metadata(),
+                configuration,
+                input,
+            );
         },
         async refresh(refreshToken: string, scopes?: string[]) {
-            return refreshTokens(await metadata(), configuration, refreshToken, scopes);
+            return refreshTokens(
+                await metadata(),
+                configuration,
+                refreshToken,
+                scopes,
+            );
         },
         async revoke(
             token: string,
             tokenTypeHint: "access_token" | "refresh_token" = "refresh_token",
         ) {
-            return revokeToken(await metadata(), configuration, token, tokenTypeHint);
+            return revokeToken(
+                await metadata(),
+                configuration,
+                token,
+                tokenTypeHint,
+            );
         },
         async verifyAccessToken(token: string) {
             if (!configuration.audience) {

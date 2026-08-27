@@ -76,6 +76,9 @@ export function assertState(expected: string, actual: string): void {
 
 export function assertNonce(expected: string, actual?: string): void {
     if (!actual || !timingSafeEqual(expected, actual)) {
-        throw new AccountsError("nonce_mismatch", "ID token nonce did not match");
+        throw new AccountsError(
+            "nonce_mismatch",
+            "ID token nonce did not match",
+        );
     }
 }

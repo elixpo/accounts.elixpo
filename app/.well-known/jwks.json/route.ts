@@ -9,7 +9,8 @@ export async function GET() {
             { keys: [await getPublicJwk()] },
             {
                 headers: {
-                    "Cache-Control": "public, max-age=3600, stale-while-revalidate=300",
+                    "Cache-Control":
+                        "public, max-age=3600, stale-while-revalidate=300",
                     "Access-Control-Allow-Origin": "*",
                 },
             },
@@ -19,9 +20,6 @@ export async function GET() {
             "[JWKS] Unable to export the configured public signing key",
             error instanceof Error ? error.message : "unknown error",
         );
-        return NextResponse.json(
-            { error: "server_error" },
-            { status: 500 },
-        );
+        return NextResponse.json({ error: "server_error" }, { status: 500 });
     }
 }

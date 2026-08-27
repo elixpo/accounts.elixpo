@@ -1,12 +1,12 @@
 import {
+    calculateJwkThumbprint,
     exportJWK,
     generateKeyPair,
     SignJWT,
-    calculateJwkThumbprint,
 } from "jose";
 import { describe, expect, it } from "vitest";
 import {
-    AccountsError,
+    type AccountsError,
     assertNonce,
     assertState,
     createAuthorizationRequest,
@@ -78,20 +78,23 @@ describe("@elixpo/accounts core", () => {
     });
 
     it("validates discovery issuer, origin, and PKCE support", async () => {
-        const fetcher: typeof fetch = async (input) =>
+        const fetcher: typeof fetch = async (_input) =>
             new Response(JSON.stringify(metadata), {
                 status: 200,
                 headers: { "content-type": "application/json" },
             });
-        await expect(discoverAccounts({ issuer, fetch: fetcher })).resolves.toEqual(
-            metadata,
-        );
+        await expect(
+            discoverAccounts({ issuer, fetch: fetcher }),
+        ).resolves.toEqual(metadata);
         await expect(
             discoverAccounts({
                 issuer,
                 fetch: async () =>
                     new Response(
-                        JSON.stringify({ ...metadata, issuer: "https://evil.example" }),
+                        JSON.stringify({
+                            ...metadata,
+                            issuer: "https://evil.example",
+                        }),
                     ),
             }),
         ).rejects.toMatchObject({ code: "discovery_error" });
@@ -111,31 +114,41 @@ describe("@elixpo/accounts core", () => {
         };
         const config = { ...configuration, fetch: fetcher };
         expect(
-            (await exchangeAuthorizationCode(metadata, config, {
-                code: "code-secret",
-                codeVerifier:
-                    "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
-            })).refreshToken,
+            (
+                await exchangeAuthorizationCode(metadata, config, {
+                    code: "code-secret",
+                    codeVerifier: "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
+                })
+            ).refreshToken,
         ).toBe("rotated-secret");
-        expect((await refreshTokens(metadata, config, "refresh-secret")).refreshToken).toBe(
-            "rotated-secret",
-        );
-        await expect(revokeToken(metadata, config, "refresh-secret")).resolves.toBeUndefined();
+        expect(
+            (await refreshTokens(metadata, config, "refresh-secret"))
+                .refreshToken,
+        ).toBe("rotated-secret");
+        await expect(
+            revokeToken(metadata, config, "refresh-secret"),
+        ).resolves.toBeUndefined();
         expect(requests).toHaveLength(3);
 
         await expect(
-            exchangeAuthorizationCode(metadata, {
-                ...configuration,
-                fetch: async () =>
-                    Response.json(
-                        { error: "invalid_grant", error_description: "code-secret" },
-                        { status: 400 },
-                    ),
-            }, {
-                code: "code-secret",
-                codeVerifier:
-                    "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
-            }),
+            exchangeAuthorizationCode(
+                metadata,
+                {
+                    ...configuration,
+                    fetch: async () =>
+                        Response.json(
+                            {
+                                error: "invalid_grant",
+                                error_description: "code-secret",
+                            },
+                            { status: 400 },
+                        ),
+                },
+                {
+                    code: "code-secret",
+                    codeVerifier: "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk",
+                },
+            ),
         ).rejects.toSatisfy(
             (error: AccountsError) =>
                 error.code === "oauth_error" &&
