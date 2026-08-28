@@ -54,8 +54,8 @@ export function parseCustomScopes(value: unknown): CustomOAuthScope[] {
 }
 
 export function validateCustomScopes(value: unknown):
-    | { scopes: CustomOAuthScope[]; error?: never }
-    | { scopes?: never; error: string } {
+    | { scopes: CustomOAuthScope[] }
+    | { error: string } {
     if (value === undefined) return { scopes: [] };
     if (!Array.isArray(value)) return { error: "custom_scopes must be an array" };
     if (value.length > 20) return { error: "Maximum of 20 custom scopes allowed" };
