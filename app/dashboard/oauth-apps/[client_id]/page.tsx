@@ -997,7 +997,7 @@ export default function OAuthAppSettingsPage() {
                 </Box>
 
                 {/* Redirect URIs */}
-                <Box sx={cardSx}>
+                <Box sx={{ ...cardSx, gridColumn: { lg: "1 / -1" } }}>
                     <Typography
                         sx={{ color: "var(--fg)", fontWeight: 600, mb: 0.5 }}
                     >
@@ -1086,7 +1086,7 @@ export default function OAuthAppSettingsPage() {
                 </Box>
 
                 {/* Scopes + Stats */}
-                <Box sx={cardSx}>
+                <Box sx={{ ...cardSx, gridColumn: { lg: "1 / -1" } }}>
                     <Typography
                         sx={{ color: "var(--fg)", fontWeight: 600, mb: 2 }}
                     >
