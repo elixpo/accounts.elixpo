@@ -1,6 +1,7 @@
 export const runtime = "edge";
 
 import { type NextRequest, NextResponse } from "next/server";
+import { getBrandingGate } from "@/lib/branding-gate";
 import { getDatabase } from "@/lib/d1-client";
 import {
     createAuthRequest,
@@ -8,7 +9,9 @@ import {
     getOAuthClientById,
 } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
+import { findScopeOption, parseCustomScopes } from "@/lib/oauth-scope-registry";
 import { parseOAuthScopes, unsupportedOAuthScopes } from "@/lib/oauth-scopes";
+import { isValidPkceValue } from "@/lib/pkce";
 import { generateRandomString, generateUUID } from "@/lib/webcrypto";
 
 // Built-in/trusted domains auto-whitelisted
@@ -23,6 +26,8 @@ export async function GET(request: NextRequest) {
         const scope = searchParams.get("scope") || "openid profile email";
         const state = searchParams.get("state");
         const nonce = searchParams.get("nonce");
+        const codeChallenge = searchParams.get("code_challenge");
+        const codeChallengeMethod = searchParams.get("code_challenge_method");
 
         if (!responseType || !clientId || !redirectUri || !state) {
             return NextResponse.json(
@@ -68,7 +73,9 @@ export async function GET(request: NextRequest) {
         const isBuiltinClient = BUILTIN_DOMAINS.includes(redirectUrl.hostname);
         const db = await getDatabase();
         const requestedScopes = parseOAuthScopes(scope);
-        const unsupported = unsupportedOAuthScopes(requestedScopes);
+        const unsupported = isBuiltinClient
+            ? unsupportedOAuthScopes(requestedScopes)
+            : [];
         if (unsupported.length > 0) {
             return NextResponse.json(
                 {
@@ -113,11 +120,43 @@ export async function GET(request: NextRequest) {
                         { status: 401 },
                     );
                 }
+                const brandingGate = await getBrandingGate(db, clientId);
+                if (brandingGate.verificationRequired) {
+                    return NextResponse.json(
+                        {
+                            error: "branding_verification_required",
+                            error_description:
+                                "This application must verify its brand before accepting more sign-ins.",
+                        },
+                        { status: 403 },
+                    );
+                }
+                if (
+                    ((client as any).client_type === "public" &&
+                        !codeChallenge) ||
+                    (!codeChallenge && !!codeChallengeMethod) ||
+                    (codeChallenge &&
+                        (codeChallengeMethod !== "S256" ||
+                            !isValidPkceValue(codeChallenge)))
+                ) {
+                    return NextResponse.json(
+                        {
+                            error: "invalid_request",
+                            error_description:
+                                "Use a valid S256 PKCE code_challenge; public clients require PKCE",
+                        },
+                        { status: 400 },
+                    );
+                }
                 const registeredScopes: string[] = JSON.parse(
                     (client as any).scopes || "[]",
                 );
+                const customScopes = parseCustomScopes(
+                    (client as any).custom_scopes,
+                );
                 const unregistered = requestedScopes.filter(
                     (requestedScope) =>
+                        !findScopeOption(requestedScope, customScopes) ||
                         !registeredScopes.includes(requestedScope),
                 );
                 if (unregistered.length > 0) {
@@ -150,6 +189,8 @@ export async function GET(request: NextRequest) {
                 state,
                 nonce: nonce || "",
                 pkceVerifier: generateRandomString(128),
+                codeChallenge,
+                codeChallengeMethod: codeChallenge ? "S256" : null,
                 provider: "sso",
                 clientId,
                 redirectUri,
@@ -181,7 +222,15 @@ export async function GET(request: NextRequest) {
 
         response.cookies.set(
             "oauth_sso_state",
-            JSON.stringify({ clientId, redirectUri, scope, state, nonce }),
+            JSON.stringify({
+                clientId,
+                redirectUri,
+                scope,
+                state,
+                nonce,
+                codeChallenge,
+                codeChallengeMethod,
+            }),
             {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
@@ -299,6 +348,17 @@ export async function POST(request: NextRequest) {
             redirectUrl.searchParams.append(
                 "error_description",
                 "User denied access",
+            );
+            redirectUrl.searchParams.append("state", state);
+            return NextResponse.json({ redirect_uri: redirectUrl.toString() });
+        }
+
+        const brandingGate = await getBrandingGate(db, clientId);
+        if (brandingGate.verificationRequired) {
+            redirectUrl.searchParams.append("error", "temporarily_unavailable");
+            redirectUrl.searchParams.append(
+                "error_description",
+                "This application must verify its brand before accepting more sign-ins.",
             );
             redirectUrl.searchParams.append("state", state);
             return NextResponse.json({ redirect_uri: redirectUrl.toString() });

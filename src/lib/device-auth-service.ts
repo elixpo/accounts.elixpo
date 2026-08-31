@@ -12,13 +12,16 @@
  */
 
 import type { D1Database } from "@cloudflare/workers-types";
-import { isLixBlogsScope } from "./lixblogs-scopes";
-import { SUPPORTED_OAUTH_SCOPES } from "./oauth-scopes";
+import {
+    type CustomOAuthScope,
+    findScopeOption,
+    parseCustomScopes,
+} from "./oauth-scope-registry";
 import { generateRandomString, generateUUID, hashString } from "./webcrypto";
 
 const DEVICE_CODE_PREFIX = "dvc_";
 const DEFAULT_EXPIRES_IN_SECONDS = 600; // 10 minutes — RFC 8628 typical range
-const DEFAULT_INTERVAL_SECONDS = 5;
+const DEFAULT_INTERVAL_SECONDS = 2;
 const MAX_CODE_GENERATION_ATTEMPTS = 5;
 
 // Excludes visually ambiguous characters (0/O, 1/I/L) so a user transcribing
@@ -100,19 +103,7 @@ interface OAuthClientRow {
     is_active: number;
     scopes: string;
     audience: string | null;
-}
-
-/**
- * Scopes valid platform-wide: core identity scopes (openid/profile/email)
- * plus every registered LixBlogs resource scope. A request must additionally
- * be a subset of the requesting client's own registered `scopes` — this is
- * just "is this scope string one we know how to describe/consent for at all".
- */
-function isKnownScope(scope: string): boolean {
-    return (
-        (SUPPORTED_OAUTH_SCOPES as readonly string[]).includes(scope) ||
-        isLixBlogsScope(scope)
-    );
+    custom_scopes: string;
 }
 
 export interface CreateDeviceAuthorizationInput {
@@ -139,7 +130,7 @@ export async function createDeviceAuthorization(
 
     const client = (await db
         .prepare(
-            "SELECT client_id, client_type, is_active, scopes, audience FROM oauth_clients WHERE client_id = ?",
+            "SELECT client_id, client_type, is_active, scopes, audience, custom_scopes FROM oauth_clients WHERE client_id = ?",
         )
         .bind(clientId)
         .first()) as OAuthClientRow | null;
@@ -161,6 +152,7 @@ export async function createDeviceAuthorization(
     }
 
     const clientScopes: string[] = JSON.parse(client.scopes || "[]");
+    const customScopes = parseCustomScopes(client.custom_scopes);
     const requestedScopes = input.scope
         ? [...new Set(input.scope.split(/\s+/).filter(Boolean))]
         : clientScopes;
@@ -173,7 +165,9 @@ export async function createDeviceAuthorization(
     }
 
     const scopesValid = requestedScopes.every(
-        (scope) => isKnownScope(scope) && clientScopes.includes(scope),
+        (scope) =>
+            !!findScopeOption(scope, customScopes) &&
+            clientScopes.includes(scope),
     );
     if (!scopesValid) {
         throw new DeviceAuthorizationRequestError(
@@ -256,6 +250,16 @@ export interface DeviceAuthorizationLookupResult {
     client_name?: string;
     scopes?: string[];
     expires_at?: string;
+    logo_url?: string | null;
+    branding_display_name?: string | null;
+    branding_primary_color?: string | null;
+    branding_accent_color?: string | null;
+    privacy_policy_url?: string | null;
+    terms_of_service_url?: string | null;
+    is_branding_verified?: boolean;
+    branding_verified_domain?: string | null;
+    audience?: string | null;
+    custom_scopes?: CustomOAuthScope[];
 }
 
 /**
@@ -271,7 +275,7 @@ export async function lookupDeviceAuthorizationByUserCode(
 
     const row = (await db
         .prepare(
-            `SELECT da.status, da.expires_at, da.scopes, da.client_id, oc.name AS client_name
+            `SELECT da.status, da.expires_at, da.scopes, da.audience, da.client_id, oc.name AS client_name, oc.custom_scopes, oc.logo_url, oc.branding_display_name, oc.branding_primary_color, oc.branding_accent_color, oc.privacy_policy_url, oc.terms_of_service_url, oc.is_branding_verified, oc.branding_verified_domain
              FROM device_authorizations da
              JOIN oauth_clients oc ON oc.client_id = da.client_id
              WHERE da.user_code_hash = ?`,
@@ -283,13 +287,28 @@ export async function lookupDeviceAuthorizationByUserCode(
         scopes: string;
         client_id: string;
         client_name: string;
+        logo_url: string | null;
+        branding_display_name: string | null;
+        branding_primary_color: string | null;
+        branding_accent_color: string | null;
+        privacy_policy_url: string | null;
+        terms_of_service_url: string | null;
+        is_branding_verified: number;
+        branding_verified_domain: string | null;
+        audience: string | null;
+        custom_scopes: string;
     } | null;
 
     if (!row) {
         return { status: "not_found" };
     }
 
-    const expired = new Date(row.expires_at) <= new Date();
+    const expired =
+        new Date(
+            row.expires_at.endsWith("Z") || row.expires_at.includes("+")
+                ? row.expires_at
+                : `${row.expires_at} Z`,
+        ) <= new Date();
 
     return {
         status: expired
@@ -299,6 +318,34 @@ export async function lookupDeviceAuthorizationByUserCode(
         client_name: row.client_name,
         scopes: row.scopes.split(" ").filter(Boolean),
         expires_at: row.expires_at,
+        audience: row.audience,
+        custom_scopes: parseCustomScopes(row.custom_scopes),
+        logo_url: row.is_branding_verified === 1 ? row.logo_url || null : null,
+        branding_display_name:
+            row.is_branding_verified === 1
+                ? row.branding_display_name || null
+                : null,
+        branding_primary_color:
+            row.is_branding_verified === 1
+                ? row.branding_primary_color || null
+                : null,
+        branding_accent_color:
+            row.is_branding_verified === 1
+                ? row.branding_accent_color || null
+                : null,
+        privacy_policy_url:
+            row.is_branding_verified === 1
+                ? row.privacy_policy_url || null
+                : null,
+        terms_of_service_url:
+            row.is_branding_verified === 1
+                ? row.terms_of_service_url || null
+                : null,
+        is_branding_verified: row.is_branding_verified === 1,
+        branding_verified_domain:
+            row.is_branding_verified === 1
+                ? row.branding_verified_domain || null
+                : null,
     };
 }
 
@@ -527,7 +574,11 @@ export function classifyDevicePollAttempt(
         return { kind: "client_mismatch" };
     }
 
-    const expiresAt = new Date(row.expires_at);
+    const expiresAt = new Date(
+        row.expires_at.endsWith("Z") || row.expires_at.includes("+")
+            ? row.expires_at
+            : `${row.expires_at} Z`,
+    );
     if (row.status === "expired" || expiresAt <= now) {
         return { kind: "expired_token", wasPending: row.status === "pending" };
     }
@@ -538,7 +589,12 @@ export function classifyDevicePollAttempt(
 
     if (row.status === "pending") {
         const lastPolledAt = row.last_polled_at
-            ? new Date(row.last_polled_at)
+            ? new Date(
+                  row.last_polled_at.endsWith("Z") ||
+                      row.last_polled_at.includes("+")
+                      ? row.last_polled_at
+                      : `${row.last_polled_at} Z`,
+              )
             : null;
         const elapsedSeconds = lastPolledAt
             ? (now.getTime() - lastPolledAt.getTime()) / 1000

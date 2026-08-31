@@ -4,7 +4,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getDatabase } from "@/lib/d1-client";
 import { createAuthRequest, getOAuthClientById, getUserById } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
-import { parseOAuthScopes, unsupportedOAuthScopes } from "@/lib/oauth-scopes";
+import { findScopeOption, parseCustomScopes } from "@/lib/oauth-scope-registry";
+import { parseOAuthScopes } from "@/lib/oauth-scopes";
+import { isValidPkceValue } from "@/lib/pkce";
 import { generateRandomString, generateUUID } from "@/lib/webcrypto";
 
 /**
@@ -35,6 +37,8 @@ export async function GET(request: NextRequest) {
     const state = sp.get("state");
     const scope = sp.get("scope") || "openid profile email";
     const nonce = sp.get("nonce") || "";
+    const codeChallenge = sp.get("code_challenge");
+    const codeChallengeMethod = sp.get("code_challenge_method");
 
     // --- 1. Validate required params ---
     if (!responseType || !clientId || !redirectUri || !state) {
@@ -104,6 +108,23 @@ export async function GET(request: NextRequest) {
             );
         }
 
+        if (
+            (client.client_type === "public" && !codeChallenge) ||
+            (!codeChallenge && !!codeChallengeMethod) ||
+            (codeChallenge &&
+                (codeChallengeMethod !== "S256" ||
+                    !isValidPkceValue(codeChallenge)))
+        ) {
+            return NextResponse.json(
+                {
+                    error: "invalid_request",
+                    error_description:
+                        "Use a valid S256 PKCE code_challenge; public clients require PKCE",
+                },
+                { status: 400 },
+            );
+        }
+
         const allowedUris: string[] = JSON.parse(client.redirect_uris || "[]");
         if (!allowedUris.includes(redirectUri)) {
             return NextResponse.json(
@@ -118,12 +139,12 @@ export async function GET(request: NextRequest) {
 
         const requestedScopes = parseOAuthScopes(scope);
         const registeredScopes: string[] = JSON.parse(client.scopes || "[]");
-        const invalidScopes = [
-            ...unsupportedOAuthScopes(requestedScopes),
-            ...requestedScopes.filter(
-                (requestedScope) => !registeredScopes.includes(requestedScope),
-            ),
-        ];
+        const customScopes = parseCustomScopes(client.custom_scopes);
+        const invalidScopes = requestedScopes.filter(
+            (requestedScope) =>
+                !findScopeOption(requestedScope, customScopes) ||
+                !registeredScopes.includes(requestedScope),
+        );
         if (invalidScopes.length > 0) {
             parsedRedirect.searchParams.set("error", "invalid_scope");
             parsedRedirect.searchParams.set(
@@ -152,6 +173,12 @@ export async function GET(request: NextRequest) {
                 state,
                 scope,
                 ...(nonce ? { nonce } : {}),
+                ...(codeChallenge
+                    ? {
+                          code_challenge: codeChallenge,
+                          code_challenge_method: "S256",
+                      }
+                    : {}),
             });
             const loginUrl = new URL("/login", request.url);
             loginUrl.searchParams.set(
@@ -210,6 +237,12 @@ export async function GET(request: NextRequest) {
                 state,
                 scope,
                 ...(nonce ? { nonce } : {}),
+                ...(codeChallenge
+                    ? {
+                          code_challenge: codeChallenge,
+                          code_challenge_method: "S256",
+                      }
+                    : {}),
             });
             const setupUrl = new URL("/setup-name", request.url);
             setupUrl.searchParams.set(
@@ -225,6 +258,8 @@ export async function GET(request: NextRequest) {
             state,
             nonce,
             pkceVerifier: generateRandomString(128),
+            codeChallenge,
+            codeChallengeMethod: codeChallenge ? "S256" : null,
             provider: "sso",
             clientId,
             redirectUri,
