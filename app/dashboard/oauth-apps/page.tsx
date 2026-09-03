@@ -20,12 +20,14 @@ import {
     InputAdornment,
     Paper,
     Snackbar,
+    Tab,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
+    Tabs,
     TextField,
     Typography,
 } from "@mui/material";
@@ -148,15 +150,30 @@ const OAuthAppsPage = () => {
     const [secretCopied, setSecretCopied] = useState(false);
     const [idCopied, setIdCopied] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [appFilter, setAppFilter] = useState<"all" | "web" | "device">(
+        "all",
+    );
     const filteredApps = useMemo(() => {
         const query = searchQuery.trim().toLowerCase();
-        if (!query) return apps;
-        return apps.filter((app) =>
-            [app.name, app.client_id, app.homepage_url, app.description].some(
+        return apps.filter((app) => {
+            const clientType = app.client_type || "confidential";
+            if (appFilter === "web" && clientType !== "confidential") {
+                return false;
+            }
+            if (appFilter === "device" && clientType !== "public") {
+                return false;
+            }
+            if (!query) return true;
+            return [
+                app.name,
+                app.client_id,
+                app.homepage_url,
+                app.description,
+            ].some(
                 (value) => value?.toLowerCase().includes(query),
-            ),
-        );
-    }, [apps, searchQuery]);
+            );
+        });
+    }, [appFilter, apps, searchQuery]);
 
     const [emailVerified, setEmailVerified] = useState<boolean | null>(null);
     const [toast, setToast] = useState<{
@@ -484,25 +501,56 @@ const OAuthAppsPage = () => {
                 )}
 
                 {apps.length > 0 && (
-                    <TextField
-                        fullWidth
-                        value={searchQuery}
-                        onChange={(event) => setSearchQuery(event.target.value)}
-                        placeholder="Search by app name, domain, or client ID"
-                        aria-label="Search OAuth applications"
-                        sx={{ ...textFieldSx, mb: 2 }}
-                        slotProps={{
-                            input: {
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon
-                                            sx={{ color: "var(--fg-faint)" }}
-                                        />
-                                    </InputAdornment>
-                                ),
-                            },
-                        }}
-                    />
+                    <>
+                        <Tabs
+                            value={appFilter}
+                            onChange={(_, value: "all" | "web" | "device") =>
+                                setAppFilter(value)
+                            }
+                            sx={{
+                                mb: 2,
+                                minHeight: 40,
+                                borderBottom: "1px solid var(--border)",
+                                "& .MuiTab-root": {
+                                    minHeight: 40,
+                                    color: "var(--fg-faint)",
+                                    textTransform: "none",
+                                    fontWeight: 600,
+                                },
+                                "& .Mui-selected": { color: "#ff7759" },
+                                "& .MuiTabs-indicator": {
+                                    backgroundColor: "#ff7759",
+                                },
+                            }}
+                        >
+                            <Tab value="all" label="All" />
+                            <Tab value="web" label="Web Apps" />
+                            <Tab value="device" label="Device Flow" />
+                        </Tabs>
+                        <TextField
+                            fullWidth
+                            value={searchQuery}
+                            onChange={(event) =>
+                                setSearchQuery(event.target.value)
+                            }
+                            placeholder="Search by app name, domain, or client ID"
+                            aria-label="Search OAuth applications"
+                            sx={{ ...textFieldSx, mb: 2 }}
+                            slotProps={{
+                                input: {
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon
+                                                sx={{
+                                                    color: "var(--fg-faint)",
+                                                }}
+                                            />
+                                        </InputAdornment>
+                                    ),
+                                },
+                            }}
+                        />
+                    </>
                 )}
 
                 {/* Applications Table */}
@@ -546,7 +594,11 @@ const OAuthAppsPage = () => {
                     ) : filteredApps.length === 0 ? (
                         <Box sx={{ p: 6, textAlign: "center" }}>
                             <Typography sx={{ color: "var(--fg-faint)" }}>
-                                No applications match “{searchQuery}”.
+                                {searchQuery.trim()
+                                    ? `No applications match “${searchQuery}”.`
+                                    : appFilter === "device"
+                                      ? "No Device Flow applications registered."
+                                      : "No Web applications registered."}
                             </Typography>
                         </Box>
                     ) : (
