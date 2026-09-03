@@ -4,6 +4,7 @@ import AddIcon from "@mui/icons-material/Add";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import SearchIcon from "@mui/icons-material/Search";
 import SettingsIcon from "@mui/icons-material/Settings";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import {
@@ -16,34 +17,44 @@ import {
     DialogContent,
     DialogTitle,
     IconButton,
+    InputAdornment,
     Paper,
     Snackbar,
+    Tab,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
+    Tabs,
     TextField,
     Typography,
 } from "@mui/material";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { CustomOAuthScope } from "@/lib/oauth-scope-registry";
 import { generatePixelAvatar } from "@/lib/pixel-avatar";
+import { OAuthScopePicker } from "../../components/oauth-scope-picker";
 
 interface OAuthApp {
     client_id: string;
     name: string;
     homepage_url?: string;
+    logo_url?: string;
     description?: string;
     created_at: string;
     is_active: boolean;
     redirect_uris?: string[];
+    client_type?: "confidential" | "public";
+    audience?: string | null;
 }
 
 interface CreateAppResponse {
     client_id: string;
-    client_secret: string;
+    client_secret?: string;
+    client_type: "confidential" | "public";
+    audience?: string | null;
     name: string;
     redirect_uris: string[];
     scopes: string[];
@@ -82,24 +93,27 @@ const tableBodySx = {
     },
 };
 
-// Favicon sources tried in order: the app's OWN /favicon.ico (real brand icon),
-// then Google's favicon service (cached), then a generated pixel avatar.
-function faviconSources(homepageUrl?: string): string[] {
-    if (!homepageUrl) return [];
+// Prefer the configured brand asset, then the app's own favicon and a cached
+// favicon lookup before falling back to a generated avatar.
+function faviconSources(homepageUrl?: string, logoUrl?: string): string[] {
+    const sources = logoUrl ? [logoUrl] : [];
+    if (!homepageUrl) return sources;
     try {
         const u = new URL(homepageUrl);
-        return [
+        sources.push(
             `${u.origin}/favicon.ico`,
             `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=64`,
-        ];
+        );
+        return [...new Set(sources)];
     } catch {
-        return [];
+        return sources;
     }
 }
 
 function AppIcon({ app, size = 28 }: { app: OAuthApp; size?: number }) {
     const [stage, setStage] = useState(0);
-    const sources = faviconSources(app.homepage_url);
+    const sources = faviconSources(app.homepage_url, app.logo_url);
+    useEffect(() => setStage(0), [app.homepage_url, app.logo_url]);
     const src =
         stage < sources.length
             ? sources[stage]
@@ -109,6 +123,7 @@ function AppIcon({ app, size = 28 }: { app: OAuthApp; size?: number }) {
             component="img"
             src={src}
             alt=""
+            referrerPolicy="no-referrer"
             sx={{
                 width: size,
                 height: size,
@@ -134,6 +149,31 @@ const OAuthAppsPage = () => {
     );
     const [secretCopied, setSecretCopied] = useState(false);
     const [idCopied, setIdCopied] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [appFilter, setAppFilter] = useState<"all" | "web" | "device">(
+        "all",
+    );
+    const filteredApps = useMemo(() => {
+        const query = searchQuery.trim().toLowerCase();
+        return apps.filter((app) => {
+            const clientType = app.client_type || "confidential";
+            if (appFilter === "web" && clientType !== "confidential") {
+                return false;
+            }
+            if (appFilter === "device" && clientType !== "public") {
+                return false;
+            }
+            if (!query) return true;
+            return [
+                app.name,
+                app.client_id,
+                app.homepage_url,
+                app.description,
+            ].some(
+                (value) => value?.toLowerCase().includes(query),
+            );
+        });
+    }, [appFilter, apps, searchQuery]);
 
     const [emailVerified, setEmailVerified] = useState<boolean | null>(null);
     const [toast, setToast] = useState<{
@@ -150,8 +190,13 @@ const OAuthAppsPage = () => {
     const [formData, setFormData] = useState({
         name: "",
         homepage_url: "",
+        logo_url: "",
         description: "",
         redirect_uris: [""],
+        client_type: "confidential" as "confidential" | "public",
+        audience: "",
+        scopes: ["openid", "profile", "email"],
+        custom_scopes: [] as CustomOAuthScope[],
     });
 
     // useCallback gives stable refs so the auth/apps fetches don't loop
@@ -211,11 +256,30 @@ const OAuthAppsPage = () => {
             setError("Homepage URL is required");
             return;
         }
+        if (formData.logo_url.trim()) {
+            try {
+                const logoUrl = new URL(formData.logo_url.trim());
+                if (
+                    logoUrl.protocol !== "https:" &&
+                    logoUrl.protocol !== "http:"
+                ) {
+                    setError("App icon URL must use HTTP or HTTPS");
+                    return;
+                }
+            } catch {
+                setError("App icon URL must be a valid URL");
+                return;
+            }
+        }
         const uris = formData.redirect_uris
             .map((u) => u.trim())
             .filter(Boolean);
-        if (uris.length === 0) {
+        if (formData.client_type === "confidential" && uris.length === 0) {
             setError("At least one redirect URI is required");
+            return;
+        }
+        if (formData.client_type === "public" && !formData.audience.trim()) {
+            setError("A resource audience is required for public clients");
             return;
         }
 
@@ -228,9 +292,16 @@ const OAuthAppsPage = () => {
                 body: JSON.stringify({
                     name: formData.name,
                     homepage_url: formData.homepage_url,
+                    logo_url: formData.logo_url.trim() || undefined,
                     description: formData.description || undefined,
                     redirect_uris: uris,
-                    scopes: ["openid", "profile", "email"],
+                    scopes: formData.scopes,
+                    custom_scopes: formData.custom_scopes,
+                    client_type: formData.client_type,
+                    audience:
+                        formData.client_type === "public"
+                            ? formData.audience.trim()
+                            : undefined,
                 }),
             });
 
@@ -248,8 +319,13 @@ const OAuthAppsPage = () => {
             setFormData({
                 name: "",
                 homepage_url: "",
+                logo_url: "",
                 description: "",
                 redirect_uris: [""],
+                client_type: "confidential",
+                audience: "",
+                scopes: ["openid", "profile", "email"],
+                custom_scopes: [],
             });
             setSuccessMessage("Application registered successfully!");
             await fetchApps();
@@ -305,8 +381,13 @@ const OAuthAppsPage = () => {
         setFormData({
             name: "",
             homepage_url: "",
+            logo_url: "",
             description: "",
             redirect_uris: [""],
+            client_type: "confidential",
+            audience: "",
+            scopes: ["openid", "profile", "email"],
+            custom_scopes: [],
         });
     };
 
@@ -419,6 +500,59 @@ const OAuthAppsPage = () => {
                     </Alert>
                 )}
 
+                {apps.length > 0 && (
+                    <>
+                        <Tabs
+                            value={appFilter}
+                            onChange={(_, value: "all" | "web" | "device") =>
+                                setAppFilter(value)
+                            }
+                            sx={{
+                                mb: 2,
+                                minHeight: 40,
+                                borderBottom: "1px solid var(--border)",
+                                "& .MuiTab-root": {
+                                    minHeight: 40,
+                                    color: "var(--fg-faint)",
+                                    textTransform: "none",
+                                    fontWeight: 600,
+                                },
+                                "& .Mui-selected": { color: "#ff7759" },
+                                "& .MuiTabs-indicator": {
+                                    backgroundColor: "#ff7759",
+                                },
+                            }}
+                        >
+                            <Tab value="all" label="All" />
+                            <Tab value="web" label="Web Apps" />
+                            <Tab value="device" label="Device Flow" />
+                        </Tabs>
+                        <TextField
+                            fullWidth
+                            value={searchQuery}
+                            onChange={(event) =>
+                                setSearchQuery(event.target.value)
+                            }
+                            placeholder="Search by app name, domain, or client ID"
+                            aria-label="Search OAuth applications"
+                            sx={{ ...textFieldSx, mb: 2 }}
+                            slotProps={{
+                                input: {
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon
+                                                sx={{
+                                                    color: "var(--fg-faint)",
+                                                }}
+                                            />
+                                        </InputAdornment>
+                                    ),
+                                },
+                            }}
+                        />
+                    </>
+                )}
+
                 {/* Applications Table */}
                 <Box
                     sx={{
@@ -457,6 +591,16 @@ const OAuthAppsPage = () => {
                                 application.
                             </Typography>
                         </Box>
+                    ) : filteredApps.length === 0 ? (
+                        <Box sx={{ p: 6, textAlign: "center" }}>
+                            <Typography sx={{ color: "var(--fg-faint)" }}>
+                                {searchQuery.trim()
+                                    ? `No applications match “${searchQuery}”.`
+                                    : appFilter === "device"
+                                      ? "No Device Flow applications registered."
+                                      : "No Web applications registered."}
+                            </Typography>
+                        </Box>
                     ) : (
                         <TableContainer
                             component={Paper}
@@ -478,7 +622,7 @@ const OAuthAppsPage = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody sx={tableBodySx}>
-                                    {apps.map((app) => (
+                                    {filteredApps.map((app) => (
                                         <TableRow key={app.client_id}>
                                             <TableCell>
                                                 <Box
@@ -513,6 +657,22 @@ const OAuthAppsPage = () => {
                                                         >
                                                             {app.name}
                                                         </Typography>
+                                                        {app.client_type ===
+                                                            "public" && (
+                                                            <Typography
+                                                                variant="caption"
+                                                                sx={{
+                                                                    display:
+                                                                        "block",
+                                                                    color: "#ff7759",
+                                                                    fontSize:
+                                                                        "0.68rem",
+                                                                }}
+                                                            >
+                                                                Device flow ·{" "}
+                                                                {app.audience}
+                                                            </Typography>
+                                                        )}
                                                         {app.homepage_url && (
                                                             <Typography
                                                                 component="a"
@@ -686,7 +846,7 @@ const OAuthAppsPage = () => {
             <Dialog
                 open={openDialog}
                 onClose={handleCloseDialog}
-                maxWidth="sm"
+                maxWidth="md"
                 fullWidth
                 PaperProps={{ sx: dialogPaperSx }}
             >
@@ -743,6 +903,23 @@ const OAuthAppsPage = () => {
                     />
                     <TextField
                         fullWidth
+                        type="url"
+                        label="App icon URL"
+                        value={formData.logo_url}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                logo_url: e.target.value,
+                            })
+                        }
+                        margin="dense"
+                        placeholder="https://example.com/icon.png"
+                        helperText="Optional — falls back to your homepage favicon, then a generated icon"
+                        sx={textFieldSx}
+                        disabled={loading}
+                    />
+                    <TextField
+                        fullWidth
                         label="Application description"
                         value={formData.description}
                         onChange={(e) =>
@@ -767,6 +944,79 @@ const OAuthAppsPage = () => {
                             mb: 0.5,
                         }}
                     >
+                        Application type
+                    </Typography>
+                    <Box
+                        component="select"
+                        value={formData.client_type}
+                        onChange={(event) =>
+                            setFormData({
+                                ...formData,
+                                client_type: event.target.value as
+                                    | "confidential"
+                                    | "public",
+                            })
+                        }
+                        disabled={loading}
+                        sx={{
+                            width: "100%",
+                            bgcolor: "var(--surface)",
+                            color: "var(--fg)",
+                            border: "1px solid var(--border)",
+                            borderRadius: "8px",
+                            p: 1.25,
+                        }}
+                    >
+                        <option value="confidential">Web Application</option>
+                        <option value="public">Device Flow</option>
+                    </Box>
+
+                    {formData.client_type === "public" && (
+                        <TextField
+                            fullWidth
+                            label="Resource audience"
+                            value={formData.audience}
+                            onChange={(event) =>
+                                setFormData({
+                                    ...formData,
+                                    audience: event.target.value,
+                                })
+                            }
+                            margin="dense"
+                            placeholder="blogs.elixpo.com"
+                            helperText="Host only. Device Flow apps never receive a client secret."
+                            sx={textFieldSx}
+                            disabled={loading}
+                        />
+                    )}
+                    <Typography
+                        sx={{
+                            color: "var(--fg-muted)",
+                            fontSize: "0.85rem",
+                            mt: 2,
+                            mb: 0.75,
+                        }}
+                    >
+                        OAuth scopes
+                    </Typography>
+                    <OAuthScopePicker
+                        selectedScopes={formData.scopes}
+                        customScopes={formData.custom_scopes}
+                        onSelectedScopesChange={(scopes) =>
+                            setFormData({ ...formData, scopes })
+                        }
+                        onCustomScopesChange={(custom_scopes) =>
+                            setFormData({ ...formData, custom_scopes })
+                        }
+                    />
+                    <Typography
+                        sx={{
+                            color: "var(--fg-muted)",
+                            fontSize: "0.85rem",
+                            mt: 2,
+                            mb: 0.5,
+                        }}
+                    >
                         Redirect URIs
                     </Typography>
                     <Typography
@@ -777,8 +1027,9 @@ const OAuthAppsPage = () => {
                             mb: 1,
                         }}
                     >
-                        The callback URLs where users will be redirected after
-                        authorization (up to 5)
+                        {formData.client_type === "public"
+                            ? "Optional for Device Flow apps"
+                            : "The callback URLs where users return after authorization (up to 5)"}
                     </Typography>
                     {formData.redirect_uris.map((uri, index) => (
                         <Box
@@ -993,11 +1244,15 @@ const OAuthAppsPage = () => {
                         borderBottom: "1px solid var(--border)",
                     }}
                 >
-                    Your new client secret
+                    Application registered
                 </DialogTitle>
                 <DialogContent sx={{ pt: 3 }}>
                     <Alert
-                        severity="warning"
+                        severity={
+                            newAppData?.client_type === "public"
+                                ? "info"
+                                : "warning"
+                        }
                         sx={{
                             mb: 3,
                             backgroundColor: "rgba(251, 146, 60, 0.1)",
@@ -1005,8 +1260,9 @@ const OAuthAppsPage = () => {
                             borderColor: "rgba(251, 146, 60, 0.3)",
                         }}
                     >
-                        Make sure to copy your new client secret now. You won't
-                        be able to see it again.
+                        {newAppData?.client_type === "public"
+                            ? "Device Flow apps do not use a client secret."
+                            : "Copy the client secret now. It will not be shown again."}
                     </Alert>
 
                     {newAppData && (
@@ -1075,63 +1331,66 @@ const OAuthAppsPage = () => {
                                 )}
                             </Box>
 
-                            <Box>
-                                <Typography
-                                    sx={{
-                                        color: "var(--fg-faint)",
-                                        fontSize: "0.8rem",
-                                        mb: 0.75,
-                                    }}
-                                >
-                                    Client Secret
-                                </Typography>
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: 1,
-                                        background: "var(--surface)",
-                                        p: 1.5,
-                                        borderRadius: "8px",
-                                        border: "1px solid rgba(239, 68, 68, 0.2)",
-                                    }}
-                                >
+                            {newAppData.client_secret && (
+                                <Box>
                                     <Typography
                                         sx={{
-                                            color: "#ef4444",
-                                            fontFamily: "monospace",
-                                            fontSize: "0.85rem",
-                                            flex: 1,
-                                            wordBreak: "break-all",
+                                            color: "var(--fg-faint)",
+                                            fontSize: "0.8rem",
+                                            mb: 0.75,
                                         }}
                                     >
-                                        {newAppData.client_secret}
+                                        Client Secret
                                     </Typography>
-                                    <IconButton
-                                        size="small"
-                                        onClick={() =>
-                                            handleCopyToClipboard(
-                                                newAppData.client_secret,
-                                                "secret",
-                                            )
-                                        }
-                                        sx={{ color: "#ef4444" }}
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: 1,
+                                            background: "var(--surface)",
+                                            p: 1.5,
+                                            borderRadius: "8px",
+                                            border: "1px solid rgba(239, 68, 68, 0.2)",
+                                        }}
                                     >
-                                        <ContentCopyIcon fontSize="small" />
-                                    </IconButton>
+                                        <Typography
+                                            sx={{
+                                                color: "#ef4444",
+                                                fontFamily: "monospace",
+                                                fontSize: "0.85rem",
+                                                flex: 1,
+                                                wordBreak: "break-all",
+                                            }}
+                                        >
+                                            {newAppData.client_secret}
+                                        </Typography>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() =>
+                                                handleCopyToClipboard(
+                                                    newAppData.client_secret ||
+                                                        "",
+                                                    "secret",
+                                                )
+                                            }
+                                            sx={{ color: "#ef4444" }}
+                                        >
+                                            <ContentCopyIcon fontSize="small" />
+                                        </IconButton>
+                                    </Box>
+                                    {secretCopied && (
+                                        <Typography
+                                            sx={{
+                                                color: "#ef4444",
+                                                fontSize: "0.75rem",
+                                                mt: 0.5,
+                                            }}
+                                        >
+                                            Copied!
+                                        </Typography>
+                                    )}
                                 </Box>
-                                {secretCopied && (
-                                    <Typography
-                                        sx={{
-                                            color: "#ef4444",
-                                            fontSize: "0.75rem",
-                                            mt: 0.5,
-                                        }}
-                                    >
-                                        Copied!
-                                    </Typography>
-                                )}
-                            </Box>
+                            )}
 
                             <Box>
                                 <Typography

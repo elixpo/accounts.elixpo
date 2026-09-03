@@ -1,21 +1,55 @@
 export const runtime = "edge";
 
 import { type NextRequest, NextResponse } from "next/server";
+import {
+    hasSufficientContrast,
+    isOpaqueHexColor,
+    isValidUrl,
+    sanitizeString,
+    validateBrandAssetUrl,
+    validateLogoUrl,
+} from "@/lib/branding-validation";
 import { getDatabase } from "@/lib/d1-client";
 import {
     getOAuthClientById,
     getOAuthClientByIdWithSecret,
     getUserById,
+    logAuditEvent,
     updateOAuthClient,
 } from "@/lib/db";
 import { verifyJWT } from "@/lib/jwt";
-import { SUPPORTED_LIXBLOGS_SCOPES } from "@/lib/lixblogs-scopes";
 import { sendMail } from "@/lib/mails";
+import { normalizeOAuthAudience } from "@/lib/oauth-client-registration";
 import {
-    SUPPORTED_OAUTH_SCOPES,
-    unsupportedOAuthScopes,
-} from "@/lib/oauth-scopes";
-import { generateRandomString, hashString } from "@/lib/webcrypto";
+    findScopeOption,
+    parseCustomScopes,
+    SUPPORTED_PRODUCT_SCOPES,
+    validateCustomScopes,
+} from "@/lib/oauth-scope-registry";
+import { SUPPORTED_OAUTH_SCOPES } from "@/lib/oauth-scopes";
+import {
+    generateRandomString,
+    generateUUID,
+    hashString,
+} from "@/lib/webcrypto";
+
+async function canManageClient(
+    db: Awaited<ReturnType<typeof getDatabase>>,
+    app: { owner_id?: string },
+    userId: string,
+): Promise<boolean> {
+    if (app.owner_id === userId) return true;
+    if (
+        app.owner_id !== "system-lixblogs-cli" &&
+        app.owner_id !== "system-lixrl-cli"
+    )
+        return false;
+    const user = await db
+        .prepare("SELECT is_internal FROM users WHERE id = ?")
+        .bind(userId)
+        .first<{ is_internal: number }>();
+    return user?.is_internal === 1;
+}
 
 /**
  * PUT /api/auth/oauth-clients/[client_id]
@@ -51,6 +85,13 @@ export async function PUT(
             description,
             homepage_url,
             logo_url,
+            branding_display_name,
+            branding_primary_color,
+            branding_accent_color,
+            privacy_policy_url,
+            terms_of_service_url,
+            audience,
+            custom_scopes,
         } = body;
 
         if (!client_id) {
@@ -70,15 +111,20 @@ export async function PUT(
                 { status: 404 },
             );
         }
-        if (app.owner_id !== payload.sub) {
+        if (!(await canManageClient(db, app, payload.sub))) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
         // Validate redirect URIs if provided
         if (redirect_uris !== undefined) {
-            if (!Array.isArray(redirect_uris) || redirect_uris.length === 0) {
+            if (
+                !Array.isArray(redirect_uris) ||
+                (app.client_type !== "public" && redirect_uris.length === 0)
+            ) {
                 return NextResponse.json(
-                    { error: "redirect_uris must be a non-empty array" },
+                    {
+                        error: "redirect_uris must be an array; confidential clients require at least one",
+                    },
                     { status: 400 },
                 );
             }
@@ -111,20 +157,54 @@ export async function PUT(
             }
         }
 
-        const allowedScopes: string[] =
-            app.client_type === "public"
-                ? [...SUPPORTED_OAUTH_SCOPES, ...SUPPORTED_LIXBLOGS_SCOPES]
-                : [...SUPPORTED_OAUTH_SCOPES];
+        let normalizedAudience: string | null | undefined;
+        if (audience !== undefined) {
+            normalizedAudience = normalizeOAuthAudience(audience);
+            if (app.client_type !== "public" || !normalizedAudience) {
+                return NextResponse.json(
+                    {
+                        error:
+                            app.client_type !== "public"
+                                ? "Audience is only supported for public clients"
+                                : "Public clients require a valid host-only audience",
+                    },
+                    { status: 400 },
+                );
+            }
+        }
+
+        const customScopeResult =
+            custom_scopes === undefined
+                ? { scopes: JSON.parse(app.custom_scopes || "[]") }
+                : validateCustomScopes(custom_scopes);
+        if ("error" in customScopeResult) {
+            return NextResponse.json(
+                { error: customScopeResult.error },
+                { status: 400 },
+            );
+        }
+        const customScopeDefinitions = customScopeResult.scopes || [];
+        const existingScopes: string[] = JSON.parse(app.scopes || "[]");
+        const currentCustomScopes = parseCustomScopes(app.custom_scopes);
+        const legacyUnknownScopes = existingScopes.filter(
+            (scope) => !findScopeOption(scope, currentCustomScopes),
+        );
+        const allowedScopes: string[] = [
+            ...SUPPORTED_OAUTH_SCOPES,
+            ...SUPPORTED_PRODUCT_SCOPES,
+            ...customScopeDefinitions.map(
+                (scope: { name: string }) => scope.name,
+            ),
+            ...legacyUnknownScopes,
+        ];
         if (
             scopes !== undefined &&
             (!Array.isArray(scopes) ||
-                (app.client_type === "public"
-                    ? scopes.some(
-                          (scope: unknown) =>
-                              typeof scope !== "string" ||
-                              !allowedScopes.includes(scope),
-                      )
-                    : unsupportedOAuthScopes(scopes).length > 0))
+                scopes.some(
+                    (scope: unknown) =>
+                        typeof scope !== "string" ||
+                        !allowedScopes.includes(scope),
+                ))
         ) {
             return NextResponse.json(
                 {
@@ -134,6 +214,139 @@ export async function PUT(
             );
         }
 
+        // Custom branding validations
+        for (const [label, value] of [
+            ["Homepage", homepage_url],
+            ["Logo", logo_url],
+            ["Privacy Policy", privacy_policy_url],
+            ["Terms of Service", terms_of_service_url],
+        ] as const) {
+            if (
+                value !== undefined &&
+                value !== null &&
+                typeof value !== "string"
+            ) {
+                return NextResponse.json(
+                    { error: `${label} URL must be a string` },
+                    { status: 400 },
+                );
+            }
+            if (typeof value === "string" && value.length > 2048) {
+                return NextResponse.json(
+                    { error: `${label} URL is too long` },
+                    { status: 400 },
+                );
+            }
+        }
+        if (homepage_url !== undefined) {
+            if (homepage_url && !isValidUrl(homepage_url)) {
+                return NextResponse.json(
+                    { error: "Invalid homepage URL" },
+                    { status: 400 },
+                );
+            }
+        }
+        if (privacy_policy_url !== undefined) {
+            if (privacy_policy_url && !isValidUrl(privacy_policy_url)) {
+                return NextResponse.json(
+                    { error: "Invalid Privacy Policy URL" },
+                    { status: 400 },
+                );
+            }
+        }
+        if (terms_of_service_url !== undefined) {
+            if (terms_of_service_url && !isValidUrl(terms_of_service_url)) {
+                return NextResponse.json(
+                    { error: "Invalid Terms of Service URL" },
+                    { status: 400 },
+                );
+            }
+        }
+        const effectiveHomepage =
+            homepage_url !== undefined ? homepage_url : app.homepage_url;
+        if (logo_url) {
+            const logoCheck = validateLogoUrl(logo_url, effectiveHomepage);
+            if (!logoCheck.valid) {
+                return NextResponse.json(
+                    { error: logoCheck.error },
+                    { status: 400 },
+                );
+            }
+        }
+        for (const [label, value] of [
+            ["Privacy Policy", privacy_policy_url],
+            ["Terms of Service", terms_of_service_url],
+        ] as const) {
+            if (!value) continue;
+            const result = validateBrandAssetUrl(value, effectiveHomepage);
+            if (!result.valid) {
+                return NextResponse.json(
+                    { error: `${label} URL: ${result.error}` },
+                    { status: 400 },
+                );
+            }
+        }
+        if (
+            branding_display_name !== undefined &&
+            branding_display_name !== null &&
+            typeof branding_display_name !== "string"
+        ) {
+            return NextResponse.json(
+                { error: "Branding display name must be a string" },
+                { status: 400 },
+            );
+        }
+        if (branding_primary_color !== undefined) {
+            if (branding_primary_color) {
+                if (
+                    typeof branding_primary_color !== "string" ||
+                    !hasSufficientContrast(branding_primary_color)
+                ) {
+                    return NextResponse.json(
+                        {
+                            error: "Primary color has insufficient contrast against both black and white.",
+                        },
+                        { status: 400 },
+                    );
+                }
+            }
+        }
+        if (
+            branding_accent_color &&
+            (typeof branding_accent_color !== "string" ||
+                !isOpaqueHexColor(branding_accent_color))
+        ) {
+            return NextResponse.json(
+                {
+                    error: "Accent color must be an opaque 3- or 6-digit hex color",
+                },
+                { status: 400 },
+            );
+        }
+
+        const trustBearingBrandingChanged =
+            (homepage_url !== undefined &&
+                (homepage_url || null) !== (app.homepage_url || null)) ||
+            (redirect_uris !== undefined &&
+                JSON.stringify(redirect_uris) !== app.redirect_uris) ||
+            (logo_url !== undefined &&
+                (logo_url || null) !== (app.logo_url || null)) ||
+            (branding_display_name !== undefined &&
+                (branding_display_name || null) !==
+                    (app.branding_display_name || null)) ||
+            (branding_primary_color !== undefined &&
+                (branding_primary_color || null) !==
+                    (app.branding_primary_color || null)) ||
+            (branding_accent_color !== undefined &&
+                (branding_accent_color || null) !==
+                    (app.branding_accent_color || null)) ||
+            (privacy_policy_url !== undefined &&
+                (privacy_policy_url || null) !==
+                    (app.privacy_policy_url || null)) ||
+            (terms_of_service_url !== undefined &&
+                (terms_of_service_url || null) !==
+                    (app.terms_of_service_url || null));
+
         try {
             await updateOAuthClient(db, client_id, {
                 ...(name !== undefined && { name }),
@@ -141,12 +354,63 @@ export async function PUT(
                     redirectUris: JSON.stringify(redirect_uris),
                 }),
                 ...(scopes !== undefined && { scopes: JSON.stringify(scopes) }),
+                ...(custom_scopes !== undefined && {
+                    customScopes: JSON.stringify(customScopeDefinitions),
+                }),
+                ...(normalizedAudience !== undefined && {
+                    audience: normalizedAudience,
+                }),
                 ...(description !== undefined && { description }),
                 ...(homepage_url !== undefined && {
-                    homepageUrl: homepage_url,
+                    homepageUrl: homepage_url || null,
                 }),
-                ...(logo_url !== undefined && { logoUrl: logo_url }),
+                ...(logo_url !== undefined && { logoUrl: logo_url || null }),
+                ...(branding_display_name !== undefined && {
+                    brandingDisplayName: branding_display_name
+                        ? sanitizeString(branding_display_name).slice(0, 50)
+                        : null,
+                }),
+                ...(branding_primary_color !== undefined && {
+                    brandingPrimaryColor: branding_primary_color || null,
+                }),
+                ...(branding_accent_color !== undefined && {
+                    brandingAccentColor: branding_accent_color || null,
+                }),
+                ...(privacy_policy_url !== undefined && {
+                    privacyPolicyUrl: privacy_policy_url || null,
+                }),
+                ...(terms_of_service_url !== undefined && {
+                    termsOfServiceUrl: terms_of_service_url || null,
+                }),
+                ...(trustBearingBrandingChanged && {
+                    isBrandingVerified: false,
+                    brandingVerifiedDomain: null,
+                    brandingVerifiedAt: null,
+                }),
             });
+
+            // Log audit event for branding modifications
+            if (
+                scopes !== undefined ||
+                audience !== undefined ||
+                branding_display_name !== undefined ||
+                branding_primary_color !== undefined ||
+                branding_accent_color !== undefined ||
+                logo_url !== undefined ||
+                privacy_policy_url !== undefined ||
+                terms_of_service_url !== undefined
+            ) {
+                await logAuditEvent(db, {
+                    id: generateUUID(),
+                    userId: payload.sub,
+                    eventType:
+                        scopes !== undefined || audience !== undefined
+                            ? "client.registration_updated"
+                            : "client.branding_updated",
+                    provider: client_id,
+                    status: "success",
+                }).catch(() => {});
+            }
         } catch (error) {
             console.error("[OAuth Client] Database update error:", error);
             return NextResponse.json(
@@ -163,10 +427,25 @@ export async function PUT(
             homepage_url: updated?.homepage_url,
             redirect_uris: JSON.parse(updated?.redirect_uris || "[]"),
             scopes: JSON.parse(updated?.scopes || "[]"),
+            custom_scopes: JSON.parse(updated?.custom_scopes || "[]"),
             is_active: Boolean(updated?.is_active),
             client_type: updated?.client_type || "confidential",
+            token_endpoint_auth_method:
+                updated?.client_type === "public"
+                    ? "none"
+                    : "client_secret_post",
+            audience: updated?.audience || null,
             request_count: updated?.request_count ?? 0,
             last_used: updated?.last_used,
+            logo_url: updated?.logo_url || null,
+            branding_display_name: updated?.branding_display_name || null,
+            branding_primary_color: updated?.branding_primary_color || null,
+            branding_accent_color: updated?.branding_accent_color || null,
+            privacy_policy_url: updated?.privacy_policy_url || null,
+            terms_of_service_url: updated?.terms_of_service_url || null,
+            is_branding_verified: updated?.is_branding_verified === 1,
+            branding_verified_domain: updated?.branding_verified_domain || null,
+            branding_verified_at: updated?.branding_verified_at || null,
         });
     } catch (error) {
         console.error("[OAuth Client] Update error:", error);
@@ -221,7 +500,7 @@ export async function PATCH(
                 { status: 404 },
             );
         }
-        if (app.owner_id !== payload.sub) {
+        if (!(await canManageClient(db, app, payload.sub))) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
         if (app.client_type === "public") {
@@ -299,7 +578,7 @@ export async function DELETE(
                 { status: 404 },
             );
         }
-        if (app.owner_id !== payload.sub) {
+        if (!(await canManageClient(db, app, payload.sub))) {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
@@ -391,6 +670,12 @@ export async function GET(
 
         // Get from D1
         let app: any = null;
+        let canManage = false;
+        let auditHistory: Array<{
+            event_type: string;
+            status: string;
+            created_at: string;
+        }> = [];
         try {
             const db = await getDatabase();
             app = await getOAuthClientByIdWithSecret(db, client_id);
@@ -400,10 +685,25 @@ export async function GET(
                     { status: 404 },
                 );
             }
-            if (
-                !(app as any).is_active &&
-                (app as any).owner_id !== payload.sub
-            ) {
+            canManage = await canManageClient(db, app, payload.sub);
+            if (canManage) {
+                const history = await db
+                    .prepare(
+                        `SELECT event_type, status, created_at
+                         FROM audit_logs
+                         WHERE provider = ?
+                         ORDER BY created_at DESC
+                         LIMIT 20`,
+                    )
+                    .bind(client_id)
+                    .all<{
+                        event_type: string;
+                        status: string;
+                        created_at: string;
+                    }>();
+                auditHistory = history.results || [];
+            }
+            if (!(app as any).is_active && !canManage) {
                 return NextResponse.json(
                     { error: "Application is inactive" },
                     { status: 403 },
@@ -435,7 +735,7 @@ export async function GET(
         }
 
         // Return full data (owner gets extra fields, others get public subset)
-        const isOwner = (app as any).owner_id === payload.sub;
+        const isOwner = canManage;
         return NextResponse.json({
             client_id,
             name: (app as any).name,
@@ -443,13 +743,33 @@ export async function GET(
             homepage_url: (app as any).homepage_url || null,
             redirect_uris,
             scopes,
+            custom_scopes: JSON.parse((app as any).custom_scopes || "[]"),
             is_active: Boolean((app as any).is_active),
             client_type: (app as any).client_type || "confidential",
+            token_endpoint_auth_method:
+                (app as any).client_type === "public"
+                    ? "none"
+                    : "client_secret_post",
+            audience: (app as any).audience || null,
             created_at: (app as any).created_at,
             ...(isOwner && {
                 logo_url: (app as any).logo_url,
                 request_count: (app as any).request_count ?? 0,
                 last_used: (app as any).last_used,
+                branding_display_name:
+                    (app as any).branding_display_name || null,
+                branding_primary_color:
+                    (app as any).branding_primary_color || null,
+                branding_accent_color:
+                    (app as any).branding_accent_color || null,
+                privacy_policy_url: (app as any).privacy_policy_url || null,
+                terms_of_service_url: (app as any).terms_of_service_url || null,
+                is_branding_verified: (app as any).is_branding_verified === 1,
+                branding_verified_domain:
+                    (app as any).branding_verified_domain || null,
+                branding_verified_at: (app as any).branding_verified_at || null,
+                owner_id: (app as any).owner_id,
+                audit_history: auditHistory,
             }),
         });
     } catch (error) {

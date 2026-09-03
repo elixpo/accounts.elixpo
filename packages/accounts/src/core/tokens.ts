@@ -1,107 +1,172 @@
-import { createRemoteJWKSet, type JWTPayload, jwtVerify } from "jose";
-import { discover } from "./discovery";
-import { AccountsError } from "./errors";
-import type { AccountsConfig } from "./types";
+import { AccountsError } from "./errors.js";
+import type {
+    AccountsConfiguration,
+    AuthorizationServerMetadata,
+    OAuthErrorCode,
+    TokenSet,
+} from "./types.js";
 
-export class TokenValidationError extends AccountsError {
-    constructor(message: string) {
-        super("invalid_token", message);
-        this.name = "TokenValidationError";
-    }
-}
+type RawTokenResponse = {
+    access_token?: unknown;
+    refresh_token?: unknown;
+    id_token?: unknown;
+    token_type?: unknown;
+    expires_in?: unknown;
+    scope?: unknown;
+    error?: unknown;
+};
 
-/**
- * ID token claims per OpenID Connect Core §2, plus the standard JWT claims.
- * Only fields the SDK relies on are typed — consumers needing custom claims
- * should treat the return value as a base to extend, not the full contract.
- */
-export interface IDTokenClaims extends JWTPayload {
-    sub: string;
-    nonce?: string;
-    email?: string;
-    email_verified?: boolean;
-    name?: string;
-    picture?: string;
-}
-
-// One JWKS remote set per issuer, reused across verifications so we're not
-// refetching /jwks on every request. jose handles its own internal caching
-// and rotation-aware refetch on kid miss.
-const jwksCache = new Map<string, ReturnType<typeof createRemoteJWKSet>>();
-
-function getJWKS(jwksUri: string) {
-    let jwks = jwksCache.get(jwksUri);
-    if (!jwks) {
-        jwks = createRemoteJWKSet(new URL(jwksUri));
-        jwksCache.set(jwksUri, jwks);
-    }
-    return jwks;
-}
-
-/**
- * Verifies an ID token's signature, issuer, audience, and expiry against the
- * discovered provider configuration. Algorithm is constrained to whatever
- * the provider's discovery document advertises — this SDK never trusts an
- * algorithm the provider itself didn't declare as supported, which rules out
- * algorithm-confusion attacks (e.g. a token claiming "alg: none" or HS256
- * signed with a public RSA key value).
- *
- * Does NOT validate the nonce — nonce comparison requires the value stored
- * client-side at authorization time, which this function has no access to.
- * Callers must separately call validateStateOrNonce() against the returned
- * claims.nonce.
- */
-export async function verifyIdToken(
-    config: AccountsConfig,
-    idToken: string,
-): Promise<IDTokenClaims> {
-    const discovery = await discover(config);
-    const jwks = getJWKS(discovery.jwks_uri);
-
-    try {
-        const { payload } = await jwtVerify(idToken, jwks, {
-            issuer: discovery.issuer,
-            audience: config.clientId,
-            algorithms: discovery.id_token_signing_alg_values_supported,
-        });
-        return payload as IDTokenClaims;
-    } catch (err) {
-        // jose errors carry their own descriptive messages (e.g. "exp claim timestamp
-        // check failed") that are safe to surface — they describe the validation
-        // failure, not any secret material. We still don't forward the raw error
-        // object, since it may embed the offending token in some jose versions.
-        const reason =
-            err instanceof Error ? err.message : "unknown validation failure";
-        throw new TokenValidationError(
-            `ID token verification failed: ${reason}`,
+function parseTokenSet(value: RawTokenResponse): TokenSet {
+    if (
+        typeof value.access_token !== "string" ||
+        typeof value.refresh_token !== "string" ||
+        value.token_type !== "Bearer" ||
+        typeof value.expires_in !== "number" ||
+        typeof value.scope !== "string"
+    ) {
+        throw new AccountsError(
+            "protocol_error",
+            "Token endpoint returned an invalid response",
         );
     }
+    return {
+        accessToken: value.access_token,
+        refreshToken: value.refresh_token,
+        ...(typeof value.id_token === "string"
+            ? { idToken: value.id_token }
+            : {}),
+        tokenType: "Bearer",
+        expiresIn: value.expires_in,
+        scope: value.scope.split(/\s+/).filter(Boolean),
+    };
 }
 
-/**
- * Verifies an access token issued by Elixpo Accounts. Structurally identical
- * to ID token verification (same issuer/JWKS), but does not assume OIDC
- * standard claims beyond sub/exp/iss/aud — access tokens are opaque-ish by
- * OAuth spec and their claim shape is provider-defined.
- */
-export async function verifyAccessToken(
-    config: AccountsConfig,
-    accessToken: string,
-): Promise<JWTPayload> {
-    const discovery = await discover(config);
-    const jwks = getJWKS(discovery.jwks_uri);
-
+async function postForm(
+    endpoint: string,
+    values: Record<string, string | undefined>,
+    options: { fetch?: typeof fetch; timeoutMs?: number },
+): Promise<Record<string, unknown>> {
+    const fetcher = options.fetch ?? globalThis.fetch;
+    const controller = new AbortController();
+    const timeout = setTimeout(
+        () => controller.abort(),
+        options.timeoutMs ?? 5_000,
+    );
     try {
-        const { payload } = await jwtVerify(accessToken, jwks, {
-            issuer: discovery.issuer,
-            algorithms: discovery.id_token_signing_alg_values_supported,
+        const body = new URLSearchParams();
+        for (const [key, value] of Object.entries(values)) {
+            if (value !== undefined) body.set(key, value);
+        }
+        const response = await fetcher(endpoint, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body,
+            cache: "no-store",
+            redirect: "error",
+            signal: controller.signal,
         });
+        let payload: Record<string, unknown>;
+        try {
+            payload = (await response.json()) as Record<string, unknown>;
+        } catch (error) {
+            throw new AccountsError(
+                "protocol_error",
+                "OAuth endpoint returned invalid JSON",
+                {
+                    status: response.status,
+                    cause: error,
+                },
+            );
+        }
+        if (!response.ok || typeof payload.error === "string") {
+            throw new AccountsError(
+                "oauth_error",
+                "OAuth request was rejected",
+                {
+                    oauthCode:
+                        typeof payload.error === "string"
+                            ? (payload.error as OAuthErrorCode)
+                            : "server_error",
+                    retryable: response.status >= 500,
+                    status: response.status,
+                },
+            );
+        }
         return payload;
-    } catch (err) {
-        const reason =
-            err instanceof Error ? err.message : "unknown validation failure";
-        throw new TokenValidationError(
-            `Access token verification failed: ${reason}`,
+    } catch (error) {
+        if (error instanceof AccountsError) throw error;
+        throw new AccountsError(
+            "network_error",
+            "OAuth endpoint was unavailable",
+            {
+                retryable: true,
+                cause: error,
+            },
         );
+    } finally {
+        clearTimeout(timeout);
     }
+}
+
+export async function exchangeAuthorizationCode(
+    metadata: AuthorizationServerMetadata,
+    configuration: AccountsConfiguration,
+    input: { code: string; codeVerifier: string },
+): Promise<TokenSet> {
+    return parseTokenSet(
+        await postForm(
+            metadata.token_endpoint,
+            {
+                grant_type: "authorization_code",
+                code: input.code,
+                code_verifier: input.codeVerifier,
+                client_id: configuration.clientId,
+                client_secret: configuration.clientSecret,
+                redirect_uri: configuration.redirectUri,
+            },
+            configuration,
+        ),
+    );
+}
+
+export async function refreshTokens(
+    metadata: AuthorizationServerMetadata,
+    configuration: AccountsConfiguration,
+    refreshToken: string,
+    scopes?: string[],
+): Promise<TokenSet> {
+    return parseTokenSet(
+        await postForm(
+            metadata.token_endpoint,
+            {
+                grant_type: "refresh_token",
+                refresh_token: refreshToken,
+                client_id: configuration.clientId,
+                client_secret: configuration.clientSecret,
+                scope: scopes?.join(" "),
+            },
+            configuration,
+        ),
+    );
+}
+
+export async function revokeToken(
+    metadata: AuthorizationServerMetadata,
+    configuration: AccountsConfiguration,
+    token: string,
+    tokenTypeHint: "access_token" | "refresh_token" = "refresh_token",
+): Promise<void> {
+    await postForm(
+        metadata.revocation_endpoint,
+        {
+            token,
+            token_type_hint: tokenTypeHint,
+            client_id: configuration.clientId,
+            client_secret: configuration.clientSecret,
+        },
+        configuration,
+    );
 }

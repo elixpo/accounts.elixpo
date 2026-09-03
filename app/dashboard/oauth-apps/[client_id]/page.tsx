@@ -4,6 +4,7 @@ import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DownloadIcon from "@mui/icons-material/Download";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import SaveIcon from "@mui/icons-material/Save";
@@ -21,6 +22,8 @@ import {
 } from "@mui/material";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import type { CustomOAuthScope } from "@/lib/oauth-scope-registry";
+import { OAuthScopePicker } from "../../../components/oauth-scope-picker";
 
 const cardSx = {
     background: "var(--surface)",
@@ -51,6 +54,21 @@ const monoBox = {
     p: 1.5,
 };
 
+function appIconSources(homepageUrl: string, logoUrl: string): string[] {
+    const sources = logoUrl ? [logoUrl] : [];
+    if (!homepageUrl) return sources;
+    try {
+        const url = new URL(homepageUrl);
+        sources.push(
+            `${url.origin}/favicon.ico`,
+            `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=64`,
+        );
+        return [...new Set(sources)];
+    } catch {
+        return sources;
+    }
+}
+
 export default function OAuthAppSettingsPage() {
     const params = useParams();
     const router = useRouter();
@@ -63,18 +81,36 @@ export default function OAuthAppSettingsPage() {
         text: string;
         type: "success" | "error";
     } | null>(null);
+    const [verifyingDomain, setVerifyingDomain] = useState(false);
+    const [verifyMessage, setVerifyMessage] = useState<{
+        text: string;
+        type: "success" | "error";
+    } | null>(null);
+    const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">(
+        "desktop",
+    );
     const [copiedField, setCopiedField] = useState<string | null>(null);
 
     const [regeneratedSecret, setRegeneratedSecret] = useState<string | null>(
         null,
     );
     const [regenerating, setRegenerating] = useState(false);
+    const [iconStage, setIconStage] = useState(0);
 
     const [form, setForm] = useState({
         name: "",
         description: "",
         homepage_url: "",
         redirect_uris: [""] as string[],
+        logo_url: "",
+        branding_display_name: "",
+        branding_primary_color: "",
+        branding_accent_color: "",
+        privacy_policy_url: "",
+        terms_of_service_url: "",
+        audience: "",
+        scopes: ["openid", "profile", "email"] as string[],
+        custom_scopes: [] as CustomOAuthScope[],
     });
 
     // ── Webhook endpoints state ─────────────────────────────────────────
@@ -126,6 +162,9 @@ export default function OAuthAppSettingsPage() {
         unique_users: number;
         active_sessions: number;
         sign_in_timeline: Array<{ date: string; count: number }>;
+        timeline_days: number;
+        can_export_lifetime: boolean;
+        branding_verification_required: boolean;
         webhooks: {
             total_endpoints: number;
             active_endpoints: number;
@@ -133,13 +172,14 @@ export default function OAuthAppSettingsPage() {
         };
     }
     const [stats, setStats] = useState<AppStats | null>(null);
+    const [activityDays, setActivityDays] = useState(30);
 
     useEffect(() => {
         let cancelled = false;
         (async () => {
             try {
                 const res = await fetch(
-                    `/api/auth/oauth-clients/${clientId}/stats`,
+                    `/api/auth/oauth-clients/${clientId}/stats?days=${activityDays}`,
                     { credentials: "include" },
                 );
                 if (!res.ok) return;
@@ -152,7 +192,7 @@ export default function OAuthAppSettingsPage() {
         return () => {
             cancelled = true;
         };
-    }, [clientId]);
+    }, [activityDays, clientId]);
 
     useEffect(() => {
         const fetchApp = async () => {
@@ -173,6 +213,19 @@ export default function OAuthAppSettingsPage() {
                     description: data.description || "",
                     homepage_url: data.homepage_url || "",
                     redirect_uris: uris.length > 0 ? uris : [""],
+                    logo_url: data.logo_url || "",
+                    branding_display_name: data.branding_display_name || "",
+                    branding_primary_color: data.branding_primary_color || "",
+                    branding_accent_color: data.branding_accent_color || "",
+                    privacy_policy_url: data.privacy_policy_url || "",
+                    terms_of_service_url: data.terms_of_service_url || "",
+                    audience: data.audience || "",
+                    scopes: Array.isArray(data.scopes)
+                        ? data.scopes
+                        : ["openid", "profile", "email"],
+                    custom_scopes: Array.isArray(data.custom_scopes)
+                        ? data.custom_scopes
+                        : [],
                 });
             } catch {
                 router.push("/dashboard/oauth-apps");
@@ -355,6 +408,17 @@ export default function OAuthAppSettingsPage() {
                     description: form.description,
                     homepage_url: form.homepage_url,
                     redirect_uris: redirectUris,
+                    logo_url: form.logo_url,
+                    branding_display_name: form.branding_display_name,
+                    branding_primary_color: form.branding_primary_color,
+                    branding_accent_color: form.branding_accent_color,
+                    privacy_policy_url: form.privacy_policy_url,
+                    terms_of_service_url: form.terms_of_service_url,
+                    scopes: form.scopes,
+                    custom_scopes: form.custom_scopes,
+                    ...(app?.client_type === "public" && {
+                        audience: form.audience,
+                    }),
                 }),
             });
             if (!res.ok) {
@@ -373,6 +437,102 @@ export default function OAuthAppSettingsPage() {
             setSaving(false);
         }
     };
+
+    const handleVerifyDomain = async () => {
+        setVerifyingDomain(true);
+        setVerifyMessage(null);
+        try {
+            const res = await fetch(
+                `/api/auth/oauth-clients/${clientId}/verify`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                },
+            );
+            const data: any = await res.json();
+            if (!res.ok) throw new Error(data.error || "Verification failed");
+            setVerifyMessage({ text: data.message, type: "success" });
+            setApp((prev: any) => ({
+                ...prev,
+                is_branding_verified: 1,
+                branding_verified_domain: data.verified_domain,
+            }));
+        } catch (err: any) {
+            setVerifyMessage({ text: err.message, type: "error" });
+        } finally {
+            setVerifyingDomain(false);
+        }
+    };
+
+    const getContrastColorLocal = (hex: string): string => {
+        if (!hex?.startsWith("#")) return "#FFFFFF";
+        let cleanHex = hex.slice(1);
+        if (cleanHex.length === 3 || cleanHex.length === 4) {
+            cleanHex = cleanHex
+                .split("")
+                .map((c) => c + c)
+                .join("");
+        }
+        const r = parseInt(cleanHex.slice(0, 2), 16);
+        const g = parseInt(cleanHex.slice(2, 4), 16);
+        const b = parseInt(cleanHex.slice(4, 6), 16);
+        if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b))
+            return "#FFFFFF";
+
+        const [rs, gs, bs] = [r, g, b].map((c) => {
+            const s = c / 255;
+            return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+        });
+        const luminance = 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+        return luminance > 0.179 ? "#000000" : "#FFFFFF";
+    };
+
+    const getContrastRatioLocal = (hex1: string, hex2: string): number => {
+        const hexToRgb = (hex: string) => {
+            let cleanHex = hex.slice(1);
+            if (cleanHex.length === 3 || cleanHex.length === 4) {
+                cleanHex = cleanHex
+                    .split("")
+                    .map((c) => c + c)
+                    .join("");
+            }
+            const r = parseInt(cleanHex.slice(0, 2), 16);
+            const g = parseInt(cleanHex.slice(2, 4), 16);
+            const b = parseInt(cleanHex.slice(4, 6), 16);
+            return Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)
+                ? null
+                : { r, g, b };
+        };
+        const getLuminance = (rgb: { r: number; g: number; b: number }) => {
+            const [rs, gs, bs] = [rgb.r, rgb.g, rgb.b].map((c) => {
+                const s = c / 255;
+                return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+            });
+            return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+        };
+        const rgb1 = hexToRgb(hex1);
+        const rgb2 = hexToRgb(hex2);
+        if (!rgb1 || !rgb2) return 1;
+        const l1 = getLuminance(rgb1);
+        const l2 = getLuminance(rgb2);
+        return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    };
+
+    const _hasSufficientContrastLocal = (hex: string): boolean => {
+        const HEX_REGEX = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+        if (!HEX_REGEX.test(hex)) return false;
+        const ratioWhite = getContrastRatioLocal(hex, "#FFFFFF");
+        const ratioBlack = getContrastRatioLocal(hex, "#000000");
+        return ratioWhite >= 4.5 || ratioBlack >= 4.5;
+    };
+
+    const verificationDomain = (() => {
+        try {
+            return new URL(form.homepage_url).hostname;
+        } catch {
+            return "your-domain.com";
+        }
+    })();
 
     const handleDelete = async () => {
         if (
@@ -424,15 +584,12 @@ export default function OAuthAppSettingsPage() {
         }
     };
 
-    const faviconUrl = form.homepage_url
-        ? (() => {
-              try {
-                  return `https://www.google.com/s2/favicons?domain=${new URL(form.homepage_url).hostname}&sz=64`;
-              } catch {
-                  return null;
-              }
-          })()
-        : null;
+    const iconSources = appIconSources(form.homepage_url, form.logo_url);
+    const faviconUrl = iconSources[iconStage] || null;
+    useEffect(
+        () => setIconStage(0),
+        [form.homepage_url, form.logo_url],
+    );
 
     if (loading) {
         return (
@@ -450,14 +607,25 @@ export default function OAuthAppSettingsPage() {
     }
 
     return (
-        <Box>
+        <Box
+            sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                    xs: "minmax(0, 1fr)",
+                    lg: "190px minmax(0, 1fr) minmax(0, 1fr)",
+                },
+                gap: 2.5,
+                alignItems: "start",
+            }}
+        >
             {/* Back + Header */}
             <Button
                 startIcon={<ArrowBackIcon />}
                 onClick={() => router.push("/dashboard/oauth-apps")}
                 sx={{
+                    gridColumn: "1 / -1",
+                    justifySelf: "start",
                     color: "var(--fg-faint)",
-                    mb: 2,
                     textTransform: "none",
                     "&:hover": { color: "var(--fg)" },
                 }}
@@ -465,13 +633,33 @@ export default function OAuthAppSettingsPage() {
                 Back to OAuth Apps
             </Button>
 
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}>
+            <Box
+                sx={{
+                    gridColumn: "1 / -1",
+                    position: "sticky",
+                    top: { xs: 56, sm: 64 },
+                    zIndex: 10,
+                    display: "flex",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 2,
+                    mx: { xs: -1, sm: 0 },
+                    px: { xs: 1, sm: 1.5 },
+                    py: 1.5,
+                    bgcolor: "color-mix(in srgb, var(--bg) 88%, transparent)",
+                    backdropFilter: "blur(16px)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "14px",
+                    boxShadow: "0 8px 24px var(--overlay)",
+                }}
+            >
                 {/* Favicon */}
                 {faviconUrl ? (
                     <Box
                         component="img"
                         src={faviconUrl}
                         alt=""
+                        referrerPolicy="no-referrer"
                         sx={{
                             width: 40,
                             height: 40,
@@ -479,9 +667,7 @@ export default function OAuthAppSettingsPage() {
                             bgcolor: "var(--overlay)",
                             p: 0.5,
                         }}
-                        onError={(e: any) => {
-                            e.target.style.display = "none";
-                        }}
+                        onError={() => setIconStage((stage) => stage + 1)}
                     />
                 ) : (
                     <Box
@@ -501,7 +687,7 @@ export default function OAuthAppSettingsPage() {
                         {(app?.name || "A").charAt(0).toUpperCase()}
                     </Box>
                 )}
-                <Box>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
                     <Typography
                         variant="h5"
                         sx={{ fontWeight: 700, color: "var(--fg)" }}
@@ -531,6 +717,61 @@ export default function OAuthAppSettingsPage() {
                             })()}
                         </Typography>
                     )}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.5,
+                            mt: 0.25,
+                        }}
+                    >
+                        <Typography
+                            sx={{
+                                color: "var(--fg-faint)",
+                                fontFamily: "monospace",
+                                fontSize: "0.72rem",
+                                wordBreak: "break-all",
+                            }}
+                        >
+                            {app?.client_id || clientId}
+                        </Typography>
+                        <Tooltip
+                            title={
+                                copiedField === "client_id"
+                                    ? "Copied!"
+                                    : "Copy"
+                            }
+                        >
+                            <IconButton
+                                size="small"
+                                onClick={() =>
+                                    copyToClipboard(
+                                        app?.client_id || clientId,
+                                        "client_id",
+                                    )
+                                }
+                                sx={{ color: "#ff7759", p: 0.25 }}
+                            >
+                                <ContentCopyIcon
+                                    sx={{ fontSize: "0.85rem" }}
+                                />
+                            </IconButton>
+                        </Tooltip>
+                        <Typography
+                            component="a"
+                            href="/docs/lixaccounts"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{
+                                color: "#ff7759",
+                                fontSize: "0.7rem",
+                                textDecoration: "none",
+                                "&:hover": { textDecoration: "underline" },
+                            }}
+                        >
+                            SDK docs
+                        </Typography>
+                    </Box>
                 </Box>
                 {app?.is_active === false && (
                     <Chip
@@ -542,6 +783,24 @@ export default function OAuthAppSettingsPage() {
                         }}
                     />
                 )}
+                <Button
+                    variant="contained"
+                    startIcon={<SaveIcon />}
+                    onClick={handleSave}
+                    disabled={saving}
+                    sx={{
+                        ml: { xs: 0, sm: "auto" },
+                        width: { xs: "100%", sm: "auto" },
+                        background: "rgba(255, 119, 89,0.15)",
+                        color: "#ff7759",
+                        border: "1px solid rgba(255, 119, 89,0.3)",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        "&:hover": { background: "rgba(255, 119, 89,0.25)" },
+                    }}
+                >
+                    {saving ? "Saving..." : "Save Changes"}
+                </Button>
             </Box>
 
             {message && (
@@ -549,7 +808,7 @@ export default function OAuthAppSettingsPage() {
                     severity={message.type}
                     onClose={() => setMessage(null)}
                     sx={{
-                        mb: 3,
+                        gridColumn: "1 / -1",
                         bgcolor:
                             message.type === "success"
                                 ? "rgba(255, 119, 89,0.1)"
@@ -569,62 +828,69 @@ export default function OAuthAppSettingsPage() {
                 </Alert>
             )}
 
+            <Box
+                component="nav"
+                aria-label="Application settings sections"
+                sx={{
+                    display: { xs: "none", lg: "flex" },
+                    position: "sticky",
+                    top: 150,
+                    gridColumn: "1",
+                    gridRow: "span 7",
+                    order: 1,
+                    flexDirection: "column",
+                    gap: 0.5,
+                    p: 1,
+                    borderRadius: "12px",
+                    border: "1px solid var(--border)",
+                    bgcolor: "var(--surface)",
+                }}
+            >
+                {[
+                    ["overview", "Application"],
+                    ["credentials", "Client secret"],
+                    ["webhooks", "Webhook endpoints"],
+                    ["routes", "Redirects & info"],
+                    ["branding", "Branding & identity"],
+                    ["activity", "Activity"],
+                    ["danger", "Danger zone"],
+                ].map(([id, label]) => (
+                    <Button
+                        key={id}
+                        component="a"
+                        href={`#${id}`}
+                        sx={{
+                            justifyContent: "flex-start",
+                            color: "var(--fg-muted)",
+                            textTransform: "none",
+                            fontSize: "0.82rem",
+                            "&:hover": {
+                                color: "#ff7759",
+                                bgcolor: "rgba(255, 119, 89,0.08)",
+                            },
+                        }}
+                    >
+                        {label}
+                    </Button>
+                ))}
+            </Box>
+
             {/* Bento Grid */}
             <Box
                 sx={{
-                    display: "grid",
-                    gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
-                    gap: 2.5,
-                    mb: 3,
+                    display: "contents",
                 }}
             >
-                {/* Client ID */}
-                <Box sx={cardSx}>
-                    <Typography
-                        sx={{
-                            color: "var(--fg-faint)",
-                            fontSize: "0.8rem",
-                            mb: 1,
-                            fontWeight: 500,
-                        }}
-                    >
-                        Client ID
-                    </Typography>
-                    <Box sx={monoBox}>
-                        <Typography
-                            sx={{
-                                color: "#ff7759",
-                                fontFamily: "monospace",
-                                fontSize: "0.8rem",
-                                flex: 1,
-                                wordBreak: "break-all",
-                            }}
-                        >
-                            {app?.client_id || clientId}
-                        </Typography>
-                        <Tooltip
-                            title={
-                                copiedField === "client_id" ? "Copied!" : "Copy"
-                            }
-                        >
-                            <IconButton
-                                size="small"
-                                onClick={() =>
-                                    copyToClipboard(
-                                        app?.client_id || clientId,
-                                        "client_id",
-                                    )
-                                }
-                                sx={{ color: "#ff7759" }}
-                            >
-                                <ContentCopyIcon fontSize="small" />
-                            </IconButton>
-                        </Tooltip>
-                    </Box>
-                </Box>
-
                 {/* Client Secret */}
-                <Box sx={cardSx}>
+                <Box
+                    id="credentials"
+                    sx={{
+                        ...cardSx,
+                        order: 2,
+                        gridColumn: { xs: "1", lg: "2 / -1" },
+                        scrollMarginTop: "150px",
+                    }}
+                >
                     <Typography
                         sx={{
                             color: "var(--fg-faint)",
@@ -633,9 +899,17 @@ export default function OAuthAppSettingsPage() {
                             fontWeight: 500,
                         }}
                     >
-                        Client Secret
+                        {app?.client_type === "public"
+                            ? "Token authentication"
+                            : "Client Secret"}
                     </Typography>
-                    {regeneratedSecret ? (
+                    {app?.client_type === "public" ? (
+                        <Alert severity="info">
+                            Public device-flow clients authenticate with method
+                            <strong> none</strong>. No secret exists or can be
+                            regenerated.
+                        </Alert>
+                    ) : regeneratedSecret ? (
                         <>
                             <Box
                                 sx={{
@@ -704,16 +978,21 @@ export default function OAuthAppSettingsPage() {
                                 >
                                     ••••••••••••••••••••••••••••
                                 </Typography>
-                                <Tooltip title="Regenerate secret">
-                                    <IconButton
-                                        size="small"
-                                        onClick={handleRegenerateSecret}
-                                        disabled={regenerating}
-                                        sx={{ color: "#ff7759" }}
-                                    >
-                                        <RefreshIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
+                                <Button
+                                    size="small"
+                                    startIcon={<RefreshIcon />}
+                                    onClick={handleRegenerateSecret}
+                                    disabled={regenerating}
+                                    sx={{
+                                        color: "#ff7759",
+                                        textTransform: "none",
+                                        flexShrink: 0,
+                                    }}
+                                >
+                                    {regenerating
+                                        ? "Regenerating…"
+                                        : "Regenerate"}
+                                </Button>
                             </Box>
                             <Typography
                                 variant="caption"
@@ -729,8 +1008,16 @@ export default function OAuthAppSettingsPage() {
                     )}
                 </Box>
 
-                {/* General Settings (spans full width on lg) */}
-                <Box sx={{ ...cardSx, gridColumn: { lg: "1 / -1" } }}>
+                {/* General Settings */}
+                <Box
+                    id="overview"
+                    sx={{
+                        ...cardSx,
+                        order: 1,
+                        gridColumn: { xs: "1", lg: "2 / -1" },
+                        scrollMarginTop: "150px",
+                    }}
+                >
                     <Typography
                         sx={{ color: "var(--fg)", fontWeight: 600, mb: 2 }}
                     >
@@ -739,33 +1026,28 @@ export default function OAuthAppSettingsPage() {
                     <Box
                         sx={{
                             display: "grid",
-                            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                            gridTemplateColumns: {
+                                xs: "1fr",
+                                md:
+                                    app?.client_type === "public"
+                                        ? "1fr 1fr"
+                                        : "1fr",
+                            },
                             gap: 2,
                         }}
                     >
-                        <TextField
-                            fullWidth
-                            label="Application Name"
-                            value={form.name}
-                            onChange={(e) =>
-                                setForm({ ...form, name: e.target.value })
-                            }
-                            sx={textFieldSx}
-                        />
-                        <TextField
-                            fullWidth
-                            label="Homepage URL"
-                            placeholder="https://example.com"
-                            value={form.homepage_url}
-                            onChange={(e) =>
-                                setForm({
-                                    ...form,
-                                    homepage_url: e.target.value,
-                                })
-                            }
-                            sx={textFieldSx}
-                        />
-                        <Box sx={{ gridColumn: { md: "1 / -1" } }}>
+                        <Box sx={{ gridColumn: "1 / -1" }}>
+                            <TextField
+                                fullWidth
+                                label="Application Name"
+                                value={form.name}
+                                onChange={(e) =>
+                                    setForm({ ...form, name: e.target.value })
+                                }
+                                sx={textFieldSx}
+                            />
+                        </Box>
+                        <Box sx={{ gridColumn: "1 / -1" }}>
                             <TextField
                                 fullWidth
                                 label="Description"
@@ -782,11 +1064,48 @@ export default function OAuthAppSettingsPage() {
                                 sx={textFieldSx}
                             />
                         </Box>
+                        <TextField
+                            fullWidth
+                            label="Homepage URL"
+                            placeholder="https://example.com"
+                            value={form.homepage_url}
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    homepage_url: e.target.value,
+                                })
+                            }
+                            sx={textFieldSx}
+                        />
+                        {app?.client_type === "public" && (
+                            <TextField
+                                fullWidth
+                                label="Resource audience"
+                                value={form.audience}
+                                onChange={(event) =>
+                                    setForm({
+                                        ...form,
+                                        audience: event.target.value,
+                                    })
+                                }
+                                placeholder="blogs.elixpo.com"
+                                helperText="Host only; bound into access tokens"
+                                sx={textFieldSx}
+                            />
+                        )}
                     </Box>
                 </Box>
 
                 {/* Redirect URIs */}
-                <Box sx={cardSx}>
+                <Box
+                    id="routes"
+                    sx={{
+                        ...cardSx,
+                        order: 4,
+                        gridColumn: { xs: "1", lg: "2" },
+                        scrollMarginTop: "150px",
+                    }}
+                >
                     <Typography
                         sx={{ color: "var(--fg)", fontWeight: 600, mb: 0.5 }}
                     >
@@ -875,7 +1194,13 @@ export default function OAuthAppSettingsPage() {
                 </Box>
 
                 {/* Scopes + Stats */}
-                <Box sx={cardSx}>
+                <Box
+                    sx={{
+                        ...cardSx,
+                        order: 4,
+                        gridColumn: { xs: "1", lg: "3" },
+                    }}
+                >
                     <Typography
                         sx={{ color: "var(--fg)", fontWeight: 600, mb: 2 }}
                     >
@@ -892,30 +1217,27 @@ export default function OAuthAppSettingsPage() {
                         >
                             Scopes
                         </Typography>
-                        <Box
-                            sx={{
-                                display: "flex",
-                                gap: 0.75,
-                                flexWrap: "wrap",
-                            }}
-                        >
-                            {(Array.isArray(app?.scopes)
-                                ? app.scopes
-                                : ["openid", "profile", "email"]
-                            ).map((s: string) => (
-                                <Chip
-                                    key={s}
-                                    label={s}
-                                    size="small"
-                                    sx={{
-                                        bgcolor: "rgba(255, 119, 89,0.1)",
-                                        color: "#ff7759",
-                                        border: "1px solid rgba(255, 119, 89,0.2)",
-                                    }}
-                                />
-                            ))}
-                        </Box>
+                        <OAuthScopePicker
+                            selectedScopes={form.scopes}
+                            customScopes={form.custom_scopes}
+                            onSelectedScopesChange={(scopes) =>
+                                setForm({ ...form, scopes })
+                            }
+                            onCustomScopesChange={(custom_scopes) =>
+                                setForm({ ...form, custom_scopes })
+                            }
+                        />
                     </Box>
+
+                    <Typography
+                        sx={{ color: "var(--fg-faint)", fontSize: "0.8rem" }}
+                    >
+                        Type: {app?.client_type || "confidential"} · Auth:{" "}
+                        {app?.token_endpoint_auth_method ||
+                            "client_secret_post"}
+                        {app?.audience ? ` · Audience: ${app.audience}` : ""}
+                        {app?.owner_id ? ` · Owner: ${app.owner_id}` : ""}
+                    </Typography>
 
                     {app?.request_count !== undefined && (
                         <Box sx={{ mb: 2 }}>
@@ -961,19 +1283,1071 @@ export default function OAuthAppSettingsPage() {
                             </Typography>
                         </Box>
                     )}
+                    {Array.isArray(app?.audit_history) &&
+                        app.audit_history.length > 0 && (
+                            <Box sx={{ mt: 2 }}>
+                                <Typography
+                                    sx={{
+                                        color: "var(--fg-faint)",
+                                        fontSize: "0.8rem",
+                                        mb: 0.75,
+                                    }}
+                                >
+                                    Recent audit history
+                                </Typography>
+                                {app.audit_history
+                                    .slice(0, 5)
+                                    .map(
+                                        (entry: {
+                                            event_type: string;
+                                            status: string;
+                                            created_at: string;
+                                        }) => (
+                                            <Typography
+                                                key={`${entry.event_type}-${entry.created_at}`}
+                                                sx={{
+                                                    color: "var(--fg-faint)",
+                                                    fontSize: "0.72rem",
+                                                    fontFamily: "monospace",
+                                                    mb: 0.5,
+                                                }}
+                                            >
+                                                {entry.event_type} ·{" "}
+                                                {entry.status} ·{" "}
+                                                {new Date(
+                                                    entry.created_at,
+                                                ).toLocaleString()}
+                                            </Typography>
+                                        ),
+                                    )}
+                            </Box>
+                        )}
                 </Box>
             </Box>
 
-            {/* Activity panel — sign-ins, sessions, request count, and a
-                30-day sign-in mini chart. Free to all tiers for now; we'll
-                gate the longer windows when the tier system lands. */}
-            {stats && (
-                <Box sx={{ ...cardSx, mb: 3 }}>
-                    <Typography
-                        sx={{ color: "var(--fg)", fontWeight: 600, mb: 0.5 }}
+            {/* Custom Branding & Identity card */}
+            <Box
+                id="branding"
+                sx={{
+                    ...cardSx,
+                    order: 5,
+                    gridColumn: { xs: "1", lg: "2 / -1" },
+                    scrollMarginTop: "150px",
+                }}
+            >
+                <Typography
+                    sx={{ color: "var(--fg)", fontWeight: 600, mb: 0.5 }}
+                >
+                    Custom Branding & Identity
+                </Typography>
+                <Typography
+                    sx={{
+                        color: "var(--fg-faint)",
+                        fontSize: "0.85rem",
+                        mb: 3,
+                    }}
+                >
+                    Configure custom colors, display name, and policy links for
+                    a continuous sign-in handshake. Unverified branding is
+                    automatically hidden to prevent phishing.
+                </Typography>
+
+                {/* Domain Verification Section */}
+                <Box
+                    sx={{
+                        p: 2.5,
+                        mb: 3,
+                        bgcolor: "var(--surface)",
+                        border: "1px solid var(--border)",
+                        borderRadius: "8px",
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            flexWrap: "wrap",
+                            gap: 2,
+                            mb: 1.5,
+                        }}
                     >
-                        Activity
-                    </Typography>
+                        <Typography
+                            sx={{
+                                fontWeight: 600,
+                                color: "var(--fg)",
+                                fontSize: "0.95rem",
+                            }}
+                        >
+                            Domain Verification Status
+                        </Typography>
+                        {app?.is_branding_verified ? (
+                            <Chip
+                                label="Verified & Active"
+                                color="success"
+                                size="small"
+                                sx={{ fontWeight: 600 }}
+                            />
+                        ) : (
+                            <Chip
+                                label="Inactive (Domain Unverified)"
+                                color="warning"
+                                size="small"
+                                sx={{ fontWeight: 600 }}
+                            />
+                        )}
+                    </Box>
+
+                    {app?.is_branding_verified ? (
+                        <Typography
+                            sx={{
+                                color: "var(--fg-muted)",
+                                fontSize: "0.85rem",
+                            }}
+                        >
+                            Your custom branding is active for{" "}
+                            {app.branding_verified_domain || verificationDomain}
+                            . Changing branding, policy links, redirect URIs, or
+                            the homepage resets verification.
+                        </Typography>
+                    ) : (
+                        <Box>
+                            <Typography
+                                sx={{
+                                    color: "var(--fg-muted)",
+                                    fontSize: "0.85rem",
+                                    mb: 2,
+                                }}
+                            >
+                                To prevent phishing and brand impersonation,
+                                custom branding is only enabled once you verify
+                                ownership of your homepage domain.
+                            </Typography>
+                            <Typography
+                                sx={{
+                                    color: "var(--fg)",
+                                    fontSize: "0.85rem",
+                                    fontWeight: 600,
+                                    mb: 1,
+                                }}
+                            >
+                                Verification Steps:
+                            </Typography>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: 1,
+                                    mb: 2,
+                                }}
+                            >
+                                <Typography
+                                    sx={{
+                                        color: "var(--fg-muted)",
+                                        fontSize: "0.8rem",
+                                    }}
+                                >
+                                    1. Create this DNS TXT record name:
+                                    <code
+                                        style={{
+                                            display: "block",
+                                            background: "rgba(0,0,0,0.15)",
+                                            padding: "4px 8px",
+                                            borderRadius: "4px",
+                                            marginTop: "4px",
+                                            wordBreak: "break-all",
+                                        }}
+                                    >
+                                        _elixpo-challenge.{verificationDomain}
+                                    </code>
+                                </Typography>
+                                <Typography
+                                    sx={{
+                                        color: "var(--fg-muted)",
+                                        fontSize: "0.8rem",
+                                    }}
+                                >
+                                    2. Set its exact TXT value to:
+                                </Typography>
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        gap: 1,
+                                        alignItems: "center",
+                                    }}
+                                >
+                                    <code
+                                        style={{
+                                            flexGrow: 1,
+                                            background:
+                                                "rgba(255, 119, 89,0.1)",
+                                            border: "1px solid rgba(255, 119, 89,0.2)",
+                                            color: "#ff7759",
+                                            padding: "6px 12px",
+                                            borderRadius: "4px",
+                                            fontWeight: "bold",
+                                        }}
+                                    >
+                                        elixpo-verification={clientId}
+                                    </code>
+                                    <IconButton
+                                        size="small"
+                                        onClick={() =>
+                                            copyToClipboard(
+                                                `elixpo-verification=${clientId}`,
+                                                "challenge",
+                                            )
+                                        }
+                                        sx={{ color: "#ff7759" }}
+                                    >
+                                        <ContentCopyIcon fontSize="small" />
+                                    </IconButton>
+                                </Box>
+                                <Typography
+                                    sx={{
+                                        color: "var(--fg-muted)",
+                                        fontSize: "0.8rem",
+                                    }}
+                                >
+                                    3. Ensure every redirect URI and branding
+                                    link uses this domain or one of its
+                                    subdomains, then verify.
+                                </Typography>
+                            </Box>
+
+                            {verifyMessage && (
+                                <Alert
+                                    severity={verifyMessage.type}
+                                    sx={{ mb: 2 }}
+                                >
+                                    {verifyMessage.text}
+                                </Alert>
+                            )}
+
+                            <Button
+                                variant="outlined"
+                                size="small"
+                                onClick={handleVerifyDomain}
+                                disabled={verifyingDomain}
+                                sx={{
+                                    color: "#ff7759",
+                                    borderColor: "rgba(255, 119, 89,0.5)",
+                                    "&:hover": { borderColor: "#ff7759" },
+                                    textTransform: "none",
+                                }}
+                            >
+                                {verifyingDomain
+                                    ? "Verifying..."
+                                    : "Verify Domain Ownership"}
+                            </Button>
+                        </Box>
+                    )}
+                </Box>
+
+                <Box
+                    sx={{
+                        display: "grid",
+                        gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                        gap: 4,
+                    }}
+                >
+                    {/* Left: Branding Form Fields */}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2.5,
+                        }}
+                    >
+                        <Typography
+                            sx={{
+                                color: "var(--fg)",
+                                fontWeight: 600,
+                                fontSize: "0.95rem",
+                            }}
+                        >
+                            Branding Configurations
+                        </Typography>
+
+                        <TextField
+                            fullWidth
+                            label="Branding Display Name"
+                            placeholder={form.name || "Default Display Name"}
+                            value={form.branding_display_name}
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    branding_display_name: e.target.value,
+                                })
+                            }
+                            helperText="Overrides the app name shown during the login handshake. Max 50 characters."
+                            sx={textFieldSx}
+                        />
+
+                        <TextField
+                            fullWidth
+                            label="Logo URL"
+                            placeholder="https://example.com/logo.png"
+                            value={form.logo_url}
+                            onChange={(e) =>
+                                setForm({ ...form, logo_url: e.target.value })
+                            }
+                            helperText="Must use HTTPS on the verified domain or one of its subdomains."
+                            sx={textFieldSx}
+                        />
+
+                        <Box sx={{ display: "flex", gap: 2 }}>
+                            <Box sx={{ flexGrow: 1 }}>
+                                <TextField
+                                    fullWidth
+                                    label="Primary Theme Color"
+                                    placeholder="#ff7759"
+                                    value={form.branding_primary_color}
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            branding_primary_color:
+                                                e.target.value,
+                                        })
+                                    }
+                                    sx={textFieldSx}
+                                    helperText={(() => {
+                                        const color =
+                                            form.branding_primary_color ||
+                                            "#ff7759";
+                                        const HEX_REGEX =
+                                            /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+                                        if (!HEX_REGEX.test(color)) {
+                                            return (
+                                                <span
+                                                    style={{ color: "#ef4444" }}
+                                                >
+                                                    Invalid hex format
+                                                </span>
+                                            );
+                                        }
+                                        const ratioWhite =
+                                            getContrastRatioLocal(
+                                                color,
+                                                "#FFFFFF",
+                                            );
+                                        const ratioBlack =
+                                            getContrastRatioLocal(
+                                                color,
+                                                "#000000",
+                                            );
+                                        if (
+                                            ratioWhite >= 4.5 ||
+                                            ratioBlack >= 4.5
+                                        ) {
+                                            const textCol =
+                                                getContrastColorLocal(color) ===
+                                                "#FFFFFF"
+                                                    ? "white text"
+                                                    : "black text";
+                                            return (
+                                                <span
+                                                    style={{ color: "#22c55e" }}
+                                                >
+                                                    Passes contrast (&gt;=
+                                                    4.5:1) with {textCol}
+                                                </span>
+                                            );
+                                        }
+                                        return (
+                                            <span style={{ color: "#f97316" }}>
+                                                Lacks contrast against both
+                                                white and black
+                                            </span>
+                                        );
+                                    })()}
+                                />
+                            </Box>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <input
+                                    type="color"
+                                    value={
+                                        form.branding_primary_color?.startsWith(
+                                            "#",
+                                        ) &&
+                                        (form.branding_primary_color.length ===
+                                            4 ||
+                                            form.branding_primary_color
+                                                .length === 7)
+                                            ? form.branding_primary_color
+                                            : "#ff7759"
+                                    }
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            branding_primary_color:
+                                                e.target.value,
+                                        })
+                                    }
+                                    style={{
+                                        border: "1px solid var(--border)",
+                                        borderRadius: "4px",
+                                        width: "48px",
+                                        height: "48px",
+                                        cursor: "pointer",
+                                        background: "transparent",
+                                    }}
+                                />
+                            </Box>
+                        </Box>
+
+                        <Box sx={{ display: "flex", gap: 2 }}>
+                            <Box sx={{ flexGrow: 1 }}>
+                                <TextField
+                                    fullWidth
+                                    label="Accent Color"
+                                    placeholder="#ff8c70"
+                                    value={form.branding_accent_color}
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            branding_accent_color:
+                                                e.target.value,
+                                        })
+                                    }
+                                    sx={textFieldSx}
+                                    helperText="Used for links and subtle highlighting."
+                                />
+                            </Box>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <input
+                                    type="color"
+                                    value={
+                                        form.branding_accent_color?.startsWith(
+                                            "#",
+                                        ) &&
+                                        (form.branding_accent_color.length ===
+                                            4 ||
+                                            form.branding_accent_color
+                                                .length === 7)
+                                            ? form.branding_accent_color
+                                            : "#ff8c70"
+                                    }
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            branding_accent_color:
+                                                e.target.value,
+                                        })
+                                    }
+                                    style={{
+                                        border: "1px solid var(--border)",
+                                        borderRadius: "4px",
+                                        width: "48px",
+                                        height: "48px",
+                                        cursor: "pointer",
+                                        background: "transparent",
+                                    }}
+                                />
+                            </Box>
+                        </Box>
+
+                        <TextField
+                            fullWidth
+                            label="Privacy Policy URL"
+                            placeholder="https://example.com/privacy"
+                            value={form.privacy_policy_url}
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    privacy_policy_url: e.target.value,
+                                })
+                            }
+                            sx={textFieldSx}
+                        />
+
+                        <TextField
+                            fullWidth
+                            label="Terms of Service URL"
+                            placeholder="https://example.com/terms"
+                            value={form.terms_of_service_url}
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    terms_of_service_url: e.target.value,
+                                })
+                            }
+                            sx={textFieldSx}
+                        />
+                    </Box>
+
+                    {/* Right: Live Preview Mockup */}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 2,
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                            }}
+                        >
+                            <Typography
+                                sx={{
+                                    color: "var(--fg)",
+                                    fontWeight: 600,
+                                    fontSize: "0.95rem",
+                                }}
+                            >
+                                Live Preview Handshake
+                            </Typography>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    border: "1px solid var(--border)",
+                                    borderRadius: "6px",
+                                    overflow: "hidden",
+                                }}
+                            >
+                                <Button
+                                    size="small"
+                                    onClick={() => setPreviewMode("desktop")}
+                                    sx={{
+                                        bgcolor:
+                                            previewMode === "desktop"
+                                                ? "rgba(255, 119, 89, 0.15)"
+                                                : "transparent",
+                                        color:
+                                            previewMode === "desktop"
+                                                ? "#ff7759"
+                                                : "var(--fg-faint)",
+                                        borderRight: "1px solid var(--border)",
+                                        borderRadius: 0,
+                                        textTransform: "none",
+                                        fontSize: "0.75rem",
+                                        px: 1.5,
+                                        py: 0.5,
+                                    }}
+                                >
+                                    Desktop
+                                </Button>
+                                <Button
+                                    size="small"
+                                    onClick={() => setPreviewMode("mobile")}
+                                    sx={{
+                                        bgcolor:
+                                            previewMode === "mobile"
+                                                ? "rgba(255, 119, 89, 0.15)"
+                                                : "transparent",
+                                        color:
+                                            previewMode === "mobile"
+                                                ? "#ff7759"
+                                                : "var(--fg-faint)",
+                                        borderRadius: 0,
+                                        textTransform: "none",
+                                        fontSize: "0.75rem",
+                                        px: 1.5,
+                                        py: 0.5,
+                                    }}
+                                >
+                                    Mobile
+                                </Button>
+                            </Box>
+                        </Box>
+
+                        {/* Preview Frame */}
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                bgcolor: "var(--surface)",
+                                border: "1px solid var(--border)",
+                                borderRadius: "8px",
+                                minHeight: "560px",
+                                p: previewMode === "desktop" ? 3 : 1,
+                            }}
+                        >
+                            {/* Device representation */}
+                            <Box
+                                sx={
+                                    previewMode === "desktop"
+                                        ? {
+                                              width: "100%",
+                                              borderRadius: "6px",
+                                              border: "1px solid var(--border)",
+                                              bgcolor: "var(--bg)",
+                                              boxShadow:
+                                                  "0 10px 30px rgba(0,0,0,0.5)",
+                                              overflow: "hidden",
+                                              display: "flex",
+                                              flexDirection: "column",
+                                          }
+                                        : {
+                                              width: "260px",
+                                              height: "580px",
+                                              borderRadius: "28px",
+                                              border: "10px solid #222",
+                                              bgcolor: "var(--bg)",
+                                              boxShadow:
+                                                  "0 10px 30px rgba(0,0,0,0.5)",
+                                              overflow: "hidden",
+                                              display: "flex",
+                                              flexDirection: "column",
+                                              position: "relative",
+                                          }
+                                }
+                            >
+                                {/* Header / Top Bar */}
+                                <Box
+                                    sx={{
+                                        bgcolor: "var(--surface)",
+                                        px: 2,
+                                        py: 1.5,
+                                        borderBottom: "1px solid var(--border)",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1,
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            width: 10,
+                                            height: 10,
+                                            borderRadius: "50%",
+                                            bgcolor: "#ef4444",
+                                        }}
+                                    />
+                                    <Box
+                                        sx={{
+                                            width: 10,
+                                            height: 10,
+                                            borderRadius: "50%",
+                                            bgcolor: "#fbbf24",
+                                        }}
+                                    />
+                                    <Box
+                                        sx={{
+                                            width: 10,
+                                            height: 10,
+                                            borderRadius: "50%",
+                                            bgcolor: "#22c55e",
+                                        }}
+                                    />
+                                    <Typography
+                                        sx={{
+                                            color: "var(--fg-faint)",
+                                            fontSize: "0.7rem",
+                                            ml: "auto",
+                                        }}
+                                    >
+                                        accounts.elixpo.com
+                                    </Typography>
+                                </Box>
+
+                                {/* Page content */}
+                                <Box
+                                    sx={{
+                                        flexGrow: 1,
+                                        p: previewMode === "desktop" ? 4 : 2,
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        color: "var(--fg)",
+                                        bgcolor: "var(--bg)",
+                                        backgroundImage: `radial-gradient(circle at 12% 15%, color-mix(in srgb, ${form.branding_primary_color || "#ff7759"} 16%, transparent), transparent 38%), radial-gradient(circle at 88% 86%, color-mix(in srgb, ${form.branding_accent_color || form.branding_primary_color || "#ff9b85"} 14%, transparent), transparent 42%)`,
+                                    }}
+                                >
+                                    {/* Application Logo & Connection Visual */}
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: 1.5,
+                                            mb: 2,
+                                        }}
+                                    >
+                                        {form.logo_url ? (
+                                            <img
+                                                src={form.logo_url}
+                                                alt="App logo"
+                                                style={{
+                                                    width: "42px",
+                                                    height: "42px",
+                                                    borderRadius: "10px",
+                                                    objectFit: "cover",
+                                                    border: "1px solid var(--border)",
+                                                }}
+                                                onError={(e) => {
+                                                    (
+                                                        e.target as HTMLElement
+                                                    ).style.display = "none";
+                                                }}
+                                            />
+                                        ) : (
+                                            <Box
+                                                sx={{
+                                                    width: "42px",
+                                                    height: "42px",
+                                                    borderRadius: "10px",
+                                                    bgcolor:
+                                                        form.branding_primary_color ||
+                                                        "#ff7759",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyItems: "center",
+                                                    justifyContent: "center",
+                                                    fontWeight: "bold",
+                                                    border: "1px solid var(--border)",
+                                                }}
+                                            >
+                                                {(
+                                                    form.branding_display_name ||
+                                                    form.name ||
+                                                    "App"
+                                                )
+                                                    .charAt(0)
+                                                    .toUpperCase()}
+                                            </Box>
+                                        )}
+                                        <Typography
+                                            sx={{
+                                                fontSize: "1.2rem",
+                                                fontWeight: "bold",
+                                                color: "var(--fg-faint)",
+                                            }}
+                                        >
+                                            ↔
+                                        </Typography>
+                                        <Box
+                                            component="img"
+                                            src="/LOGO/logo.png"
+                                            alt="Elixpo Accounts"
+                                            sx={{
+                                                width: "42px",
+                                                height: "42px",
+                                                borderRadius: "10px",
+                                                border: "1px solid var(--border)",
+                                            }}
+                                        />
+                                    </Box>
+
+                                    <Typography
+                                        sx={{
+                                            fontSize:
+                                                previewMode === "desktop"
+                                                    ? "1.2rem"
+                                                    : "0.95rem",
+                                            fontWeight: "bold",
+                                            textAlign: "center",
+                                            mb: 0.5,
+                                        }}
+                                    >
+                                        Continue to{" "}
+                                        {form.branding_display_name ||
+                                            form.name ||
+                                            "Application"}
+                                    </Typography>
+                                    <Typography
+                                        sx={{
+                                            fontSize: "0.75rem",
+                                            color: "var(--fg-faint)",
+                                            textAlign: "center",
+                                            mb: 2,
+                                        }}
+                                    >
+                                        via global secured Elixpo Accounts
+                                        Network
+                                    </Typography>
+
+                                    {/* Dummy Scopes Card */}
+                                    <Box
+                                        sx={{
+                                            width: "100%",
+                                            bgcolor: "var(--surface)",
+                                            border: "1px solid var(--border)",
+                                            borderRadius: "12px",
+                                            p: 1.5,
+                                            mb: 3,
+                                        }}
+                                    >
+                                        <Typography
+                                            sx={{
+                                                fontSize: "0.7rem",
+                                                color: "var(--fg-faint)",
+                                                fontWeight: "bold",
+                                                mb: 1,
+                                                textTransform: "uppercase",
+                                            }}
+                                        >
+                                            Requested permissions:
+                                        </Typography>
+                                        <Box
+                                            sx={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                gap: 0.75,
+                                            }}
+                                        >
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: 1,
+                                                }}
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        width: 6,
+                                                        height: 6,
+                                                        borderRadius: "50%",
+                                                        bgcolor:
+                                                            form.branding_primary_color ||
+                                                            "#ff7759",
+                                                    }}
+                                                />
+                                                <Typography
+                                                    sx={{
+                                                        fontSize: "0.75rem",
+                                                        color: "var(--fg)",
+                                                    }}
+                                                >
+                                                    Access your openid profile
+                                                </Typography>
+                                            </Box>
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: 1,
+                                                }}
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        width: 6,
+                                                        height: 6,
+                                                        borderRadius: "50%",
+                                                        bgcolor:
+                                                            form.branding_primary_color ||
+                                                            "#ff7759",
+                                                    }}
+                                                />
+                                                <Typography
+                                                    sx={{
+                                                        fontSize: "0.75rem",
+                                                        color: "var(--fg)",
+                                                    }}
+                                                >
+                                                    Read email address
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                    </Box>
+
+                                    <Box
+                                        sx={{
+                                            width: "100%",
+                                            bgcolor: "var(--overlay)",
+                                            border: "1px solid var(--border)",
+                                            borderRadius: "12px",
+                                            p: 1.25,
+                                            mb: 1.5,
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
+                                            gap: 1.5,
+                                        }}
+                                    >
+                                        <Typography
+                                            sx={{
+                                                color: "var(--fg-faint)",
+                                                fontSize: "0.7rem",
+                                            }}
+                                        >
+                                            <strong>Security</strong>
+                                            <br />
+                                            Renewable access. Revoke anytime.
+                                        </Typography>
+                                        <Typography
+                                            sx={{
+                                                color:
+                                                    form.branding_accent_color ||
+                                                    form.branding_primary_color ||
+                                                    "#ff7759",
+                                                fontFamily: "monospace",
+                                                fontWeight: 700,
+                                            }}
+                                        >
+                                            9:53
+                                        </Typography>
+                                    </Box>
+
+                                    <Box
+                                        sx={{
+                                            width: "100%",
+                                            display: "flex",
+                                            gap: 1,
+                                            mb: 1.5,
+                                        }}
+                                    >
+                                        <Button
+                                            fullWidth
+                                            size="small"
+                                            sx={{
+                                                color: "var(--fg-faint)",
+                                                border: "1px solid var(--border)",
+                                                textTransform: "none",
+                                            }}
+                                        >
+                                            Deny
+                                        </Button>
+                                        <Button
+                                            fullWidth
+                                            variant="contained"
+                                            size="small"
+                                            sx={{
+                                                bgcolor:
+                                                    form.branding_primary_color ||
+                                                    "#ff7759",
+                                                color: getContrastColorLocal(
+                                                    form.branding_primary_color ||
+                                                        "#ff7759",
+                                                ),
+                                                textTransform: "none",
+                                                fontWeight: 600,
+                                                "&:hover": {
+                                                    bgcolor:
+                                                        form.branding_accent_color ||
+                                                        form.branding_primary_color ||
+                                                        "#ff7759",
+                                                },
+                                            }}
+                                        >
+                                            Authorize
+                                        </Button>
+                                    </Box>
+
+                                    {/* Trust marker footer */}
+                                    <Typography
+                                        sx={{
+                                            fontSize: "0.7rem",
+                                            color: "var(--fg-faint)",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: 0.5,
+                                            mt: "auto",
+                                        }}
+                                    >
+                                        🛡️ Secured by Elixpo Accounts
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Box>
+                    </Box>
+                </Box>
+            </Box>
+
+            {/* Activity panel — sign-ins, sessions, request count, and a */}
+            {stats && (
+                <Box
+                    id="activity"
+                    sx={{
+                        ...cardSx,
+                        order: 6,
+                        gridColumn: { xs: "1", lg: "2 / -1" },
+                        scrollMarginTop: "150px",
+                    }}
+                >
+                    {stats.branding_verification_required && (
+                        <Alert severity="warning" sx={{ mb: 2 }}>
+                            Sign-ins are paused because this app has more than
+                            20 sign-ins. Verify its branding domain above to
+                            resume authorization.
+                        </Alert>
+                    )}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            gap: 1.5,
+                            flexWrap: "wrap",
+                            mb: 0.5,
+                        }}
+                    >
+                        <Typography
+                            sx={{ color: "var(--fg)", fontWeight: 600 }}
+                        >
+                            Activity
+                        </Typography>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                            }}
+                        >
+                            <Box
+                                component="select"
+                                aria-label="Activity range"
+                                value={activityDays}
+                                onChange={(event) =>
+                                    setActivityDays(Number(event.target.value))
+                                }
+                                sx={{
+                                    bgcolor: "var(--surface)",
+                                    color: "var(--fg)",
+                                    border: "1px solid var(--border)",
+                                    borderRadius: "8px",
+                                    px: 1.25,
+                                    py: 0.75,
+                                    fontSize: "0.8rem",
+                                }}
+                            >
+                                {[7, 30, 60, 90].map((days) => (
+                                    <option key={days} value={days}>
+                                        Last {days} days
+                                    </option>
+                                ))}
+                            </Box>
+                            <Button
+                                component="a"
+                                href={
+                                    stats.can_export_lifetime
+                                        ? `/api/auth/oauth-clients/${clientId}/stats?export=csv`
+                                        : "/pricing"
+                                }
+                                download={
+                                    stats.can_export_lifetime
+                                        ? `${clientId}-activity.csv`
+                                        : undefined
+                                }
+                                size="small"
+                                startIcon={<DownloadIcon />}
+                                sx={{
+                                    color: "#ff7759",
+                                    textTransform: "none",
+                                    whiteSpace: "nowrap",
+                                }}
+                            >
+                                {stats.can_export_lifetime
+                                    ? "Lifetime CSV"
+                                    : "Upgrade for CSV"}
+                            </Button>
+                        </Box>
+                    </Box>
                     <Typography
                         sx={{
                             color: "var(--fg-faint)",
@@ -1023,7 +2397,7 @@ export default function OAuthAppSettingsPage() {
                             mb: 1.5,
                         }}
                     >
-                        Sign-ins · last 30 days
+                        Sign-ins · last {activityDays} days
                     </Typography>
                     {stats.sign_in_timeline.length === 0 ? (
                         <Typography
@@ -1082,7 +2456,15 @@ export default function OAuthAppSettingsPage() {
             )}
 
             {/* Webhooks panel — multi-endpoint event subscription */}
-            <Box sx={{ ...cardSx, mb: 3 }}>
+            <Box
+                id="webhooks"
+                sx={{
+                    ...cardSx,
+                    order: 3,
+                    gridColumn: { xs: "1", lg: "2 / -1" },
+                    scrollMarginTop: "150px",
+                }}
+            >
                 <Typography
                     sx={{ color: "var(--fg)", fontWeight: 600, mb: 0.5 }}
                 >
@@ -1100,7 +2482,7 @@ export default function OAuthAppSettingsPage() {
                     separating localhost/staging/production receivers, each
                     listening to a different subset of events. See the{" "}
                     <a
-                        href="https://github.com/elixpo/accounts.elixpo/blob/main/docs/WEBHOOKS_APP_SUBSCRIPTION.md"
+                        href="/docs/webhooks"
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
@@ -1334,28 +2716,16 @@ export default function OAuthAppSettingsPage() {
                 </Box>
             </Box>
 
-            {/* Save Button */}
-            <Box sx={{ mb: 3 }}>
-                <Button
-                    variant="contained"
-                    startIcon={<SaveIcon />}
-                    onClick={handleSave}
-                    disabled={saving}
-                    sx={{
-                        background: "rgba(255, 119, 89,0.15)",
-                        color: "#ff7759",
-                        border: "1px solid rgba(255, 119, 89,0.3)",
-                        fontWeight: 600,
-                        textTransform: "none",
-                        "&:hover": { background: "rgba(255, 119, 89,0.25)" },
-                    }}
-                >
-                    {saving ? "Saving..." : "Save Changes"}
-                </Button>
-            </Box>
-
             {/* Danger Zone */}
-            <Box sx={{ ...cardSx, border: "1px solid rgba(239,68,68,0.3)" }}>
+            <Box
+                id="danger"
+                sx={{
+                    ...cardSx,
+                    order: 7,
+                    gridColumn: { xs: "1", lg: "2 / -1" },
+                    border: "1px solid rgba(239,68,68,0.3)",
+                }}
+            >
                 <Typography sx={{ color: "#b91c1c", fontWeight: 600, mb: 1 }}>
                     Danger Zone
                 </Typography>

@@ -1,27 +1,36 @@
-/**
- * Base error for all @elixpo/accounts errors.
- * Never include raw tokens, secrets, or full request/response bodies in messages.
- */
-export class AccountsError extends Error {
-    readonly code: string;
+import type { OAuthErrorCode } from "./types.js";
 
-    constructor(code: string, message: string) {
-        super(message);
+export type AccountsErrorCode =
+    | "configuration_error"
+    | "discovery_error"
+    | "network_error"
+    | "oauth_error"
+    | "protocol_error"
+    | "state_mismatch"
+    | "nonce_mismatch"
+    | "token_verification_error";
+
+export class AccountsError extends Error {
+    readonly code: AccountsErrorCode;
+    readonly oauthCode?: OAuthErrorCode;
+    readonly retryable: boolean;
+    readonly status?: number;
+
+    constructor(
+        code: AccountsErrorCode,
+        message: string,
+        options: {
+            oauthCode?: OAuthErrorCode;
+            retryable?: boolean;
+            status?: number;
+            cause?: unknown;
+        } = {},
+    ) {
+        super(message, { cause: options.cause });
         this.name = "AccountsError";
         this.code = code;
-    }
-}
-
-export class DiscoveryError extends AccountsError {
-    constructor(message: string) {
-        super("discovery_failed", message);
-        this.name = "DiscoveryError";
-    }
-}
-
-export class ConfigError extends AccountsError {
-    constructor(message: string) {
-        super("invalid_config", message);
-        this.name = "ConfigError";
+        this.oauthCode = options.oauthCode;
+        this.retryable = options.retryable ?? false;
+        this.status = options.status;
     }
 }

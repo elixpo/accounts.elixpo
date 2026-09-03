@@ -1,50 +1,87 @@
-/**
- * Configuration a consuming app provides to talk to Elixpo Accounts.
- * `issuer` is the only required field — everything else is discovered
- * or defaulted.
- */
-export interface AccountsConfig {
-    /** e.g. "https://accounts.elixpo.com" — no trailing slash. */
-    issuer: string;
-    /** OAuth client_id registered in the Accounts dashboard. */
-    clientId: string;
-    /** Redirect URI registered for this client. Required for auth code flow. */
-    redirectUri?: string;
-    /** Scopes to request. Defaults to ["openid", "profile"]. */
-    scopes?: string[];
-}
+export type OAuthErrorCode =
+    | "access_denied"
+    | "authorization_pending"
+    | "expired_token"
+    | "invalid_client"
+    | "invalid_grant"
+    | "invalid_request"
+    | "invalid_scope"
+    | "server_error"
+    | "slow_down"
+    | "temporarily_unavailable"
+    | "unsupported_grant_type"
+    | "unsupported_response_type";
 
-/**
- * Subset of the OIDC discovery document (RFC 8414 / OpenID Connect Discovery)
- * that @elixpo/accounts actually uses. We don't type the full spec —
- * only fields core relies on.
- */
-export interface OIDCConfiguration {
+export interface AuthorizationServerMetadata {
     issuer: string;
     authorization_endpoint: string;
     token_endpoint: string;
+    userinfo_endpoint: string;
     jwks_uri: string;
-    userinfo_endpoint?: string;
-    revocation_endpoint?: string;
-    end_session_endpoint?: string;
+    device_authorization_endpoint?: string;
+    revocation_endpoint: string;
+    scopes_supported: string[];
+    grant_types_supported: string[];
     response_types_supported: string[];
-    code_challenge_methods_supported?: string[];
-    id_token_signing_alg_values_supported: string[];
+    token_endpoint_auth_methods_supported: string[];
+    revocation_endpoint_auth_methods_supported?: string[];
+    code_challenge_methods_supported: string[];
+    subject_types_supported?: string[];
+    id_token_signing_alg_values_supported?: string[];
+    claims_supported?: string[];
+    elixpo_contract_version?: string;
+    elixpo_min_compatible_sdk_version?: string;
 }
 
-const REQUIRED_DISCOVERY_FIELDS = [
-    "issuer",
-    "authorization_endpoint",
-    "token_endpoint",
-    "jwks_uri",
-    "response_types_supported",
-    "id_token_signing_alg_values_supported",
-] as const;
+export interface AccountsConfiguration {
+    issuer: string;
+    clientId: string;
+    clientSecret?: string;
+    redirectUri: string;
+    audience?: string;
+    fetch?: typeof fetch;
+    timeoutMs?: number;
+}
 
-export function isOIDCConfiguration(
-    value: unknown,
-): value is OIDCConfiguration {
-    if (typeof value !== "object" || value === null) return false;
-    const record = value as Record<string, unknown>;
-    return REQUIRED_DISCOVERY_FIELDS.every((field) => field in record);
+export interface AuthorizationTransaction {
+    state: string;
+    nonce: string;
+    codeVerifier: string;
+    createdAt: number;
+}
+
+export interface TokenSet {
+    accessToken: string;
+    refreshToken: string;
+    idToken?: string;
+    tokenType: "Bearer";
+    expiresIn: number;
+    scope: string[];
+}
+
+export interface VerifiedAccessToken {
+    tokenType: "access";
+    subject: string;
+    issuer: string;
+    audience: string[];
+    clientId: string;
+    expiresAt: number;
+    issuedAt: number;
+    scopes: string[];
+    sessionId?: string;
+    email?: string;
+}
+
+export interface VerifiedIdToken {
+    tokenType: "id";
+    subject: string;
+    issuer: string;
+    audience: string[];
+    expiresAt: number;
+    issuedAt: number;
+    nonce?: string;
+    email?: string;
+    emailVerified?: boolean;
+    name?: string;
+    preferredUsername?: string;
 }

@@ -1,4 +1,4 @@
-node_modules
+/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -27,3 +27,5 @@ __pycache__/
 
 # Repo-context artifact (generated in CI, uploaded as GH Actions artifact)
 .elixpo-context/
+dist/
+out/
