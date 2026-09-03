@@ -173,6 +173,7 @@ const OAuthAppsPage = () => {
     const [formData, setFormData] = useState({
         name: "",
         homepage_url: "",
+        logo_url: "",
         description: "",
         redirect_uris: [""],
         client_type: "confidential" as "confidential" | "public",
@@ -238,6 +239,21 @@ const OAuthAppsPage = () => {
             setError("Homepage URL is required");
             return;
         }
+        if (formData.logo_url.trim()) {
+            try {
+                const logoUrl = new URL(formData.logo_url.trim());
+                if (
+                    logoUrl.protocol !== "https:" &&
+                    logoUrl.protocol !== "http:"
+                ) {
+                    setError("App icon URL must use HTTP or HTTPS");
+                    return;
+                }
+            } catch {
+                setError("App icon URL must be a valid URL");
+                return;
+            }
+        }
         const uris = formData.redirect_uris
             .map((u) => u.trim())
             .filter(Boolean);
@@ -259,6 +275,7 @@ const OAuthAppsPage = () => {
                 body: JSON.stringify({
                     name: formData.name,
                     homepage_url: formData.homepage_url,
+                    logo_url: formData.logo_url.trim() || undefined,
                     description: formData.description || undefined,
                     redirect_uris: uris,
                     scopes: formData.scopes,
@@ -285,6 +302,7 @@ const OAuthAppsPage = () => {
             setFormData({
                 name: "",
                 homepage_url: "",
+                logo_url: "",
                 description: "",
                 redirect_uris: [""],
                 client_type: "confidential",
@@ -346,6 +364,7 @@ const OAuthAppsPage = () => {
         setFormData({
             name: "",
             homepage_url: "",
+            logo_url: "",
             description: "",
             redirect_uris: [""],
             client_type: "confidential",
@@ -832,6 +851,23 @@ const OAuthAppsPage = () => {
                     />
                     <TextField
                         fullWidth
+                        type="url"
+                        label="App icon URL"
+                        value={formData.logo_url}
+                        onChange={(e) =>
+                            setFormData({
+                                ...formData,
+                                logo_url: e.target.value,
+                            })
+                        }
+                        margin="dense"
+                        placeholder="https://example.com/icon.png"
+                        helperText="Optional — falls back to your homepage favicon, then a generated icon"
+                        sx={textFieldSx}
+                        disabled={loading}
+                    />
+                    <TextField
+                        fullWidth
                         label="Application description"
                         value={formData.description}
                         onChange={(e) =>
@@ -879,8 +915,8 @@ const OAuthAppsPage = () => {
                             p: 1.25,
                         }}
                     >
-                        <option value="confidential">Web application</option>
-                        <option value="public">Public CLI / device flow</option>
+                        <option value="confidential">Web Application</option>
+                        <option value="public">Device Flow</option>
                     </Box>
 
                     {formData.client_type === "public" && (
@@ -896,7 +932,7 @@ const OAuthAppsPage = () => {
                             }
                             margin="dense"
                             placeholder="blogs.elixpo.com"
-                            helperText="Host only. Public clients use device flow and never receive a secret."
+                            helperText="Host only. Device Flow apps never receive a client secret."
                             sx={textFieldSx}
                             disabled={loading}
                         />
@@ -940,7 +976,7 @@ const OAuthAppsPage = () => {
                         }}
                     >
                         {formData.client_type === "public"
-                            ? "Optional for device-only clients"
+                            ? "Optional for Device Flow apps"
                             : "The callback URLs where users return after authorization (up to 5)"}
                     </Typography>
                     {formData.redirect_uris.map((uri, index) => (
@@ -1173,7 +1209,7 @@ const OAuthAppsPage = () => {
                         }}
                     >
                         {newAppData?.client_type === "public"
-                            ? "Public clients use token endpoint authentication method none. No client secret was created."
+                            ? "Device Flow apps do not use a client secret."
                             : "Copy the client secret now. It will not be shown again."}
                     </Alert>
 
