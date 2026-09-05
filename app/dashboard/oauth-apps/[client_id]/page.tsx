@@ -58,6 +58,21 @@ const monoBox = {
     p: 1.5,
 };
 
+function appIconSources(homepageUrl: string, logoUrl: string): string[] {
+    const sources = logoUrl ? [logoUrl] : [];
+    if (!homepageUrl) return sources;
+    try {
+        const url = new URL(homepageUrl);
+        sources.push(
+            `${url.origin}/favicon.ico`,
+            `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=64`,
+        );
+        return [...new Set(sources)];
+    } catch {
+        return sources;
+    }
+}
+
 export default function OAuthAppSettingsPage() {
     const params = useParams();
     const router = useRouter();
@@ -88,6 +103,7 @@ export default function OAuthAppSettingsPage() {
         null,
     );
     const [regenerating, setRegenerating] = useState(false);
+    const [iconStage, setIconStage] = useState(0);
 
     const [form, setForm] = useState({
         name: "",
@@ -576,15 +592,87 @@ export default function OAuthAppSettingsPage() {
         }
     };
 
-    const faviconUrl = form.homepage_url
-        ? (() => {
-              try {
-                  return `https://www.google.com/s2/favicons?domain=${new URL(form.homepage_url).hostname}&sz=64`;
-              } catch {
-                  return null;
-              }
-          })()
-        : null;
+    const iconSources = appIconSources(form.homepage_url, form.logo_url);
+    const faviconUrl = iconSources[iconStage] || null;
+    useEffect(() => setIconStage(0), []);
+
+    const missingApplicationDetail = !form.name.trim()
+        ? "Name required"
+        : !form.homepage_url.trim()
+          ? "Homepage required"
+          : app?.client_type === "public" && !form.audience.trim()
+            ? "Audience required"
+            : !form.description.trim()
+              ? "Add description"
+              : null;
+    const redirectCount = form.redirect_uris.filter((uri) => uri.trim()).length;
+    const brandingConfigured = Boolean(
+        form.logo_url.trim() ||
+        form.branding_display_name.trim() ||
+        form.branding_primary_color.trim() ||
+        form.branding_accent_color.trim(),
+    );
+    const sectionNavigation = [
+        {
+            id: "overview",
+            label: "Application",
+            status: missingApplicationDetail || "Complete",
+            needsAttention: Boolean(
+                missingApplicationDetail?.endsWith("required"),
+            ),
+        },
+        {
+            id: "credentials",
+            label: "Client secret",
+            status:
+                app?.client_type === "public" ? "Not required" : "Configured",
+            needsAttention: false,
+        },
+        {
+            id: "webhooks",
+            label: "Webhook endpoints",
+            status: endpointsLoading
+                ? "Loading…"
+                : endpoints.length > 0
+                  ? `${endpoints.length} configured`
+                  : "Optional",
+            needsAttention: false,
+        },
+        {
+            id: "routes",
+            label: "Redirects & info",
+            status:
+                redirectCount > 0
+                    ? `${redirectCount} configured`
+                    : app?.client_type === "public"
+                      ? "Optional"
+                      : "Missing redirect",
+            needsAttention:
+                app?.client_type !== "public" && redirectCount === 0,
+        },
+        {
+            id: "branding",
+            label: "Branding & identity",
+            status: app?.is_branding_verified
+                ? "Verified"
+                : brandingConfigured
+                  ? "Needs verification"
+                  : "Optional",
+            needsAttention: false,
+        },
+        {
+            id: "activity",
+            label: "Activity",
+            status: stats ? `${stats.unique_users} users` : "No activity yet",
+            needsAttention: false,
+        },
+        {
+            id: "danger",
+            label: "Danger zone",
+            status: "Delete app",
+            needsAttention: false,
+        },
+    ];
 
     if (loading) {
         return (
@@ -602,6 +690,7 @@ export default function OAuthAppSettingsPage() {
     }
 
     return (
+<<<<<<< HEAD
         <DashboardScrollLayout
             scrollRef={scrollRef}
             sidebar={
@@ -622,13 +711,27 @@ export default function OAuthAppSettingsPage() {
             }
             header={
                 <Box>
+=======
+        <Box
+            sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                    xs: "minmax(0, 1fr)",
+                    lg: "240px minmax(0, 1fr) minmax(0, 1fr)",
+                },
+                gap: 2.5,
+                alignItems: "start",
+            }}
+        >
+>>>>>>> origin/main
             {/* Back + Header */}
             <Button
                 startIcon={<ArrowBackIcon />}
                 onClick={() => router.push("/dashboard/oauth-apps")}
                 sx={{
+                    gridColumn: "1 / -1",
+                    justifySelf: "start",
                     color: "var(--fg-faint)",
-                    mb: 2,
                     textTransform: "none",
                     "&:hover": { color: "var(--fg)" },
                 }}
@@ -638,11 +741,22 @@ export default function OAuthAppSettingsPage() {
 
             <Box
                 sx={{
+                    gridColumn: "1 / -1",
+                    position: "sticky",
+                    top: { xs: 56, sm: 64 },
+                    zIndex: 10,
                     display: "flex",
                     alignItems: "center",
                     flexWrap: "wrap",
                     gap: 2,
-                    mb: 3,
+                    mx: { xs: -1, sm: 0 },
+                    px: { xs: 1, sm: 1.5 },
+                    py: 1.5,
+                    bgcolor: "color-mix(in srgb, var(--bg) 88%, transparent)",
+                    backdropFilter: "blur(16px)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "14px",
+                    boxShadow: "0 8px 24px var(--overlay)",
                 }}
             >
                 {/* Favicon */}
@@ -651,6 +765,7 @@ export default function OAuthAppSettingsPage() {
                         component="img"
                         src={faviconUrl}
                         alt=""
+                        referrerPolicy="no-referrer"
                         sx={{
                             width: 40,
                             height: 40,
@@ -658,9 +773,7 @@ export default function OAuthAppSettingsPage() {
                             bgcolor: "var(--overlay)",
                             p: 0.5,
                         }}
-                        onError={(e: any) => {
-                            e.target.style.display = "none";
-                        }}
+                        onError={() => setIconStage((stage) => stage + 1)}
                     />
                 ) : (
                     <Box
@@ -710,7 +823,64 @@ export default function OAuthAppSettingsPage() {
                             })()}
                         </Typography>
                     )}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.5,
+                            mt: 0.25,
+                        }}
+                    >
+                        <Typography
+                            sx={{
+                                color: "var(--fg-faint)",
+                                fontFamily: "monospace",
+                                fontSize: "0.72rem",
+                                wordBreak: "break-all",
+                            }}
+                        >
+                            {app?.client_id || clientId}
+                        </Typography>
+                        <Tooltip
+                            title={
+                                copiedField === "client_id" ? "Copied!" : "Copy"
+                            }
+                        >
+                            <IconButton
+                                size="small"
+                                onClick={() =>
+                                    copyToClipboard(
+                                        app?.client_id || clientId,
+                                        "client_id",
+                                    )
+                                }
+                                sx={{ color: "#ff7759", p: 0.25 }}
+                            >
+                                <ContentCopyIcon sx={{ fontSize: "0.85rem" }} />
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
                 </Box>
+                <Chip
+                    label={
+                        app?.client_type === "public"
+                            ? "Device Flow"
+                            : "Web Application"
+                    }
+                    size="small"
+                    sx={{
+                        ml: { xs: 0, sm: "auto" },
+                        bgcolor:
+                            app?.client_type === "public"
+                                ? "rgba(255, 119, 89, 0.12)"
+                                : "var(--overlay)",
+                        color:
+                            app?.client_type === "public"
+                                ? "#ff7759"
+                                : "var(--fg-muted)",
+                        border: "1px solid var(--border)",
+                    }}
+                />
                 {app?.is_active === false && (
                     <Chip
                         label="Inactive"
@@ -722,12 +892,30 @@ export default function OAuthAppSettingsPage() {
                     />
                 )}
                 <Button
+                    component="a"
+                    href="/docs/lixaccounts"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="outlined"
+                    sx={{
+                        width: { xs: "100%", sm: "auto" },
+                        borderColor: "rgba(255, 119, 89,0.3)",
+                        color: "#ff7759",
+                        textTransform: "none",
+                        "&:hover": {
+                            borderColor: "#ff7759",
+                            bgcolor: "rgba(255, 119, 89,0.08)",
+                        },
+                    }}
+                >
+                    SDK Docs
+                </Button>
+                <Button
                     variant="contained"
                     startIcon={<SaveIcon />}
                     onClick={handleSave}
                     disabled={saving}
                     sx={{
-                        ml: { xs: 0, sm: "auto" },
                         width: { xs: "100%", sm: "auto" },
                         background: "rgba(255, 119, 89,0.15)",
                         color: "#ff7759",
@@ -746,7 +934,7 @@ export default function OAuthAppSettingsPage() {
                     severity={message.type}
                     onClose={() => setMessage(null)}
                     sx={{
-                        mb: 3,
+                        gridColumn: "1 / -1",
                         bgcolor:
                             message.type === "success"
                                 ? "rgba(255, 119, 89,0.1)"
@@ -766,6 +954,7 @@ export default function OAuthAppSettingsPage() {
                 </Alert>
             )}
 
+<<<<<<< HEAD
                 </Box>
             }
             content={
@@ -916,6 +1105,77 @@ export default function OAuthAppSettingsPage() {
 
             {/* Client Secret */}
                 <Box sx={cardSx} id="bento-secret">
+=======
+            <Box
+                component="nav"
+                aria-label="Application settings sections"
+                sx={{
+                    display: { xs: "none", lg: "flex" },
+                    position: "sticky",
+                    top: 150,
+                    gridColumn: "1",
+                    gridRow: "span 7",
+                    order: 1,
+                    flexDirection: "column",
+                    gap: 0.5,
+                    p: 1,
+                    borderRadius: "12px",
+                    border: "1px solid var(--border)",
+                    bgcolor: "var(--surface)",
+                }}
+            >
+                {sectionNavigation.map((section) => (
+                    <Button
+                        key={section.id}
+                        component="a"
+                        href={`#${section.id}`}
+                        sx={{
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            gap: 1,
+                            color: "var(--fg-muted)",
+                            textTransform: "none",
+                            fontSize: "0.82rem",
+                            "&:hover": {
+                                color: "#ff7759",
+                                bgcolor: "rgba(255, 119, 89,0.08)",
+                            },
+                        }}
+                    >
+                        <span>{section.label}</span>
+                        <Typography
+                            component="span"
+                            sx={{
+                                color: section.needsAttention
+                                    ? "#b45309"
+                                    : "var(--fg-faint)",
+                                fontSize: "0.62rem",
+                                whiteSpace: "nowrap",
+                            }}
+                        >
+                            {section.status}
+                        </Typography>
+                    </Button>
+                ))}
+            </Box>
+
+            {/* Bento Grid */}
+            <Box
+                sx={{
+                    display: "contents",
+                }}
+            >
+                {/* Client Secret */}
+                <Box
+                    id="credentials"
+                    sx={{
+                        ...cardSx,
+                        order: 2,
+                        gridColumn: { xs: "1", lg: "2 / -1" },
+                        scrollMarginTop: "150px",
+                    }}
+                >
+>>>>>>> origin/main
                     <Typography
                         sx={{
                             color: "var(--fg-faint)",
@@ -930,9 +1190,9 @@ export default function OAuthAppSettingsPage() {
                     </Typography>
                     {app?.client_type === "public" ? (
                         <Alert severity="info">
-                            Public device-flow clients authenticate with method
-                            <strong> none</strong>. No secret exists or can be
-                            regenerated.
+                            Device Flow apps do not need a client secret. They
+                            securely exchange the device code for tokens after
+                            the user approves access.
                         </Alert>
                     ) : regeneratedSecret ? (
                         <>
@@ -1003,16 +1263,21 @@ export default function OAuthAppSettingsPage() {
                                 >
                                     ••••••••••••••••••••••••••••
                                 </Typography>
-                                <Tooltip title="Regenerate secret">
-                                    <IconButton
-                                        size="small"
-                                        onClick={handleRegenerateSecret}
-                                        disabled={regenerating}
-                                        sx={{ color: "#ff7759" }}
-                                    >
-                                        <RefreshIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
+                                <Button
+                                    size="small"
+                                    startIcon={<RefreshIcon />}
+                                    onClick={handleRegenerateSecret}
+                                    disabled={regenerating}
+                                    sx={{
+                                        color: "#ff7759",
+                                        textTransform: "none",
+                                        flexShrink: 0,
+                                    }}
+                                >
+                                    {regenerating
+                                        ? "Regenerating…"
+                                        : "Regenerate"}
+                                </Button>
                             </Box>
                             <Typography
                                 variant="caption"
@@ -1028,6 +1293,7 @@ export default function OAuthAppSettingsPage() {
                     )}
                 </Box>
 
+<<<<<<< HEAD
                 
             {/* Webhooks panel — multi-endpoint event subscription */}
             <Box sx={{ ...cardSx }} id="bento-webhooks">
@@ -1056,6 +1322,20 @@ export default function OAuthAppSettingsPage() {
                             textDecoration: "underline",
                             textDecorationColor: "rgba(255, 119, 89,0.4)",
                         }}
+=======
+                {/* General Settings */}
+                <Box
+                    id="overview"
+                    sx={{
+                        ...cardSx,
+                        order: 1,
+                        gridColumn: { xs: "1", lg: "2 / -1" },
+                        scrollMarginTop: "150px",
+                    }}
+                >
+                    <Typography
+                        sx={{ color: "var(--fg)", fontWeight: 600, mb: 2 }}
+>>>>>>> origin/main
                     >
                         integration guide
                     </a>{" "}
@@ -1168,6 +1448,7 @@ export default function OAuthAppSettingsPage() {
                             display: "grid",
                             gridTemplateColumns: {
                                 xs: "1fr",
+<<<<<<< HEAD
                                 sm: "2fr 1fr",
                             },
                             gap: 1.5,
@@ -1195,6 +1476,44 @@ export default function OAuthAppSettingsPage() {
                             }}
                             sx={textFieldSx}
                         />
+=======
+                                md:
+                                    app?.client_type === "public"
+                                        ? "1fr 1fr"
+                                        : "1fr",
+                            },
+                            gap: 2,
+                        }}
+                    >
+                        <Box sx={{ gridColumn: "1 / -1" }}>
+                            <TextField
+                                fullWidth
+                                label="Application Name"
+                                value={form.name}
+                                onChange={(e) =>
+                                    setForm({ ...form, name: e.target.value })
+                                }
+                                sx={textFieldSx}
+                            />
+                        </Box>
+                        <Box sx={{ gridColumn: "1 / -1" }}>
+                            <TextField
+                                fullWidth
+                                label="Description"
+                                placeholder="What does your application do?"
+                                value={form.description}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        description: e.target.value,
+                                    })
+                                }
+                                multiline
+                                rows={2}
+                                sx={textFieldSx}
+                            />
+                        </Box>
+>>>>>>> origin/main
                         <TextField
                             fullWidth
                             size="small"
@@ -1214,6 +1533,25 @@ export default function OAuthAppSettingsPage() {
                             }}
                             sx={textFieldSx}
                         />
+<<<<<<< HEAD
+=======
+                        {app?.client_type === "public" && (
+                            <TextField
+                                fullWidth
+                                label="Resource audience"
+                                value={form.audience}
+                                onChange={(event) =>
+                                    setForm({
+                                        ...form,
+                                        audience: event.target.value,
+                                    })
+                                }
+                                placeholder="blogs.elixpo.com"
+                                helperText="Host only; bound into access tokens"
+                                sx={textFieldSx}
+                            />
+                        )}
+>>>>>>> origin/main
                     </Box>
                     <Box
                         sx={{
@@ -1282,9 +1620,22 @@ export default function OAuthAppSettingsPage() {
                 </Box>
             </Box>
 
+<<<<<<< HEAD
             
             {/* Redirect URIs */}
                 <Box sx={{ ...cardSx }}>
+=======
+                {/* Redirect URIs */}
+                <Box
+                    id="routes"
+                    sx={{
+                        ...cardSx,
+                        order: 4,
+                        gridColumn: { xs: "1", lg: "2" },
+                        scrollMarginTop: "150px",
+                    }}
+                >
+>>>>>>> origin/main
                     <Typography
                         sx={{ color: "var(--fg)", fontWeight: 600, mb: 0.5 }}
                     >
@@ -1373,7 +1724,17 @@ export default function OAuthAppSettingsPage() {
                 </Box>
 
                 {/* Scopes + Stats */}
+<<<<<<< HEAD
                 <Box sx={{ ...cardSx }}>
+=======
+                <Box
+                    sx={{
+                        ...cardSx,
+                        order: 4,
+                        gridColumn: { xs: "1", lg: "3" },
+                    }}
+                >
+>>>>>>> origin/main
                     <Typography
                         sx={{ color: "var(--fg)", fontWeight: 600, mb: 2 }}
                     >
@@ -1497,7 +1858,19 @@ export default function OAuthAppSettingsPage() {
                         )}
                 </Box>
             {/* Custom Branding & Identity card */}
+<<<<<<< HEAD
             <Box sx={{ ...cardSx }} id="bento-branding">
+=======
+            <Box
+                id="branding"
+                sx={{
+                    ...cardSx,
+                    order: 5,
+                    gridColumn: { xs: "1", lg: "2 / -1" },
+                    scrollMarginTop: "150px",
+                }}
+            >
+>>>>>>> origin/main
                 <Typography
                     sx={{ color: "var(--fg)", fontWeight: 600, mb: 0.5 }}
                 >
@@ -2424,7 +2797,15 @@ export default function OAuthAppSettingsPage() {
 
             {/* Activity panel — sign-ins, sessions, request count, and a */}
             {stats && (
-                <Box sx={{ ...cardSx, mb: 3 }}>
+                <Box
+                    id="activity"
+                    sx={{
+                        ...cardSx,
+                        order: 6,
+                        gridColumn: { xs: "1", lg: "2 / -1" },
+                        scrollMarginTop: "150px",
+                    }}
+                >
                     {stats.branding_verification_required && (
                         <Alert severity="warning" sx={{ mb: 2 }}>
                             Sign-ins are paused because this app has more than
@@ -2610,8 +2991,282 @@ export default function OAuthAppSettingsPage() {
                 </Box>
             )}
 
+<<<<<<< HEAD
             {/* Danger Zone */}
             <Box sx={{ ...cardSx, border: "1px solid rgba(239,68,68,0.3)" }} id="bento-danger">
+=======
+            {/* Webhooks panel — multi-endpoint event subscription */}
+            <Box
+                id="webhooks"
+                sx={{
+                    ...cardSx,
+                    order: 3,
+                    gridColumn: { xs: "1", lg: "2 / -1" },
+                    scrollMarginTop: "150px",
+                }}
+            >
+                <Typography
+                    sx={{ color: "var(--fg)", fontWeight: 600, mb: 0.5 }}
+                >
+                    Webhook endpoints
+                </Typography>
+                <Typography
+                    sx={{
+                        color: "var(--fg-faint)",
+                        fontSize: "0.85rem",
+                        mb: 2.5,
+                    }}
+                >
+                    Register one or more URLs that receive signed event
+                    deliveries. Each endpoint has its own secret. Useful for
+                    separating localhost/staging/production receivers, each
+                    listening to a different subset of events. See the{" "}
+                    <a
+                        href="/docs/webhooks"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                            color: "#ff7759",
+                            textDecoration: "underline",
+                            textDecorationColor: "rgba(255, 119, 89,0.4)",
+                        }}
+                    >
+                        integration guide
+                    </a>{" "}
+                    for the signature contract.
+                </Typography>
+
+                {/* Result message */}
+                {webhookMessage && (
+                    <Typography
+                        sx={{
+                            mb: 2,
+                            color:
+                                webhookMessage.type === "error"
+                                    ? "#b91c1c"
+                                    : "#15803d",
+                            fontSize: "0.85rem",
+                        }}
+                    >
+                        {webhookMessage.text}
+                    </Typography>
+                )}
+
+                {/* Existing endpoints list */}
+                {endpointsLoading ? (
+                    <Box
+                        sx={{
+                            py: 3,
+                            textAlign: "center",
+                            color: "var(--fg-faint)",
+                        }}
+                    >
+                        <CircularProgress size={20} sx={{ color: "#ff7759" }} />
+                    </Box>
+                ) : endpoints.length === 0 ? (
+                    <Box
+                        sx={{
+                            py: 3,
+                            px: 2,
+                            mb: 2.5,
+                            textAlign: "center",
+                            borderRadius: "10px",
+                            background: "var(--surface)",
+                            border: "1px dashed var(--border)",
+                            color: "var(--fg-faint)",
+                            fontSize: "0.88rem",
+                        }}
+                    >
+                        No endpoints yet — add one below.
+                    </Box>
+                ) : (
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 1.5,
+                            mb: 3,
+                        }}
+                    >
+                        {endpoints.map((ep) => (
+                            <EndpointRow
+                                key={ep.id}
+                                ep={ep}
+                                revealedSecret={revealedSecrets[ep.id]}
+                                onDismissSecret={() =>
+                                    setRevealedSecrets((s) => {
+                                        const copy = { ...s };
+                                        delete copy[ep.id];
+                                        return copy;
+                                    })
+                                }
+                                onCopySecret={() =>
+                                    copyToClipboard(
+                                        revealedSecrets[ep.id] || "",
+                                        `endpoint-${ep.id}`,
+                                    )
+                                }
+                                copiedField={copiedField}
+                                busy={endpointBusy === ep.id}
+                                onToggle={() =>
+                                    handleToggleEndpoint(ep, !ep.is_active)
+                                }
+                                onDelete={() => handleDeleteEndpoint(ep)}
+                                onRotate={() => handleRotateEndpoint(ep)}
+                            />
+                        ))}
+                    </Box>
+                )}
+
+                {/* Add-endpoint inline form */}
+                <Box
+                    sx={{
+                        p: 2.5,
+                        borderRadius: "12px",
+                        background: "var(--surface)",
+                        border: "1px solid var(--border)",
+                    }}
+                >
+                    <Typography
+                        sx={{
+                            color: "var(--fg)",
+                            fontWeight: 600,
+                            fontSize: "0.92rem",
+                            mb: 1.5,
+                        }}
+                    >
+                        Add new endpoint
+                    </Typography>
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: {
+                                xs: "1fr",
+                                sm: "2fr 1fr",
+                            },
+                            gap: 1.5,
+                            mb: 1.5,
+                        }}
+                    >
+                        <TextField
+                            fullWidth
+                            size="small"
+                            placeholder="https://yourapp.com/api/webhooks/elixpo"
+                            value={newEndpoint.url}
+                            onChange={(e) =>
+                                setNewEndpoint((p) => ({
+                                    ...p,
+                                    url: e.target.value,
+                                }))
+                            }
+                            InputProps={{
+                                sx: {
+                                    color: "var(--fg)",
+                                    fontFamily:
+                                        "var(--font-geist-mono), monospace",
+                                    fontSize: "0.82rem",
+                                },
+                            }}
+                            sx={textFieldSx}
+                        />
+                        <TextField
+                            fullWidth
+                            size="small"
+                            placeholder="Label (e.g. production)"
+                            value={newEndpoint.label}
+                            onChange={(e) =>
+                                setNewEndpoint((p) => ({
+                                    ...p,
+                                    label: e.target.value,
+                                }))
+                            }
+                            InputProps={{
+                                sx: {
+                                    color: "var(--fg)",
+                                    fontSize: "0.85rem",
+                                },
+                            }}
+                            sx={textFieldSx}
+                        />
+                    </Box>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            gap: 0.75,
+                            flexWrap: "wrap",
+                            mb: 1.5,
+                        }}
+                    >
+                        {WEBHOOK_EVENTS.map((ev) => {
+                            const checked = newEndpoint.events.includes(ev);
+                            return (
+                                <Chip
+                                    key={ev}
+                                    label={ev}
+                                    size="small"
+                                    onClick={() =>
+                                        setNewEndpoint((p) => ({
+                                            ...p,
+                                            events: checked
+                                                ? p.events.filter(
+                                                      (e) => e !== ev,
+                                                  )
+                                                : [...p.events, ev],
+                                        }))
+                                    }
+                                    sx={{
+                                        cursor: "pointer",
+                                        fontFamily:
+                                            "var(--font-geist-mono), monospace",
+                                        fontSize: "0.72rem",
+                                        bgcolor: checked
+                                            ? "rgba(255, 119, 89,0.15)"
+                                            : "var(--overlay)",
+                                        color: checked
+                                            ? "#ff7759"
+                                            : "var(--fg-faint)",
+                                        border: `1px solid ${
+                                            checked
+                                                ? "rgba(255, 119, 89,0.4)"
+                                                : "var(--border)"
+                                        }`,
+                                    }}
+                                />
+                            );
+                        })}
+                    </Box>
+                    <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={<AddIcon />}
+                        onClick={handleCreateEndpoint}
+                        disabled={creatingEndpoint}
+                        sx={{
+                            textTransform: "none",
+                            background:
+                                "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
+                            "&:hover": {
+                                background:
+                                    "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
+                            },
+                        }}
+                    >
+                        {creatingEndpoint ? "Adding…" : "Add endpoint"}
+                    </Button>
+                </Box>
+            </Box>
+
+            {/* Danger Zone */}
+            <Box
+                id="danger"
+                sx={{
+                    ...cardSx,
+                    order: 7,
+                    gridColumn: { xs: "1", lg: "2 / -1" },
+                    border: "1px solid rgba(239,68,68,0.3)",
+                }}
+            >
+>>>>>>> origin/main
                 <Typography sx={{ color: "#b91c1c", fontWeight: 600, mb: 1 }}>
                     Danger Zone
                 </Typography>
