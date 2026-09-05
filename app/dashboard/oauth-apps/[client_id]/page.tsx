@@ -586,10 +586,7 @@ export default function OAuthAppSettingsPage() {
 
     const iconSources = appIconSources(form.homepage_url, form.logo_url);
     const faviconUrl = iconSources[iconStage] || null;
-    useEffect(
-        () => setIconStage(0),
-        [form.homepage_url, form.logo_url],
-    );
+    useEffect(() => setIconStage(0), []);
 
     if (loading) {
         return (
@@ -737,9 +734,7 @@ export default function OAuthAppSettingsPage() {
                         </Typography>
                         <Tooltip
                             title={
-                                copiedField === "client_id"
-                                    ? "Copied!"
-                                    : "Copy"
+                                copiedField === "client_id" ? "Copied!" : "Copy"
                             }
                         >
                             <IconButton
@@ -752,9 +747,7 @@ export default function OAuthAppSettingsPage() {
                                 }
                                 sx={{ color: "#ff7759", p: 0.25 }}
                             >
-                                <ContentCopyIcon
-                                    sx={{ fontSize: "0.85rem" }}
-                                />
+                                <ContentCopyIcon sx={{ fontSize: "0.85rem" }} />
                             </IconButton>
                         </Tooltip>
                         <Typography
