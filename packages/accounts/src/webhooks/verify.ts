@@ -14,7 +14,7 @@ function parseTimestamp(timestamp: string): number | null {
     return Number.isSafeInteger(parsed) ? parsed : null;
 }
 
-function parseSignature(signature: string): Uint8Array | null {
+function parseSignature(signature: string): ArrayBuffer | null {
     if (!signature.startsWith(SIGNATURE_PREFIX)) return null;
     const hex = signature.slice(SIGNATURE_PREFIX.length);
     if (!/^[a-fA-F0-9]{64}$/.test(hex)) return null;
@@ -23,13 +23,13 @@ function parseSignature(signature: string): Uint8Array | null {
     for (let index = 0; index < bytes.length; index += 1) {
         bytes[index] = Number.parseInt(hex.slice(index * 2, index * 2 + 2), 16);
     }
-    return bytes;
+    return bytes.buffer as ArrayBuffer;
 }
 
 async function signatureMatches(
     payload: string,
     timestamp: string,
-    signature: Uint8Array,
+    signature: ArrayBuffer,
     secret: string,
 ): Promise<boolean> {
     const encoder = new TextEncoder();
