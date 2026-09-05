@@ -113,7 +113,7 @@ function faviconSources(homepageUrl?: string, logoUrl?: string): string[] {
 function AppIcon({ app, size = 28 }: { app: OAuthApp; size?: number }) {
     const [stage, setStage] = useState(0);
     const sources = faviconSources(app.homepage_url, app.logo_url);
-    useEffect(() => setStage(0), [app.homepage_url, app.logo_url]);
+    useEffect(() => setStage(0), []);
     const src =
         stage < sources.length
             ? sources[stage]
@@ -150,9 +150,7 @@ const OAuthAppsPage = () => {
     const [secretCopied, setSecretCopied] = useState(false);
     const [idCopied, setIdCopied] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [appFilter, setAppFilter] = useState<"all" | "web" | "device">(
-        "all",
-    );
+    const [appFilter, setAppFilter] = useState<"all" | "web" | "device">("all");
     const filteredApps = useMemo(() => {
         const query = searchQuery.trim().toLowerCase();
         return apps.filter((app) => {
@@ -169,9 +167,7 @@ const OAuthAppsPage = () => {
                 app.client_id,
                 app.homepage_url,
                 app.description,
-            ].some(
-                (value) => value?.toLowerCase().includes(query),
-            );
+            ].some((value) => value?.toLowerCase().includes(query));
         });
     }, [appFilter, apps, searchQuery]);
 
