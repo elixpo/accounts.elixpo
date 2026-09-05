@@ -24,6 +24,10 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { CustomOAuthScope } from "@/lib/oauth-scope-registry";
 import { OAuthScopePicker } from "../../../components/oauth-scope-picker";
+import { DashboardScrollLayout } from "../../../components/dashboard/section-nav/dashboard-scroll-layout";
+import { StickySectionNav } from "../../../components/dashboard/section-nav/sticky-section-nav";
+import { useScrollSpy } from "../../../components/dashboard/section-nav/use-scroll-spy";
+import { useRef } from "react";
 
 const cardSx = {
     background: "var(--surface)",
@@ -60,6 +64,10 @@ export default function OAuthAppSettingsPage() {
     const clientId = params.client_id as string;
 
     const [app, setApp] = useState<any>(null);
+    const scrollRef = useRef<HTMLElement | null>(null);
+    const sectionIds = ["bento-application", "bento-secret", "bento-webhooks", "bento-redirects", "bento-info", "bento-branding", "bento-activity", "bento-danger"];
+    const activeSectionId = useScrollSpy(sectionIds, scrollRef, 120);
+
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState<{
@@ -594,7 +602,26 @@ export default function OAuthAppSettingsPage() {
     }
 
     return (
-        <Box>
+        <DashboardScrollLayout
+            scrollRef={scrollRef}
+            sidebar={
+                <StickySectionNav
+                    sections={[
+                        { id: "bento-application", label: "Application" },
+                        { id: "bento-secret", label: "Client Secret" },
+                        { id: "bento-webhooks", label: "Webhook Endpoints" },
+                        { id: "bento-redirects", label: "Redirect URIs" },
+                        { id: "bento-info", label: "Info" },
+                        { id: "bento-branding", label: "Branding & Identity" },
+                        { id: "bento-activity", label: "Activity" },
+                        { id: "bento-danger", label: "Danger Zone" },
+                    ]}
+                    activeSectionId={activeSectionId}
+                    scrollContainerRef={scrollRef}
+                />
+            }
+            header={
+                <Box>
             {/* Back + Header */}
             <Button
                 startIcon={<ArrowBackIcon />}
@@ -739,15 +766,18 @@ export default function OAuthAppSettingsPage() {
                 </Alert>
             )}
 
-            {/* Bento Grid */}
-            <Box
-                sx={{
-                    display: "grid",
-                    gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
-                    gap: 2.5,
-                    mb: 3,
-                }}
-            >
+                </Box>
+            }
+            content={
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    <Box
+                        id="bento-application"
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
+                            gap: 2.5,
+                        }}
+                    >
                 {/* Client ID */}
                 <Box sx={cardSx}>
                     <Typography
@@ -810,8 +840,82 @@ export default function OAuthAppSettingsPage() {
                     </Typography>
                 </Box>
 
-                {/* Client Secret */}
-                <Box sx={cardSx}>
+                {/* General Settings (spans full width on lg) */}
+                <Box sx={{ ...cardSx }}>
+                    <Typography
+                        sx={{ color: "var(--fg)", fontWeight: 600, mb: 2 }}
+                    >
+                        General
+                    </Typography>
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                            gap: 2,
+                        }}
+                    >
+                        <TextField
+                            fullWidth
+                            label="Application Name"
+                            value={form.name}
+                            onChange={(e) =>
+                                setForm({ ...form, name: e.target.value })
+                            }
+                            sx={textFieldSx}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Homepage URL"
+                            placeholder="https://example.com"
+                            value={form.homepage_url}
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    homepage_url: e.target.value,
+                                })
+                            }
+                            sx={textFieldSx}
+                        />
+                        {app?.client_type === "public" && (
+                            <TextField
+                                fullWidth
+                                label="Resource audience"
+                                value={form.audience}
+                                onChange={(event) =>
+                                    setForm({
+                                        ...form,
+                                        audience: event.target.value,
+                                    })
+                                }
+                                placeholder="blogs.elixpo.com"
+                                helperText="Host only; bound into access tokens"
+                                sx={textFieldSx}
+                            />
+                        )}
+                        <Box sx={{ gridColumn: { md: "1 / -1" } }}>
+                            <TextField
+                                fullWidth
+                                label="Description"
+                                placeholder="What does your application do?"
+                                value={form.description}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        description: e.target.value,
+                                    })
+                                }
+                                multiline
+                                rows={2}
+                                sx={textFieldSx}
+                            />
+                        </Box>
+                    </Box>
+                </Box>
+
+                </Box>
+
+            {/* Client Secret */}
+                <Box sx={cardSx} id="bento-secret">
                     <Typography
                         sx={{
                             color: "var(--fg-faint)",
@@ -924,80 +1028,263 @@ export default function OAuthAppSettingsPage() {
                     )}
                 </Box>
 
-                {/* General Settings (spans full width on lg) */}
-                <Box sx={{ ...cardSx, gridColumn: { lg: "1 / -1" } }}>
-                    <Typography
-                        sx={{ color: "var(--fg)", fontWeight: 600, mb: 2 }}
+                
+            {/* Webhooks panel — multi-endpoint event subscription */}
+            <Box sx={{ ...cardSx }} id="bento-webhooks">
+                <Typography
+                    sx={{ color: "var(--fg)", fontWeight: 600, mb: 0.5 }}
+                >
+                    Webhook endpoints
+                </Typography>
+                <Typography
+                    sx={{
+                        color: "var(--fg-faint)",
+                        fontSize: "0.85rem",
+                        mb: 2.5,
+                    }}
+                >
+                    Register one or more URLs that receive signed event
+                    deliveries. Each endpoint has its own secret. Useful for
+                    separating localhost/staging/production receivers, each
+                    listening to a different subset of events. See the{" "}
+                    <a
+                        href="/docs/webhooks"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                            color: "#ff7759",
+                            textDecoration: "underline",
+                            textDecorationColor: "rgba(255, 119, 89,0.4)",
+                        }}
                     >
-                        General
+                        integration guide
+                    </a>{" "}
+                    for the signature contract.
+                </Typography>
+
+                {/* Result message */}
+                {webhookMessage && (
+                    <Typography
+                        sx={{
+                            mb: 2,
+                            color:
+                                webhookMessage.type === "error"
+                                    ? "#b91c1c"
+                                    : "#15803d",
+                            fontSize: "0.85rem",
+                        }}
+                    >
+                        {webhookMessage.text}
+                    </Typography>
+                )}
+
+                {/* Existing endpoints list */}
+                {endpointsLoading ? (
+                    <Box
+                        sx={{
+                            py: 3,
+                            textAlign: "center",
+                            color: "var(--fg-faint)",
+                        }}
+                    >
+                        <CircularProgress size={20} sx={{ color: "#ff7759" }} />
+                    </Box>
+                ) : endpoints.length === 0 ? (
+                    <Box
+                        sx={{
+                            py: 3,
+                            px: 2,
+                            mb: 2.5,
+                            textAlign: "center",
+                            borderRadius: "10px",
+                            background: "var(--surface)",
+                            border: "1px dashed var(--border)",
+                            color: "var(--fg-faint)",
+                            fontSize: "0.88rem",
+                        }}
+                    >
+                        No endpoints yet — add one below.
+                    </Box>
+                ) : (
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 1.5,
+                            mb: 3,
+                        }}
+                    >
+                        {endpoints.map((ep) => (
+                            <EndpointRow
+                                key={ep.id}
+                                ep={ep}
+                                revealedSecret={revealedSecrets[ep.id]}
+                                onDismissSecret={() =>
+                                    setRevealedSecrets((s) => {
+                                        const copy = { ...s };
+                                        delete copy[ep.id];
+                                        return copy;
+                                    })
+                                }
+                                onCopySecret={() =>
+                                    copyToClipboard(
+                                        revealedSecrets[ep.id] || "",
+                                        `endpoint-${ep.id}`,
+                                    )
+                                }
+                                copiedField={copiedField}
+                                busy={endpointBusy === ep.id}
+                                onToggle={() =>
+                                    handleToggleEndpoint(ep, !ep.is_active)
+                                }
+                                onDelete={() => handleDeleteEndpoint(ep)}
+                                onRotate={() => handleRotateEndpoint(ep)}
+                            />
+                        ))}
+                    </Box>
+                )}
+
+                {/* Add-endpoint inline form */}
+                <Box
+                    sx={{
+                        p: 2.5,
+                        borderRadius: "12px",
+                        background: "var(--surface)",
+                        border: "1px solid var(--border)",
+                    }}
+                >
+                    <Typography
+                        sx={{
+                            color: "var(--fg)",
+                            fontWeight: 600,
+                            fontSize: "0.92rem",
+                            mb: 1.5,
+                        }}
+                    >
+                        Add new endpoint
                     </Typography>
                     <Box
                         sx={{
                             display: "grid",
-                            gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                            gap: 2,
+                            gridTemplateColumns: {
+                                xs: "1fr",
+                                sm: "2fr 1fr",
+                            },
+                            gap: 1.5,
+                            mb: 1.5,
                         }}
                     >
                         <TextField
                             fullWidth
-                            label="Application Name"
-                            value={form.name}
+                            size="small"
+                            placeholder="https://yourapp.com/api/webhooks/elixpo"
+                            value={newEndpoint.url}
                             onChange={(e) =>
-                                setForm({ ...form, name: e.target.value })
+                                setNewEndpoint((p) => ({
+                                    ...p,
+                                    url: e.target.value,
+                                }))
                             }
+                            InputProps={{
+                                sx: {
+                                    color: "var(--fg)",
+                                    fontFamily:
+                                        "var(--font-geist-mono), monospace",
+                                    fontSize: "0.82rem",
+                                },
+                            }}
                             sx={textFieldSx}
                         />
                         <TextField
                             fullWidth
-                            label="Homepage URL"
-                            placeholder="https://example.com"
-                            value={form.homepage_url}
+                            size="small"
+                            placeholder="Label (e.g. production)"
+                            value={newEndpoint.label}
                             onChange={(e) =>
-                                setForm({
-                                    ...form,
-                                    homepage_url: e.target.value,
-                                })
+                                setNewEndpoint((p) => ({
+                                    ...p,
+                                    label: e.target.value,
+                                }))
                             }
+                            InputProps={{
+                                sx: {
+                                    color: "var(--fg)",
+                                    fontSize: "0.85rem",
+                                },
+                            }}
                             sx={textFieldSx}
                         />
-                        {app?.client_type === "public" && (
-                            <TextField
-                                fullWidth
-                                label="Resource audience"
-                                value={form.audience}
-                                onChange={(event) =>
-                                    setForm({
-                                        ...form,
-                                        audience: event.target.value,
-                                    })
-                                }
-                                placeholder="blogs.elixpo.com"
-                                helperText="Host only; bound into access tokens"
-                                sx={textFieldSx}
-                            />
-                        )}
-                        <Box sx={{ gridColumn: { md: "1 / -1" } }}>
-                            <TextField
-                                fullWidth
-                                label="Description"
-                                placeholder="What does your application do?"
-                                value={form.description}
-                                onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        description: e.target.value,
-                                    })
-                                }
-                                multiline
-                                rows={2}
-                                sx={textFieldSx}
-                            />
-                        </Box>
                     </Box>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            gap: 0.75,
+                            flexWrap: "wrap",
+                            mb: 1.5,
+                        }}
+                    >
+                        {WEBHOOK_EVENTS.map((ev) => {
+                            const checked = newEndpoint.events.includes(ev);
+                            return (
+                                <Chip
+                                    key={ev}
+                                    label={ev}
+                                    size="small"
+                                    onClick={() =>
+                                        setNewEndpoint((p) => ({
+                                            ...p,
+                                            events: checked
+                                                ? p.events.filter(
+                                                      (e) => e !== ev,
+                                                  )
+                                                : [...p.events, ev],
+                                        }))
+                                    }
+                                    sx={{
+                                        cursor: "pointer",
+                                        fontFamily:
+                                            "var(--font-geist-mono), monospace",
+                                        fontSize: "0.72rem",
+                                        bgcolor: checked
+                                            ? "rgba(255, 119, 89,0.15)"
+                                            : "var(--overlay)",
+                                        color: checked
+                                            ? "#ff7759"
+                                            : "var(--fg-faint)",
+                                        border: `1px solid ${
+                                            checked
+                                                ? "rgba(255, 119, 89,0.4)"
+                                                : "var(--border)"
+                                        }`,
+                                    }}
+                                />
+                            );
+                        })}
+                    </Box>
+                    <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={<AddIcon />}
+                        onClick={handleCreateEndpoint}
+                        disabled={creatingEndpoint}
+                        sx={{
+                            textTransform: "none",
+                            background:
+                                "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
+                            "&:hover": {
+                                background:
+                                    "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
+                            },
+                        }}
+                    >
+                        {creatingEndpoint ? "Adding…" : "Add endpoint"}
+                    </Button>
                 </Box>
+            </Box>
 
-                {/* Redirect URIs */}
-                <Box sx={{ ...cardSx, gridColumn: { lg: "1 / -1" } }}>
+            
+            {/* Redirect URIs */}
+                <Box sx={{ ...cardSx }}>
                     <Typography
                         sx={{ color: "var(--fg)", fontWeight: 600, mb: 0.5 }}
                     >
@@ -1086,7 +1373,7 @@ export default function OAuthAppSettingsPage() {
                 </Box>
 
                 {/* Scopes + Stats */}
-                <Box sx={{ ...cardSx, gridColumn: { lg: "1 / -1" } }}>
+                <Box sx={{ ...cardSx }}>
                     <Typography
                         sx={{ color: "var(--fg)", fontWeight: 600, mb: 2 }}
                     >
@@ -1209,10 +1496,8 @@ export default function OAuthAppSettingsPage() {
                             </Box>
                         )}
                 </Box>
-            </Box>
-
             {/* Custom Branding & Identity card */}
-            <Box sx={{ ...cardSx, gridColumn: { lg: "1 / -1" }, mb: 3 }}>
+            <Box sx={{ ...cardSx }} id="bento-branding">
                 <Typography
                     sx={{ color: "var(--fg)", fontWeight: 600, mb: 0.5 }}
                 >
@@ -2325,261 +2610,8 @@ export default function OAuthAppSettingsPage() {
                 </Box>
             )}
 
-            {/* Webhooks panel — multi-endpoint event subscription */}
-            <Box sx={{ ...cardSx, mb: 3 }}>
-                <Typography
-                    sx={{ color: "var(--fg)", fontWeight: 600, mb: 0.5 }}
-                >
-                    Webhook endpoints
-                </Typography>
-                <Typography
-                    sx={{
-                        color: "var(--fg-faint)",
-                        fontSize: "0.85rem",
-                        mb: 2.5,
-                    }}
-                >
-                    Register one or more URLs that receive signed event
-                    deliveries. Each endpoint has its own secret. Useful for
-                    separating localhost/staging/production receivers, each
-                    listening to a different subset of events. See the{" "}
-                    <a
-                        href="/docs/webhooks"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                            color: "#ff7759",
-                            textDecoration: "underline",
-                            textDecorationColor: "rgba(255, 119, 89,0.4)",
-                        }}
-                    >
-                        integration guide
-                    </a>{" "}
-                    for the signature contract.
-                </Typography>
-
-                {/* Result message */}
-                {webhookMessage && (
-                    <Typography
-                        sx={{
-                            mb: 2,
-                            color:
-                                webhookMessage.type === "error"
-                                    ? "#b91c1c"
-                                    : "#15803d",
-                            fontSize: "0.85rem",
-                        }}
-                    >
-                        {webhookMessage.text}
-                    </Typography>
-                )}
-
-                {/* Existing endpoints list */}
-                {endpointsLoading ? (
-                    <Box
-                        sx={{
-                            py: 3,
-                            textAlign: "center",
-                            color: "var(--fg-faint)",
-                        }}
-                    >
-                        <CircularProgress size={20} sx={{ color: "#ff7759" }} />
-                    </Box>
-                ) : endpoints.length === 0 ? (
-                    <Box
-                        sx={{
-                            py: 3,
-                            px: 2,
-                            mb: 2.5,
-                            textAlign: "center",
-                            borderRadius: "10px",
-                            background: "var(--surface)",
-                            border: "1px dashed var(--border)",
-                            color: "var(--fg-faint)",
-                            fontSize: "0.88rem",
-                        }}
-                    >
-                        No endpoints yet — add one below.
-                    </Box>
-                ) : (
-                    <Box
-                        sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 1.5,
-                            mb: 3,
-                        }}
-                    >
-                        {endpoints.map((ep) => (
-                            <EndpointRow
-                                key={ep.id}
-                                ep={ep}
-                                revealedSecret={revealedSecrets[ep.id]}
-                                onDismissSecret={() =>
-                                    setRevealedSecrets((s) => {
-                                        const copy = { ...s };
-                                        delete copy[ep.id];
-                                        return copy;
-                                    })
-                                }
-                                onCopySecret={() =>
-                                    copyToClipboard(
-                                        revealedSecrets[ep.id] || "",
-                                        `endpoint-${ep.id}`,
-                                    )
-                                }
-                                copiedField={copiedField}
-                                busy={endpointBusy === ep.id}
-                                onToggle={() =>
-                                    handleToggleEndpoint(ep, !ep.is_active)
-                                }
-                                onDelete={() => handleDeleteEndpoint(ep)}
-                                onRotate={() => handleRotateEndpoint(ep)}
-                            />
-                        ))}
-                    </Box>
-                )}
-
-                {/* Add-endpoint inline form */}
-                <Box
-                    sx={{
-                        p: 2.5,
-                        borderRadius: "12px",
-                        background: "var(--surface)",
-                        border: "1px solid var(--border)",
-                    }}
-                >
-                    <Typography
-                        sx={{
-                            color: "var(--fg)",
-                            fontWeight: 600,
-                            fontSize: "0.92rem",
-                            mb: 1.5,
-                        }}
-                    >
-                        Add new endpoint
-                    </Typography>
-                    <Box
-                        sx={{
-                            display: "grid",
-                            gridTemplateColumns: {
-                                xs: "1fr",
-                                sm: "2fr 1fr",
-                            },
-                            gap: 1.5,
-                            mb: 1.5,
-                        }}
-                    >
-                        <TextField
-                            fullWidth
-                            size="small"
-                            placeholder="https://yourapp.com/api/webhooks/elixpo"
-                            value={newEndpoint.url}
-                            onChange={(e) =>
-                                setNewEndpoint((p) => ({
-                                    ...p,
-                                    url: e.target.value,
-                                }))
-                            }
-                            InputProps={{
-                                sx: {
-                                    color: "var(--fg)",
-                                    fontFamily:
-                                        "var(--font-geist-mono), monospace",
-                                    fontSize: "0.82rem",
-                                },
-                            }}
-                            sx={textFieldSx}
-                        />
-                        <TextField
-                            fullWidth
-                            size="small"
-                            placeholder="Label (e.g. production)"
-                            value={newEndpoint.label}
-                            onChange={(e) =>
-                                setNewEndpoint((p) => ({
-                                    ...p,
-                                    label: e.target.value,
-                                }))
-                            }
-                            InputProps={{
-                                sx: {
-                                    color: "var(--fg)",
-                                    fontSize: "0.85rem",
-                                },
-                            }}
-                            sx={textFieldSx}
-                        />
-                    </Box>
-                    <Box
-                        sx={{
-                            display: "flex",
-                            gap: 0.75,
-                            flexWrap: "wrap",
-                            mb: 1.5,
-                        }}
-                    >
-                        {WEBHOOK_EVENTS.map((ev) => {
-                            const checked = newEndpoint.events.includes(ev);
-                            return (
-                                <Chip
-                                    key={ev}
-                                    label={ev}
-                                    size="small"
-                                    onClick={() =>
-                                        setNewEndpoint((p) => ({
-                                            ...p,
-                                            events: checked
-                                                ? p.events.filter(
-                                                      (e) => e !== ev,
-                                                  )
-                                                : [...p.events, ev],
-                                        }))
-                                    }
-                                    sx={{
-                                        cursor: "pointer",
-                                        fontFamily:
-                                            "var(--font-geist-mono), monospace",
-                                        fontSize: "0.72rem",
-                                        bgcolor: checked
-                                            ? "rgba(255, 119, 89,0.15)"
-                                            : "var(--overlay)",
-                                        color: checked
-                                            ? "#ff7759"
-                                            : "var(--fg-faint)",
-                                        border: `1px solid ${
-                                            checked
-                                                ? "rgba(255, 119, 89,0.4)"
-                                                : "var(--border)"
-                                        }`,
-                                    }}
-                                />
-                            );
-                        })}
-                    </Box>
-                    <Button
-                        variant="contained"
-                        size="small"
-                        startIcon={<AddIcon />}
-                        onClick={handleCreateEndpoint}
-                        disabled={creatingEndpoint}
-                        sx={{
-                            textTransform: "none",
-                            background:
-                                "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
-                            "&:hover": {
-                                background:
-                                    "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
-                            },
-                        }}
-                    >
-                        {creatingEndpoint ? "Adding…" : "Add endpoint"}
-                    </Button>
-                </Box>
-            </Box>
-
             {/* Danger Zone */}
-            <Box sx={{ ...cardSx, border: "1px solid rgba(239,68,68,0.3)" }}>
+            <Box sx={{ ...cardSx, border: "1px solid rgba(239,68,68,0.3)" }} id="bento-danger">
                 <Typography sx={{ color: "#b91c1c", fontWeight: 600, mb: 1 }}>
                     Danger Zone
                 </Typography>
@@ -2619,11 +2651,12 @@ export default function OAuthAppSettingsPage() {
                             },
                         }}
                     >
-                        Delete
                     </Button>
                 </Box>
             </Box>
-        </Box>
+                </Box>
+            }
+        />
     );
 }
 
