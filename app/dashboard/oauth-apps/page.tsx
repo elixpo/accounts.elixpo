@@ -653,22 +653,51 @@ const OAuthAppsPage = () => {
                                                         >
                                                             {app.name}
                                                         </Typography>
+                                                        <Chip
+                                                            size="small"
+                                                            label={
+                                                                app.client_type ===
+                                                                "public"
+                                                                    ? "Device Flow"
+                                                                    : "Web Application"
+                                                            }
+                                                            sx={{
+                                                                mt: 0.5,
+                                                                height: 20,
+                                                                bgcolor:
+                                                                    app.client_type ===
+                                                                    "public"
+                                                                        ? "rgba(255, 119, 89, 0.12)"
+                                                                        : "var(--overlay)",
+                                                                color:
+                                                                    app.client_type ===
+                                                                    "public"
+                                                                        ? "#ff7759"
+                                                                        : "var(--fg-muted)",
+                                                                border: "1px solid var(--border)",
+                                                                fontSize:
+                                                                    "0.65rem",
+                                                            }}
+                                                        />
                                                         {app.client_type ===
-                                                            "public" && (
-                                                            <Typography
-                                                                variant="caption"
-                                                                sx={{
-                                                                    display:
-                                                                        "block",
-                                                                    color: "#ff7759",
-                                                                    fontSize:
-                                                                        "0.68rem",
-                                                                }}
-                                                            >
-                                                                Device flow ·{" "}
-                                                                {app.audience}
-                                                            </Typography>
-                                                        )}
+                                                            "public" &&
+                                                            app.audience && (
+                                                                <Typography
+                                                                    variant="caption"
+                                                                    sx={{
+                                                                        display:
+                                                                            "block",
+                                                                        color: "var(--fg-faint)",
+                                                                        fontSize:
+                                                                            "0.68rem",
+                                                                    }}
+                                                                >
+                                                                    Audience ·{" "}
+                                                                    {
+                                                                        app.audience
+                                                                    }
+                                                                </Typography>
+                                                            )}
                                                         {app.homepage_url && (
                                                             <Typography
                                                                 component="a"
