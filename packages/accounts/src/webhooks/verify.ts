@@ -1,115 +1,108 @@
-/**
- * Inbound webhook signature verification for Elixpo Accounts webhooks.
- * Web Crypto only (crypto.subtle) — no Node built-ins, works in Node,
- * browsers, and edge runtimes alike.
- */
 import { AccountsError } from "../core/errors.js";
 import type { WebhookHeaders, WebhookVerificationOptions } from "./types.js";
 
-const DEFAULT_TOLERANCE_MS = 5 * 60 * 1000; // 5 minutes
+const DEFAULT_TOLERANCE_SECONDS = 5 * 60;
+const SIGNATURE_PREFIX = "sha256=";
 
-async function hmacHex(payload: string, secret: string): Promise<string> {
+function verificationError(message: string): AccountsError {
+    return new AccountsError("webhook_verification_error", message);
+}
+
+function parseTimestamp(timestamp: string): number | null {
+    if (!/^\d+$/.test(timestamp)) return null;
+    const parsed = Number(timestamp);
+    return Number.isSafeInteger(parsed) ? parsed : null;
+}
+
+function parseSignature(signature: string): Uint8Array | null {
+    if (!signature.startsWith(SIGNATURE_PREFIX)) return null;
+    const hex = signature.slice(SIGNATURE_PREFIX.length);
+    if (!/^[a-fA-F0-9]{64}$/.test(hex)) return null;
+
+    const bytes = new Uint8Array(32);
+    for (let index = 0; index < bytes.length; index += 1) {
+        bytes[index] = Number.parseInt(hex.slice(index * 2, index * 2 + 2), 16);
+    }
+    return bytes;
+}
+
+async function signatureMatches(
+    payload: string,
+    timestamp: string,
+    signature: Uint8Array,
+    secret: string,
+): Promise<boolean> {
     const encoder = new TextEncoder();
     const key = await crypto.subtle.importKey(
         "raw",
         encoder.encode(secret),
         { name: "HMAC", hash: "SHA-256" },
         false,
-        ["sign"],
+        ["verify"],
     );
-    const signature = await crypto.subtle.sign(
+    return crypto.subtle.verify(
         "HMAC",
         key,
-        encoder.encode(payload),
+        signature,
+        encoder.encode(`${timestamp}.${payload}`),
     );
-    return Array.from(new Uint8Array(signature))
-        .map((byte) => byte.toString(16).padStart(2, "0"))
-        .join("");
 }
 
 /**
- * Constant-time comparison of two hex strings. Unlike Node's
- * crypto.timingSafeEqual, this returns false on length mismatch instead
- * of throwing — a length mismatch is an expected outcome here (e.g. a
- * malformed or truncated signature header), not an exceptional one.
- */
-function timingSafeEqualHex(a: string, b: string): boolean {
-    if (a.length !== b.length) return false;
-    let result = 0;
-    for (let i = 0; i < a.length; i++) {
-        result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-    }
-    return result === 0;
-}
-
-function parseTimestamp(timestamp: string): number | null {
-    const parsed = Date.parse(timestamp);
-    return Number.isNaN(parsed) ? null : parsed;
-}
-
-/**
- * Verifies an inbound webhook: checks the HMAC-SHA256 signature over the
- * raw JSON payload, enforces a timestamp tolerance window, and — if a
- * replayStore is supplied — rejects a previously-seen signature.
+ * Verifies an inbound webhook using the exact raw request body.
  *
- * `payload` must be the exact raw request body string as received (not
- * re-serialized), since the sender signs the exact bytes it sent — any
- * re-serialization (e.g. via JSON.parse then JSON.stringify) can change
- * key order or whitespace and produce a signature mismatch even for a
- * legitimate request.
- *
- * Throws AccountsError with code "webhook_verification_error" on any
- * failure. Never includes the secret, signature, or payload contents in
- * the thrown message.
+ * The signature covers `${timestamp}.${payload}`. Throws an AccountsError
+ * with code `webhook_verification_error` on failure without exposing request
+ * contents, the signature, or the secret.
  */
 export async function verifyWebhookSignature(
     payload: string,
     headers: WebhookHeaders,
     options: WebhookVerificationOptions,
 ): Promise<void> {
-    const toleranceMs = options.toleranceMs ?? DEFAULT_TOLERANCE_MS;
+    const toleranceSeconds =
+        options.toleranceSeconds ?? DEFAULT_TOLERANCE_SECONDS;
+    if (!Number.isFinite(toleranceSeconds) || toleranceSeconds < 0) {
+        throw verificationError("Webhook timestamp tolerance is invalid");
+    }
 
     const requestTime = parseTimestamp(headers.timestamp);
     if (requestTime === null) {
-        throw new AccountsError(
-            "webhook_verification_error",
-            "Webhook timestamp header is missing or not a valid date",
+        throw verificationError(
+            "Webhook timestamp header is missing or invalid",
+        );
+    }
+    if (Math.abs(Date.now() / 1000 - requestTime) > toleranceSeconds) {
+        throw verificationError(
+            "Webhook timestamp is outside the allowed tolerance window",
         );
     }
 
-    const drift = Math.abs(Date.now() - requestTime);
-    if (drift > toleranceMs) {
-        throw new AccountsError(
-            "webhook_verification_error",
-            `Webhook timestamp is outside the allowed tolerance window (drift ${drift}ms > ${toleranceMs}ms)`,
+    const signature = parseSignature(headers.signature);
+    if (!signature) {
+        throw verificationError(
+            "Webhook signature header is missing or invalid",
         );
     }
-
-    if (!headers.signature) {
-        throw new AccountsError(
-            "webhook_verification_error",
-            "Webhook signature header is missing",
-        );
-    }
-
-    const expectedSignature = await hmacHex(payload, options.secret);
-    if (!timingSafeEqualHex(headers.signature, expectedSignature)) {
-        throw new AccountsError(
-            "webhook_verification_error",
-            "Webhook signature does not match the expected value",
-        );
+    if (
+        !(await signatureMatches(
+            payload,
+            headers.timestamp,
+            signature,
+            options.secret,
+        ))
+    ) {
+        throw verificationError("Webhook signature does not match");
     }
 
     if (options.replayStore) {
-        const alreadySeen = await options.replayStore.hasSeen(
+        const expiresAtMs = (requestTime + toleranceSeconds) * 1000;
+        const claimed = await options.replayStore.claim(
             headers.signature,
+            expiresAtMs,
         );
-        if (alreadySeen) {
-            throw new AccountsError(
-                "webhook_verification_error",
-                "Webhook signature has already been processed (possible replay)",
-            );
+        if (!claimed) {
+            throw verificationError("Webhook has already been processed");
         }
-        await options.replayStore.markSeen(headers.signature);
     }
 }

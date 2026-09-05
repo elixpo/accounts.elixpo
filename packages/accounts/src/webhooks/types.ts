@@ -1,44 +1,24 @@
-/**
- * Types for verifying inbound Elixpo Accounts webhooks.
- *
- * Signing scheme (matches src/lib/revocation-webhook.ts, the platform's
- * edge-safe sender): HMAC-SHA256 over JSON.stringify(payload), hex-encoded,
- * sent as X-Webhook-Signature. X-Webhook-Timestamp is an ISO 8601 string.
- */
-
+/** Headers required to verify an inbound Elixpo Accounts webhook. */
 export interface WebhookHeaders {
-    /** Value of the X-Webhook-Signature header (hex HMAC-SHA256). */
+    /** Value of X-Elixpo-Signature (`sha256=<hex>`). */
     signature: string;
-    /** Value of the X-Webhook-Timestamp header (ISO 8601 string). */
+    /** Value of X-Elixpo-Timestamp (Unix seconds). */
     timestamp: string;
 }
 
 /**
- * Pluggable replay-protection store. The SDK has no persistence layer of
- * its own, so callers back this with whatever they have (KV, Redis, a DB
- * table, even an in-memory Map for tests/low-traffic use). Signatures are
- * unique per payload+secret, so tracking signature strings is sufficient
- * to detect replay of an identical request.
+ * Atomic replay-protection store implemented by the consumer with KV, Redis,
+ * or a database. `claim` must return false when the key already exists.
  */
 export interface ReplayStore {
-    /** Returns true if this signature has been seen before (i.e., should be rejected as a replay). */
-    hasSeen(signature: string): Promise<boolean> | boolean;
-    /** Records that this signature has now been processed. */
-    markSeen(signature: string): Promise<void> | void;
+    claim(key: string, expiresAtMs: number): Promise<boolean> | boolean;
 }
 
 export interface WebhookVerificationOptions {
-    /** The shared secret configured for this webhook endpoint. */
+    /** The signing secret returned when the webhook endpoint was created. */
     secret: string;
-    /**
-     * Maximum allowed drift, in milliseconds, between the request's
-     * X-Webhook-Timestamp and now. Defaults to 5 minutes.
-     */
-    toleranceMs?: number;
-    /**
-     * Optional replay-protection store. If omitted, replay checking is
-     * skipped entirely (signature + timestamp are still verified) — callers
-     * that need replay protection must supply a store.
-     */
+    /** Maximum timestamp drift in seconds. Defaults to 300 (5 minutes). */
+    toleranceSeconds?: number;
+    /** Optional atomic store used to reject a signature seen before. */
     replayStore?: ReplayStore;
 }
