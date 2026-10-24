@@ -26,7 +26,10 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { DashboardScrollLayout } from "../../components/dashboard/section-nav/dashboard-scroll-layout";
+import { StickySectionNav } from "../../components/dashboard/section-nav/sticky-section-nav";
+import { useScrollSpy } from "../../components/dashboard/section-nav/use-scroll-spy";
 import { generatePixelAvatar } from "@/lib/pixel-avatar";
 
 interface UserProfile {
@@ -148,6 +151,10 @@ function ServiceIconSmall({ svc }: { svc: ConnectedService }) {
 
 const ProfilePage = () => {
     const router = useRouter();
+    const scrollRef = useRef<HTMLElement | null>(null);
+    const sectionIds = ["bento-profile", "bento-services", "bento-update", "bento-notifications", "bento-danger"];
+    const activeSectionId = useScrollSpy(sectionIds, scrollRef, 120);
+
     // Profile state
 
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -576,28 +583,45 @@ const ProfilePage = () => {
     };
 
     return (
-        <Box>
-            {/* Page Header */}
-            <Box sx={{ mb: 4 }}>
-                <Typography
-                    variant="h4"
-                    sx={{ fontWeight: 700, color: "var(--fg)", mb: 1 }}
-                >
-                    Profile
-                </Typography>
-                <Typography sx={{ color: "var(--fg-faint)" }}>
-                    Manage your account information and preferences
-                </Typography>
-            </Box>
-            {/* Bento Grid */}
-
-            <Box
-                sx={{
-                    display: "grid",
-                    gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
-                    gap: 2.5,
-                }}
-            >
+        <>
+        <DashboardScrollLayout
+            scrollRef={scrollRef}
+            sidebar={
+                <StickySectionNav
+                    sections={[
+                        { id: "bento-profile", label: "Profile Info" },
+                        { id: "bento-services", label: "Connected Services" },
+                        { id: "bento-update", label: "Update Profile" },
+                        { id: "bento-notifications", label: "Notifications" },
+                        { id: "bento-danger", label: "Danger Zone" },
+                    ]}
+                    activeSectionId={activeSectionId}
+                    scrollContainerRef={scrollRef}
+                />
+            }
+            header={
+                <Box sx={{ mb: 4 }}>
+                    <Typography
+                        variant="h4"
+                        sx={{ fontWeight: 700, color: "var(--fg)", mb: 1 }}
+                    >
+                        Profile
+                    </Typography>
+                    <Typography sx={{ color: "var(--fg-faint)" }}>
+                        Manage your account information and preferences
+                    </Typography>
+                </Box>
+            }
+            content={
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                    <Box
+                        id="bento-profile"
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" },
+                            gap: 2.5,
+                        }}
+                    >
                 {/* 1. Profile Info Card — left column */}
                 <Box sx={cardSx}>
                     <Typography variant="h6" sx={sectionTitleSx}>
@@ -1653,9 +1677,11 @@ const ProfilePage = () => {
                         </Box>
                     )}
                 </Box>
+                </Box>
+
                 {/* 2. Update Profile Card */}
 
-                <Box sx={cardSx}>
+                <Box sx={cardSx} id="bento-update">
                     <Typography variant="h6" sx={sectionTitleSx}>
                         <EditIcon
                             sx={{ color: "#ff7759", fontSize: "1.2rem" }}
@@ -1861,7 +1887,7 @@ const ProfilePage = () => {
                 </Box>
                 {/* 3. Notification Preferences Card */}
 
-                <Box sx={cardSx}>
+                <Box sx={cardSx} id="bento-notifications">
                     <Typography variant="h6" sx={sectionTitleSx}>
                         <NotificationsIcon
                             sx={{ color: "#ff7759", fontSize: "1.2rem" }}
@@ -2038,9 +2064,9 @@ const ProfilePage = () => {
                 {/* 4. Danger Zone — full width */}
 
                 <Box
+                    id="bento-danger"
                     sx={{
                         ...cardSx,
-                        gridColumn: { lg: "1 / -1" },
                         border: "1px solid rgba(239,68,68,0.35)",
                     }}
                 >
@@ -2188,7 +2214,9 @@ const ProfilePage = () => {
                         </Box>
                     </Box>
                 </Box>
-            </Box>
+                </Box>
+            }
+        />
             {/* Username Change (destructive) Dialog */}
 
             <Dialog
@@ -2412,7 +2440,7 @@ const ProfilePage = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+        </>
     );
 };
 
