@@ -22,21 +22,12 @@ export default function robots(): MetadataRoute.Robots {
                     "/.well-known/oauth-authorization-server",
                     "/llms.txt",
                 ],
-                // /authorize and /oauth/authorize are deliberately crawlable:
-                // third-party "Sign in with Elixpo" links point at them, and
-                // crawlers must be able to see their noindex / follow the
-                // redirect to the canonical /login rather than index a bare URL.
-                disallow: [
-                    "/api/",
-                    "/dashboard",
-                    "/mfa",
-                    "/device",
-                    "/verify",
-                    "/setup-name",
-                    "/forgot-password",
-                    "/error",
-                    "/callback/",
-                ],
+                // Private pages (dashboard, authorize, device, mfa, verify, ...)
+                // stay crawlable on purpose: they are linked from other sites
+                // and CLIs, and crawlers must fetch them to see their noindex
+                // (meta + X-Robots-Tag). Disallowing them would let the bare
+                // URLs get indexed. Only pure endpoints are blocked.
+                disallow: ["/api/", "/callback/"],
             },
         ],
         sitemap: `${BASE_URL}/sitemap.xml`,

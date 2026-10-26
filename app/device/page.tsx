@@ -199,7 +199,7 @@ function DeviceVerificationContent() {
         if (response?.ok) {
             // Keep the overlay up through navigation; the code is carried in
             // the URL so the request is looked up again for the new account.
-            window.location.assign(currentUrlForNext(userCode));
+            window.location.assign(currentUrlForNext(userCode.trim()));
             return;
         }
         setIsSwitching(false);
@@ -455,7 +455,10 @@ function DeviceVerificationContent() {
                             scopes={view.details.scopes || []}
                             customScopes={view.details.custom_scopes || []}
                             accentColor={
-                                view.details.branding_primary_color || "#3a65c7"
+                                view.details.is_branding_verified
+                                    ? view.details.branding_primary_color ||
+                                      undefined
+                                    : undefined
                             }
                         />
 

@@ -41,6 +41,7 @@
   --accent-contrast: #ffffff;
   --accent-tint: rgba(58, 101, 199, 0.1);
   --accent-border: rgba(58, 101, 199, 0.3);
+  --danger: #b91c1c;
   --cta-bg: #142018;
   --cta-fg: #ffffff;
   --header-bg: rgba(251, 251, 248, 0.9);
@@ -81,6 +82,7 @@
   --accent-contrast: #0f1712;
   --accent-tint: rgba(121, 167, 255, 0.14);
   --accent-border: rgba(121, 167, 255, 0.35);
+  --danger: #f2836f;
   --cta-bg: #eef1ec;
   --cta-fg: #0f1712;
   --header-bg: rgba(15, 23, 18, 0.86);

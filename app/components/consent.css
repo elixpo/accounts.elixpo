@@ -345,14 +345,15 @@ button.account-row:disabled {
   place-items: center;
   margin-top: 1px;
   border-radius: 50%;
-  background: var(--scope-accent, var(--accent));
-  color: #fff;
+  background: color-mix(in srgb, var(--scope-accent, var(--accent)) 16%, transparent);
+  color: var(--scope-accent, var(--accent));
   font-size: 0.66rem;
   font-weight: 800;
 }
 
 .scope-list li[data-high="true"] .scope-check {
-  background: #d97706;
+  background: rgba(217, 119, 6, 0.16);
+  color: #d97706;
 }
 
 .scope-list strong {
@@ -459,10 +460,10 @@ button.account-row:disabled {
 .consent-inline-error {
   margin-top: 0.75rem;
   padding: 0.6rem 0.75rem;
-  border: 1px solid rgba(185, 28, 28, 0.3);
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent);
   border-radius: 0.8rem;
-  background: rgba(185, 28, 28, 0.06);
-  color: #b91c1c;
+  background: color-mix(in srgb, var(--danger) 7%, transparent);
+  color: var(--danger);
   font-size: 0.78rem;
   line-height: 1.45;
 }

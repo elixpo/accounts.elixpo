@@ -7,6 +7,9 @@ export const metadata: Metadata = {
     alternates: { canonical: "/register" },
     robots: { index: true, follow: true },
     openGraph: {
+        type: "website",
+        siteName: "Elixpo Accounts",
+        locale: "en_US",
         url: "/register",
         title: "Create your Elixpo account",
         description:

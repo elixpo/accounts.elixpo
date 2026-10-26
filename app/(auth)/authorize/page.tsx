@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import type { CustomOAuthScope } from "@/lib/oauth-scope-registry";
 import { generatePixelAvatar } from "@/lib/pixel-avatar";
 import BackgroundAurora from "../../components/background-aurora";
@@ -143,10 +143,29 @@ function AuthorizeContent() {
     const [switchTarget, setSwitchTarget] = useState<Account | null>(null);
     const [switchError, setSwitchError] = useState<string | null>(null);
     const [reloadKey, setReloadKey] = useState(0);
+    // Account the session must belong to after a switch; the consent card is
+    // only re-enabled once /api/auth/me confirms it.
+    const expectedUserId = useRef<string | null>(null);
 
     useEffect(() => {
         let cancelled = false;
         const load = async () => {
+            try {
+                await loadRequest();
+            } catch {
+                if (cancelled) return;
+                expectedUserId.current = null;
+                if (reloadKey > 0) {
+                    setSwitchTarget(null);
+                    setSwitchError(
+                        "Couldn't load the selected account. Reload this page to continue.",
+                    );
+                } else {
+                    setError("Failed to load authorization request");
+                }
+            }
+        };
+        const loadRequest = async () => {
             const state = searchParams.get("state");
             const clientId = searchParams.get("client_id");
             const redirectUri = searchParams.get("redirect_uri");
@@ -170,24 +189,39 @@ function AuthorizeContent() {
                 window.location.href = `/login?next=${encodeURIComponent(currentUrl)}`;
                 return;
             }
+            let meData: any = null;
             try {
-                const meData: any = await meRes.clone().json();
-                if (meData?.email) {
-                    if (!meData.username) {
-                        const currentUrl = `/authorize?${searchParams.toString()}`;
-                        window.location.href = `/setup-name?next=${encodeURIComponent(currentUrl)}`;
-                        return;
-                    }
-                    setAccount({
-                        id: meData.id,
-                        email: meData.email,
-                        displayName: meData.displayName ?? null,
-                        username: meData.username ?? null,
-                        avatar: meData.avatar ?? null,
-                    });
-                }
+                meData = await meRes.clone().json();
             } catch {
-                // non-fatal — header just won't show the account line
+                // handled below
+            }
+            // After a switch, refuse to show the consent card unless the
+            // session is confirmed to be the account that was picked;
+            // authorizing uses the cookie session, not what's displayed.
+            if (
+                expectedUserId.current &&
+                meData?.id !== expectedUserId.current
+            ) {
+                expectedUserId.current = null;
+                setError(
+                    "We couldn't confirm which account is signed in. Reload this page and try again.",
+                );
+                return;
+            }
+            expectedUserId.current = null;
+            if (meData?.email) {
+                if (!meData.username) {
+                    const currentUrl = `/authorize?${searchParams.toString()}`;
+                    window.location.href = `/setup-name?next=${encodeURIComponent(currentUrl)}`;
+                    return;
+                }
+                setAccount({
+                    id: meData.id,
+                    email: meData.email,
+                    displayName: meData.displayName ?? null,
+                    username: meData.username ?? null,
+                    avatar: meData.avatar ?? null,
+                });
             }
 
             const accountsRes = await fetch("/api/auth/accounts", {
@@ -317,6 +351,7 @@ function AuthorizeContent() {
         if (!target) return;
         setSwitchTarget(target);
         setSwitchError(null);
+        expectedUserId.current = target.id;
         try {
             const response = await fetch("/api/auth/accounts", {
                 method: "POST",
@@ -334,6 +369,7 @@ function AuthorizeContent() {
             setSwitchError(
                 err instanceof Error ? err.message : "Unable to switch account",
             );
+            expectedUserId.current = null;
             setSwitchTarget(null);
         }
     };
@@ -386,7 +422,10 @@ function AuthorizeContent() {
                         </div>
                     </div>
                     <div className="consent-body" style={{ paddingTop: 24 }}>
-                        <p className="eyebrow" style={{ color: "#b91c1c" }}>
+                        <p
+                            className="eyebrow"
+                            style={{ color: "var(--danger)" }}
+                        >
                             Authorization error
                         </p>
                         <h1 className="consent-title">
