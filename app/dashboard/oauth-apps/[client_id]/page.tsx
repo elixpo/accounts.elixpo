@@ -23,6 +23,12 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { CustomOAuthScope } from "@/lib/oauth-scope-registry";
+import {
+    SectionPills,
+    SectionSidebar,
+    sectionAnchorSx,
+    useScrollSpy,
+} from "../../../components/dashboard/section-nav";
 import { OAuthScopePicker } from "../../../components/oauth-scope-picker";
 
 const cardSx = {
@@ -665,6 +671,10 @@ export default function OAuthAppSettingsPage() {
             needsAttention: false,
         },
     ];
+    const activeSectionId = useScrollSpy(
+        sectionNavigation.map((section) => section.id),
+        !loading,
+    );
 
     if (loading) {
         return (
@@ -711,8 +721,8 @@ export default function OAuthAppSettingsPage() {
             <Box
                 sx={{
                     gridColumn: "1 / -1",
-                    position: "sticky",
-                    top: { xs: 56, sm: 64 },
+                    position: { xs: "static", lg: "sticky" },
+                    top: 92,
                     zIndex: 10,
                     display: "flex",
                     alignItems: "center",
@@ -898,6 +908,13 @@ export default function OAuthAppSettingsPage() {
                 </Button>
             </Box>
 
+            <SectionPills
+                sections={sectionNavigation}
+                activeId={activeSectionId}
+                label="Application settings sections"
+                sx={{ gridColumn: "1 / -1" }}
+            />
+
             {message && (
                 <Alert
                     severity={message.type}
@@ -923,58 +940,17 @@ export default function OAuthAppSettingsPage() {
                 </Alert>
             )}
 
-            <Box
-                component="nav"
-                aria-label="Application settings sections"
+            <SectionSidebar
+                sections={sectionNavigation}
+                activeId={activeSectionId}
+                label="Application settings sections"
                 sx={{
-                    display: { xs: "none", lg: "flex" },
-                    position: "sticky",
-                    top: 150,
                     gridColumn: "1",
                     gridRow: "span 7",
                     order: 1,
-                    flexDirection: "column",
-                    gap: 0.5,
-                    p: 1,
-                    borderRadius: "12px",
-                    border: "1px solid var(--border)",
-                    bgcolor: "var(--surface)",
+                    alignSelf: "start",
                 }}
-            >
-                {sectionNavigation.map((section) => (
-                    <Button
-                        key={section.id}
-                        component="a"
-                        href={`#${section.id}`}
-                        sx={{
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            gap: 1,
-                            color: "var(--fg-muted)",
-                            textTransform: "none",
-                            fontSize: "0.82rem",
-                            "&:hover": {
-                                color: "var(--accent)",
-                                bgcolor: "rgba(58, 101, 199,0.08)",
-                            },
-                        }}
-                    >
-                        <span>{section.label}</span>
-                        <Typography
-                            component="span"
-                            sx={{
-                                color: section.needsAttention
-                                    ? "#b45309"
-                                    : "var(--fg-faint)",
-                                fontSize: "0.62rem",
-                                whiteSpace: "nowrap",
-                            }}
-                        >
-                            {section.status}
-                        </Typography>
-                    </Button>
-                ))}
-            </Box>
+            />
 
             {/* Bento Grid */}
             <Box
@@ -989,7 +965,7 @@ export default function OAuthAppSettingsPage() {
                         ...cardSx,
                         order: 2,
                         gridColumn: { xs: "1", lg: "2 / -1" },
-                        scrollMarginTop: "150px",
+                        ...sectionAnchorSx,
                     }}
                 >
                     <Typography
@@ -1116,7 +1092,7 @@ export default function OAuthAppSettingsPage() {
                         ...cardSx,
                         order: 1,
                         gridColumn: { xs: "1", lg: "2 / -1" },
-                        scrollMarginTop: "150px",
+                        ...sectionAnchorSx,
                     }}
                 >
                     <Typography
@@ -1204,7 +1180,7 @@ export default function OAuthAppSettingsPage() {
                         ...cardSx,
                         order: 4,
                         gridColumn: { xs: "1", lg: "2" },
-                        scrollMarginTop: "150px",
+                        ...sectionAnchorSx,
                     }}
                 >
                     <Typography
@@ -1433,7 +1409,7 @@ export default function OAuthAppSettingsPage() {
                     ...cardSx,
                     order: 5,
                     gridColumn: { xs: "1", lg: "2 / -1" },
-                    scrollMarginTop: "150px",
+                    ...sectionAnchorSx,
                 }}
             >
                 <Typography
@@ -2368,7 +2344,7 @@ export default function OAuthAppSettingsPage() {
                         ...cardSx,
                         order: 6,
                         gridColumn: { xs: "1", lg: "2 / -1" },
-                        scrollMarginTop: "150px",
+                        ...sectionAnchorSx,
                     }}
                 >
                     {stats.branding_verification_required && (
@@ -2563,7 +2539,7 @@ export default function OAuthAppSettingsPage() {
                     ...cardSx,
                     order: 3,
                     gridColumn: { xs: "1", lg: "2 / -1" },
-                    scrollMarginTop: "150px",
+                    ...sectionAnchorSx,
                 }}
             >
                 <Typography
@@ -2824,6 +2800,7 @@ export default function OAuthAppSettingsPage() {
                 id="danger"
                 sx={{
                     ...cardSx,
+                    ...sectionAnchorSx,
                     order: 7,
                     gridColumn: { xs: "1", lg: "2 / -1" },
                     border: "1px solid rgba(239,68,68,0.3)",
