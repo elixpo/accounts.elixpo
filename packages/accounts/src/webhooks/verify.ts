@@ -97,8 +97,10 @@ export async function verifyWebhookSignature(
 
     if (options.replayStore) {
         const expiresAtMs = (requestTime + toleranceSeconds) * 1000;
+        // Hex case doesn't change the signature bytes, so normalize the key;
+        // otherwise re-casing a captured signature would bypass the store.
         const claimed = await options.replayStore.claim(
-            headers.signature,
+            headers.signature.toLowerCase(),
             expiresAtMs,
         );
         if (!claimed) {

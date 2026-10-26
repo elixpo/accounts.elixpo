@@ -162,6 +162,21 @@ describe("verifyWebhookSignature", () => {
         ).rejects.toMatchObject({ code: "webhook_verification_error" });
     });
 
+    it("rejects a replay that only changes the signature hex case", async () => {
+        const headers = await headersFor(payload);
+        const replayStore = new InMemoryReplayStore();
+        const options = { secret: SECRET, replayStore };
+
+        await verifyWebhookSignature(payload, headers, options);
+        const recased = {
+            ...headers,
+            signature: `sha256=${headers.signature.slice(7).toUpperCase()}`,
+        };
+        await expect(
+            verifyWebhookSignature(payload, recased, options),
+        ).rejects.toMatchObject({ code: "webhook_verification_error" });
+    });
+
     it("permits repeated verification without a replay store", async () => {
         const headers = await headersFor(payload);
         const options = { secret: SECRET };
