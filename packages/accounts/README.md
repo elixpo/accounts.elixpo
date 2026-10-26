@@ -34,10 +34,7 @@ const { url, transaction } = await accounts.createAuthorizationRequest();
 ```ts
 import { parseAuthorizationCallback } from "@elixpo/accounts";
 
-const { code } = parseAuthorizationCallback(
-    request.url,
-    transaction.state,
-);
+const { code } = parseAuthorizationCallback(request.url, transaction.state);
 const tokens = await accounts.exchangeAuthorizationCode({
     code,
     codeVerifier: transaction.codeVerifier,

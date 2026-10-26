@@ -1,19 +1,19 @@
 name: Elixpoo mentions
 on:
-  issues:
-    types: [opened, edited]
-  issue_comment:
-    types: [created]
-  pull_request:
-    types: [opened, edited]
-  pull_request_review:
-    types: [submitted]
-  pull_request_review_comment:
-    types: [created]
+    issues:
+        types: [opened, edited]
+    issue_comment:
+        types: [created]
+    pull_request:
+        types: [opened, edited]
+    pull_request_review:
+        types: [submitted]
+    pull_request_review_comment:
+        types: [created]
 permissions: {}
 concurrency:
-  group: elixpoo-mention-${{ github.repository }}-${{ github.event.issue.number || github.event.pull_request.number }}
-  cancel-in-progress: false
+    group: elixpoo-mention-${{ github.repository }}-${{ github.event.issue.number || github.event.pull_request.number }}
+    cancel-in-progress: false
 jobs:
   respond:
     permissions:

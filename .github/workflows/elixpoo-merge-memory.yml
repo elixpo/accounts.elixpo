@@ -1,11 +1,11 @@
 name: Elixpoo merge memory
 on:
-  pull_request:
-    types: [closed]
+    pull_request:
+        types: [closed]
 permissions: {}
 concurrency:
-  group: elixpoo-merge-memory-${{ github.repository }}
-  cancel-in-progress: false
+    group: elixpoo-merge-memory-${{ github.repository }}
+    cancel-in-progress: false
 jobs:
   remember:
     if: github.event.pull_request.merged == true

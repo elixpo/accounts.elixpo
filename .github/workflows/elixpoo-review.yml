@@ -1,11 +1,11 @@
 name: Elixpoo pull request review
 on:
-  pull_request:
-    types: [opened, reopened, ready_for_review, synchronize]
+    pull_request:
+        types: [opened, reopened, ready_for_review, synchronize]
 permissions: {}
 concurrency:
-  group: elixpoo-review-${{ github.repository }}-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+    group: elixpoo-review-${{ github.repository }}-${{ github.event.pull_request.number }}
+    cancel-in-progress: true
 jobs:
   review:
     permissions:
