@@ -37,10 +37,10 @@ const textFieldSx = {
         color: "var(--fg)",
         "& fieldset": { borderColor: "var(--border)" },
         "&:hover fieldset": { borderColor: "var(--border)" },
-        "&.Mui-focused fieldset": { borderColor: "#ff7759" },
+        "&.Mui-focused fieldset": { borderColor: "#3a65c7" },
     },
     "& .MuiInputLabel-root": { color: "var(--fg-muted)" },
-    "& .MuiInputLabel-root.Mui-focused": { color: "#ff7759" },
+    "& .MuiInputLabel-root.Mui-focused": { color: "var(--accent)" },
     "& .MuiFormHelperText-root": { color: "var(--fg-faint)" },
 };
 
@@ -49,7 +49,7 @@ const monoBox = {
     alignItems: "center",
     gap: 1,
     background: "var(--surface)",
-    border: "1px solid rgba(255, 119, 89,0.2)",
+    border: "1px solid rgba(58, 101, 199,0.2)",
     borderRadius: "8px",
     p: 1.5,
 };
@@ -676,7 +676,7 @@ export default function OAuthAppSettingsPage() {
                     py: 10,
                 }}
             >
-                <CircularProgress sx={{ color: "#ff7759" }} />
+                <CircularProgress sx={{ color: "var(--accent)" }} />
             </Box>
         );
     }
@@ -750,11 +750,11 @@ export default function OAuthAppSettingsPage() {
                             width: 40,
                             height: 40,
                             borderRadius: "10px",
-                            bgcolor: "rgba(255, 119, 89,0.1)",
+                            bgcolor: "rgba(58, 101, 199,0.1)",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            color: "#ff7759",
+                            color: "var(--accent)",
                             fontSize: "1.2rem",
                             fontWeight: 700,
                         }}
@@ -780,7 +780,7 @@ export default function OAuthAppSettingsPage() {
                                 fontSize: "0.8rem",
                                 textDecoration: "none",
                                 fontFamily: "monospace",
-                                "&:hover": { color: "#ff7759" },
+                                "&:hover": { color: "var(--accent)" },
                             }}
                         >
                             {(() => {
@@ -823,7 +823,7 @@ export default function OAuthAppSettingsPage() {
                                         "client_id",
                                     )
                                 }
-                                sx={{ color: "#ff7759", p: 0.25 }}
+                                sx={{ color: "var(--accent)", p: 0.25 }}
                             >
                                 <ContentCopyIcon sx={{ fontSize: "0.85rem" }} />
                             </IconButton>
@@ -841,11 +841,11 @@ export default function OAuthAppSettingsPage() {
                         ml: { xs: 0, sm: "auto" },
                         bgcolor:
                             app?.client_type === "public"
-                                ? "rgba(255, 119, 89, 0.12)"
+                                ? "rgba(58, 101, 199, 0.12)"
                                 : "var(--overlay)",
                         color:
                             app?.client_type === "public"
-                                ? "#ff7759"
+                                ? "#3a65c7"
                                 : "var(--fg-muted)",
                         border: "1px solid var(--border)",
                     }}
@@ -868,12 +868,12 @@ export default function OAuthAppSettingsPage() {
                     variant="outlined"
                     sx={{
                         width: { xs: "100%", sm: "auto" },
-                        borderColor: "rgba(255, 119, 89,0.3)",
-                        color: "#ff7759",
+                        borderColor: "rgba(58, 101, 199,0.3)",
+                        color: "var(--accent)",
                         textTransform: "none",
                         "&:hover": {
-                            borderColor: "#ff7759",
-                            bgcolor: "rgba(255, 119, 89,0.08)",
+                            borderColor: "#3a65c7",
+                            bgcolor: "rgba(58, 101, 199,0.08)",
                         },
                     }}
                 >
@@ -886,12 +886,12 @@ export default function OAuthAppSettingsPage() {
                     disabled={saving}
                     sx={{
                         width: { xs: "100%", sm: "auto" },
-                        background: "rgba(255, 119, 89,0.15)",
-                        color: "#ff7759",
-                        border: "1px solid rgba(255, 119, 89,0.3)",
+                        background: "rgba(58, 101, 199,0.15)",
+                        color: "var(--accent)",
+                        border: "1px solid rgba(58, 101, 199,0.3)",
                         fontWeight: 600,
                         textTransform: "none",
-                        "&:hover": { background: "rgba(255, 119, 89,0.25)" },
+                        "&:hover": { background: "rgba(58, 101, 199,0.25)" },
                     }}
                 >
                     {saving ? "Saving..." : "Save Changes"}
@@ -906,15 +906,15 @@ export default function OAuthAppSettingsPage() {
                         gridColumn: "1 / -1",
                         bgcolor:
                             message.type === "success"
-                                ? "rgba(255, 119, 89,0.1)"
+                                ? "rgba(58, 101, 199,0.1)"
                                 : "rgba(239,68,68,0.1)",
                         color:
-                            message.type === "success" ? "#ff7759" : "#b91c1c",
-                        border: `1px solid ${message.type === "success" ? "rgba(255, 119, 89,0.3)" : "rgba(239,68,68,0.3)"}`,
+                            message.type === "success" ? "#3a65c7" : "#b91c1c",
+                        border: `1px solid ${message.type === "success" ? "rgba(58, 101, 199,0.3)" : "rgba(239,68,68,0.3)"}`,
                         "& .MuiAlert-icon": {
                             color:
                                 message.type === "success"
-                                    ? "#ff7759"
+                                    ? "#3a65c7"
                                     : "#b91c1c",
                         },
                     }}
@@ -954,8 +954,8 @@ export default function OAuthAppSettingsPage() {
                             textTransform: "none",
                             fontSize: "0.82rem",
                             "&:hover": {
-                                color: "#ff7759",
-                                bgcolor: "rgba(255, 119, 89,0.08)",
+                                color: "var(--accent)",
+                                bgcolor: "rgba(58, 101, 199,0.08)",
                             },
                         }}
                     >
@@ -1015,12 +1015,12 @@ export default function OAuthAppSettingsPage() {
                             <Box
                                 sx={{
                                     ...monoBox,
-                                    border: "1px solid rgba(255, 119, 89,0.4)",
+                                    border: "1px solid rgba(58, 101, 199,0.4)",
                                 }}
                             >
                                 <Typography
                                     sx={{
-                                        color: "#ff7759",
+                                        color: "var(--accent)",
                                         fontFamily: "monospace",
                                         fontSize: "0.8rem",
                                         flex: 1,
@@ -1044,7 +1044,7 @@ export default function OAuthAppSettingsPage() {
                                                 "secret",
                                             )
                                         }
-                                        sx={{ color: "#ff7759" }}
+                                        sx={{ color: "var(--accent)" }}
                                     >
                                         <ContentCopyIcon fontSize="small" />
                                     </IconButton>
@@ -1053,7 +1053,7 @@ export default function OAuthAppSettingsPage() {
                             <Typography
                                 variant="caption"
                                 sx={{
-                                    color: "#ff7759",
+                                    color: "var(--accent)",
                                     mt: 0.5,
                                     display: "block",
                                 }}
@@ -1085,7 +1085,7 @@ export default function OAuthAppSettingsPage() {
                                     onClick={handleRegenerateSecret}
                                     disabled={regenerating}
                                     sx={{
-                                        color: "#ff7759",
+                                        color: "var(--accent)",
                                         textTransform: "none",
                                         flexShrink: 0,
                                     }}
@@ -1283,7 +1283,7 @@ export default function OAuthAppSettingsPage() {
                                 })
                             }
                             sx={{
-                                color: "#ff7759",
+                                color: "var(--accent)",
                                 textTransform: "none",
                                 fontSize: "0.8rem",
                                 mt: 0.5,
@@ -1581,9 +1581,9 @@ export default function OAuthAppSettingsPage() {
                                         style={{
                                             flexGrow: 1,
                                             background:
-                                                "rgba(255, 119, 89,0.1)",
-                                            border: "1px solid rgba(255, 119, 89,0.2)",
-                                            color: "#ff7759",
+                                                "rgba(58, 101, 199,0.1)",
+                                            border: "1px solid rgba(58, 101, 199,0.2)",
+                                            color: "var(--accent)",
                                             padding: "6px 12px",
                                             borderRadius: "4px",
                                             fontWeight: "bold",
@@ -1599,7 +1599,7 @@ export default function OAuthAppSettingsPage() {
                                                 "challenge",
                                             )
                                         }
-                                        sx={{ color: "#ff7759" }}
+                                        sx={{ color: "var(--accent)" }}
                                     >
                                         <ContentCopyIcon fontSize="small" />
                                     </IconButton>
@@ -1631,9 +1631,9 @@ export default function OAuthAppSettingsPage() {
                                 onClick={handleVerifyDomain}
                                 disabled={verifyingDomain}
                                 sx={{
-                                    color: "#ff7759",
-                                    borderColor: "rgba(255, 119, 89,0.5)",
-                                    "&:hover": { borderColor: "#ff7759" },
+                                    color: "var(--accent)",
+                                    borderColor: "rgba(58, 101, 199,0.5)",
+                                    "&:hover": { borderColor: "#3a65c7" },
                                     textTransform: "none",
                                 }}
                             >
@@ -1702,7 +1702,7 @@ export default function OAuthAppSettingsPage() {
                                 <TextField
                                     fullWidth
                                     label="Primary Theme Color"
-                                    placeholder="#ff7759"
+                                    placeholder="#3a65c7"
                                     value={form.branding_primary_color}
                                     onChange={(e) =>
                                         setForm({
@@ -1715,7 +1715,7 @@ export default function OAuthAppSettingsPage() {
                                     helperText={(() => {
                                         const color =
                                             form.branding_primary_color ||
-                                            "#ff7759";
+                                            "#3a65c7";
                                         const HEX_REGEX =
                                             /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
                                         if (!HEX_REGEX.test(color)) {
@@ -1782,7 +1782,7 @@ export default function OAuthAppSettingsPage() {
                                             form.branding_primary_color
                                                 .length === 7)
                                             ? form.branding_primary_color
-                                            : "#ff7759"
+                                            : "#3a65c7"
                                     }
                                     onChange={(e) =>
                                         setForm({
@@ -1808,7 +1808,7 @@ export default function OAuthAppSettingsPage() {
                                 <TextField
                                     fullWidth
                                     label="Accent Color"
-                                    placeholder="#ff8c70"
+                                    placeholder="#79a7ff"
                                     value={form.branding_accent_color}
                                     onChange={(e) =>
                                         setForm({
@@ -1839,7 +1839,7 @@ export default function OAuthAppSettingsPage() {
                                             form.branding_accent_color
                                                 .length === 7)
                                             ? form.branding_accent_color
-                                            : "#ff8c70"
+                                            : "#79a7ff"
                                     }
                                     onChange={(e) =>
                                         setForm({
@@ -1927,11 +1927,11 @@ export default function OAuthAppSettingsPage() {
                                     sx={{
                                         bgcolor:
                                             previewMode === "desktop"
-                                                ? "rgba(255, 119, 89, 0.15)"
+                                                ? "rgba(58, 101, 199, 0.15)"
                                                 : "transparent",
                                         color:
                                             previewMode === "desktop"
-                                                ? "#ff7759"
+                                                ? "#3a65c7"
                                                 : "var(--fg-faint)",
                                         borderRight: "1px solid var(--border)",
                                         borderRadius: 0,
@@ -1949,11 +1949,11 @@ export default function OAuthAppSettingsPage() {
                                     sx={{
                                         bgcolor:
                                             previewMode === "mobile"
-                                                ? "rgba(255, 119, 89, 0.15)"
+                                                ? "rgba(58, 101, 199, 0.15)"
                                                 : "transparent",
                                         color:
                                             previewMode === "mobile"
-                                                ? "#ff7759"
+                                                ? "#3a65c7"
                                                 : "var(--fg-faint)",
                                         borderRadius: 0,
                                         textTransform: "none",
@@ -2068,7 +2068,7 @@ export default function OAuthAppSettingsPage() {
                                         justifyContent: "center",
                                         color: "var(--fg)",
                                         bgcolor: "var(--bg)",
-                                        backgroundImage: `radial-gradient(circle at 12% 15%, color-mix(in srgb, ${form.branding_primary_color || "#ff7759"} 16%, transparent), transparent 38%), radial-gradient(circle at 88% 86%, color-mix(in srgb, ${form.branding_accent_color || form.branding_primary_color || "#ff9b85"} 14%, transparent), transparent 42%)`,
+                                        backgroundImage: `radial-gradient(circle at 12% 15%, color-mix(in srgb, ${form.branding_primary_color || "#3a65c7"} 16%, transparent), transparent 38%), radial-gradient(circle at 88% 86%, color-mix(in srgb, ${form.branding_accent_color || form.branding_primary_color || "#79a7ff"} 14%, transparent), transparent 42%)`,
                                     }}
                                 >
                                     {/* Application Logo & Connection Visual */}
@@ -2105,7 +2105,7 @@ export default function OAuthAppSettingsPage() {
                                                     borderRadius: "10px",
                                                     bgcolor:
                                                         form.branding_primary_color ||
-                                                        "#ff7759",
+                                                        "#3a65c7",
                                                     display: "flex",
                                                     alignItems: "center",
                                                     justifyItems: "center",
@@ -2216,7 +2216,7 @@ export default function OAuthAppSettingsPage() {
                                                         borderRadius: "50%",
                                                         bgcolor:
                                                             form.branding_primary_color ||
-                                                            "#ff7759",
+                                                            "#3a65c7",
                                                     }}
                                                 />
                                                 <Typography
@@ -2242,7 +2242,7 @@ export default function OAuthAppSettingsPage() {
                                                         borderRadius: "50%",
                                                         bgcolor:
                                                             form.branding_primary_color ||
-                                                            "#ff7759",
+                                                            "#3a65c7",
                                                     }}
                                                 />
                                                 <Typography
@@ -2286,7 +2286,7 @@ export default function OAuthAppSettingsPage() {
                                                 color:
                                                     form.branding_accent_color ||
                                                     form.branding_primary_color ||
-                                                    "#ff7759",
+                                                    "#3a65c7",
                                                 fontFamily: "monospace",
                                                 fontWeight: 700,
                                             }}
@@ -2321,10 +2321,10 @@ export default function OAuthAppSettingsPage() {
                                             sx={{
                                                 bgcolor:
                                                     form.branding_primary_color ||
-                                                    "#ff7759",
+                                                    "#3a65c7",
                                                 color: getContrastColorLocal(
                                                     form.branding_primary_color ||
-                                                        "#ff7759",
+                                                        "#3a65c7",
                                                 ),
                                                 textTransform: "none",
                                                 fontWeight: 600,
@@ -2332,7 +2332,7 @@ export default function OAuthAppSettingsPage() {
                                                     bgcolor:
                                                         form.branding_accent_color ||
                                                         form.branding_primary_color ||
-                                                        "#ff7759",
+                                                        "#3a65c7",
                                                 },
                                             }}
                                         >
@@ -2438,7 +2438,7 @@ export default function OAuthAppSettingsPage() {
                                 size="small"
                                 startIcon={<DownloadIcon />}
                                 sx={{
-                                    color: "#ff7759",
+                                    color: "var(--accent)",
                                     textTransform: "none",
                                     whiteSpace: "nowrap",
                                 }}
@@ -2587,9 +2587,9 @@ export default function OAuthAppSettingsPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
-                            color: "#ff7759",
+                            color: "var(--accent)",
                             textDecoration: "underline",
-                            textDecorationColor: "rgba(255, 119, 89,0.4)",
+                            textDecorationColor: "rgba(58, 101, 199,0.4)",
                         }}
                     >
                         integration guide
@@ -2622,7 +2622,10 @@ export default function OAuthAppSettingsPage() {
                             color: "var(--fg-faint)",
                         }}
                     >
-                        <CircularProgress size={20} sx={{ color: "#ff7759" }} />
+                        <CircularProgress
+                            size={20}
+                            sx={{ color: "var(--accent)" }}
+                        />
                     </Box>
                 ) : endpoints.length === 0 ? (
                     <Box
@@ -2723,8 +2726,7 @@ export default function OAuthAppSettingsPage() {
                             InputProps={{
                                 sx: {
                                     color: "var(--fg)",
-                                    fontFamily:
-                                        "var(--font-geist-mono), monospace",
+                                    fontFamily: "var(--font-code), monospace",
                                     fontSize: "0.82rem",
                                 },
                             }}
@@ -2778,17 +2780,17 @@ export default function OAuthAppSettingsPage() {
                                     sx={{
                                         cursor: "pointer",
                                         fontFamily:
-                                            "var(--font-geist-mono), monospace",
+                                            "var(--font-code), monospace",
                                         fontSize: "0.72rem",
                                         bgcolor: checked
-                                            ? "rgba(255, 119, 89,0.15)"
+                                            ? "rgba(58, 101, 199,0.15)"
                                             : "var(--overlay)",
                                         color: checked
-                                            ? "#ff7759"
+                                            ? "#3a65c7"
                                             : "var(--fg-faint)",
                                         border: `1px solid ${
                                             checked
-                                                ? "rgba(255, 119, 89,0.4)"
+                                                ? "rgba(58, 101, 199,0.4)"
                                                 : "var(--border)"
                                         }`,
                                     }}
@@ -2805,10 +2807,10 @@ export default function OAuthAppSettingsPage() {
                         sx={{
                             textTransform: "none",
                             background:
-                                "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
+                                "linear-gradient(135deg, #3a65c7 0%, #3a65c7 100%)",
                             "&:hover": {
                                 background:
-                                    "linear-gradient(135deg, #ff7759 0%, #ff7759 100%)",
+                                    "linear-gradient(135deg, #3a65c7 0%, #3a65c7 100%)",
                             },
                         }}
                     >
@@ -2980,9 +2982,9 @@ function EndpointRow({
                                 sx={{
                                     height: 20,
                                     fontSize: "0.7rem",
-                                    bgcolor: "rgba(255, 119, 89,0.12)",
-                                    color: "#ff7759",
-                                    border: "1px solid rgba(255, 119, 89,0.3)",
+                                    bgcolor: "rgba(58, 101, 199,0.12)",
+                                    color: "var(--accent)",
+                                    border: "1px solid rgba(58, 101, 199,0.3)",
                                 }}
                             />
                         )}
@@ -3012,8 +3014,7 @@ function EndpointRow({
                                 sx={{
                                     height: 20,
                                     fontSize: "0.7rem",
-                                    fontFamily:
-                                        "var(--font-geist-mono), monospace",
+                                    fontFamily: "var(--font-code), monospace",
                                     bgcolor: statusOk
                                         ? "rgba(134,239,172,0.08)"
                                         : "rgba(239,68,68,0.1)",
@@ -3032,7 +3033,7 @@ function EndpointRow({
                         sx={{
                             display: "block",
                             color: "var(--fg)",
-                            fontFamily: "var(--font-geist-mono), monospace",
+                            fontFamily: "var(--font-code), monospace",
                             fontSize: "0.82rem",
                             wordBreak: "break-all",
                             mb: 0.5,
@@ -3052,8 +3053,7 @@ function EndpointRow({
                                 key={e}
                                 component="span"
                                 sx={{
-                                    fontFamily:
-                                        "var(--font-geist-mono), monospace",
+                                    fontFamily: "var(--font-code), monospace",
                                     fontSize: "0.7rem",
                                     color: "var(--fg-faint)",
                                     bgcolor: "var(--overlay)",
@@ -3147,8 +3147,8 @@ function EndpointRow({
                         p: 2,
                         borderRadius: "10px",
                         background:
-                            "linear-gradient(135deg, rgba(255, 119, 89,0.12) 0%, rgba(255, 119, 89,0.05) 100%)",
-                        border: "1px solid rgba(255, 119, 89,0.35)",
+                            "linear-gradient(135deg, rgba(58, 101, 199,0.12) 0%, rgba(58, 101, 199,0.05) 100%)",
+                        border: "1px solid rgba(58, 101, 199,0.35)",
                     }}
                 >
                     <Typography
@@ -3177,7 +3177,7 @@ function EndpointRow({
                             component="code"
                             sx={{
                                 color: "var(--fg)",
-                                fontFamily: "var(--font-geist-mono), monospace",
+                                fontFamily: "var(--font-code), monospace",
                                 fontSize: "0.82rem",
                                 wordBreak: "break-all",
                                 flex: 1,
@@ -3190,7 +3190,7 @@ function EndpointRow({
                             onClick={onCopySecret}
                             sx={{
                                 textTransform: "none",
-                                color: "#ff7759",
+                                color: "var(--accent)",
                                 minWidth: 0,
                             }}
                         >
@@ -3243,7 +3243,7 @@ function SignInBars({
                         height: `${Math.max((p.count / max) * 100, 4)}%`,
                         borderRadius: "3px 3px 0 0",
                         background:
-                            "linear-gradient(180deg, rgba(255, 119, 89,0.95) 0%, rgba(255, 119, 89,0.55) 100%)",
+                            "linear-gradient(180deg, rgba(58, 101, 199,0.95) 0%, rgba(58, 101, 199,0.55) 100%)",
                         transition: "filter 0.15s ease",
                         "&:hover": { filter: "brightness(1.25)" },
                     }}
