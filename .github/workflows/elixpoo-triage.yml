@@ -9,13 +9,13 @@ concurrency:
     group: elixpoo-triage-${{ github.repository }}-${{ github.event.issue.number || github.event.pull_request.number }}
     cancel-in-progress: true
 jobs:
-    triage:
-        permissions:
-            contents: read
-            issues: write
-            pull-requests: write
-        uses: elixpo/agent.elixpo/.github/workflows/elixpoo-triage-reusable.yml@v1
-        secrets:
-            github_token: ${{ secrets.ELIXPOO_GITHUB_AGENTIC_TOKEN }}
-            pollinations_key: ${{ secrets.ELIXPO_POLLINATIONS_API_KEY }}
-            project_token: ${{ secrets.ELIXPOO_GITHUB_PROJECT_TOKEN }}
+  triage:
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    uses: elixpo/agent.elixpo/.github/workflows/elixpoo-triage-reusable.yml@v2
+    secrets:
+      github_token: ${{ secrets.ELIXPOO_GITHUB_AGENTIC_TOKEN }}
+      pollinations_key: ${{ secrets.ELIXPO_POLLINATIONS_API_KEY }}
+      project_token: ${{ secrets.ELIXPOO_GITHUB_PROJECT_TOKEN }}
