@@ -86,6 +86,15 @@ npm test                   # vitest
 npm run pages:build        # catches edge-runtime incompatibilities
 ```
 
+#### Local setup without secrets
+
+The committed `.env` is SOPS-encrypted for maintainers, so you cannot read it
+and do not need it. `.env.example` lists every variable the code reads, grouped
+into required / optional / deploy-only. For a working local sign-in you only
+need `NEXT_PUBLIC_APP_URL` and a throwaway Ed25519 JWT keypair (the `openssl`
+commands are in the file's comments); leave optional integrations empty. Run
+`npm run db:migrate:local` once to create the local D1 schema.
+
 Database migrations live in `src/workers/migrations/NNNN_<name>.sql` (gapless
 numbering) and are applied via CI on merge to `main`. See
 [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) for the full
