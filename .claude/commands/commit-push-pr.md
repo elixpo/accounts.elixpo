@@ -78,6 +78,7 @@ EOF
 ```
 
 PR body rules:
+
 - Always end with `Fixes #<n>` so GitHub auto-closes on merge.
 - 3-6 bullets in Changes. No marketing. No "seamlessly", "leverages", "robust".
 - For REVIEW path (no code changes): don't open a PR at all — just comment on the issue.

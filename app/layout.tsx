@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import Script from "next/script";
 import { MuiThemeBridge } from "./components/mui-theme";
 import { THEME_BOOT_SCRIPT, ThemeProvider } from "./components/theme-provider";
-import Script from "next/script";
 
 const SITE_URL = "https://accounts.elixpo.com";
 
@@ -162,7 +162,10 @@ export default function RootLayout({
                     <MuiThemeBridge>{children}</MuiThemeBridge>
                 </ThemeProvider>
                 {/* Elixpo festive themes: dates live in agent.elixpo config/festivals.yaml */}
-                <Script src="https://agent.elixpo.com/festive/theme.js" strategy="afterInteractive" />
+                <Script
+                    src="https://agent.elixpo.com/festive/theme.js"
+                    strategy="afterInteractive"
+                />
             </body>
         </html>
     );
