@@ -239,10 +239,10 @@ brand source of truth (mascot, palette, rules) is maintained in the
 
 Elixpo uses one **licensing standard** across every repository:
 
-- **Code** - [MIT](LICENSES/preferred/MIT) (with the [Oreo-trademarks exception](LICENSES/exceptions/Oreo-trademarks)).
+- **Code** - [MIT](LICENSES/preferred/MIT) (with the [Lumi-trademarks exception](LICENSES/exceptions/Lumi-trademarks)).
 - **Brand & visual assets** - [CC-BY-4.0](LICENSES/preferred/CC-BY-4.0) (with the same exception).
 
-The Oreo mascot, the chest E-badge, and the "Elixpo" and "Oreo" names, domains,
+The Lumi mascot, the chest E-badge, and the "Elixpo" and "Lumi" names, domains,
 and palette are reserved - this protects the brand and its royalties while
 keeping the code and assets free. See [`LICENSE`](LICENSE) and the per-product
 notice board, [`NOTICE`](LICENSES/NOTICE).
